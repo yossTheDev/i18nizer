@@ -1,15 +1,23 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "module": "Node16",
+    "target": "ES2022",
+
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
     "outDir": "dist",
     "rootDir": "src",
+
+    "declaration": false,
+    "emitDeclarationOnly": false,
+
     "strict": true,
-    "target": "es2022",
-    "moduleResolution": "node16"
+
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+
+    "esModuleInterop": true
   },
-  "include": ["./src/**/*"],
-  "ts-node": {
-    "esm": true
-  }
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

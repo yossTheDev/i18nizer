@@ -20,3 +20,13 @@
 ## 0.1.2
 
 * Minor Fixes
+
+## 0.1.3
+
+* Fixed TSX/JSX parsing to work with any file path, avoiding Windows EPERM errors when scanning system folders.
+* Updated parseFile to use a minimal in-memory ts-morph project, no tsconfig scanning required.
+* Fixed extraction of translation keys: now correctly returns only the keys (e.g., hello, goodbye) instead of internal locale keys.
+* Updated buildPrompt to:
+* Always generate keys in English (camelCase).
+* Support any number of locales dynamically.
+* Ensure the AI outputs valid JSON only, with no explanations or markdown.

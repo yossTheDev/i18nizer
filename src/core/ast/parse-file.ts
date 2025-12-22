@@ -1,49 +1,28 @@
 import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
-import { Project } from "ts-morph";
-
-const CONFIG_DIR = path.join(os.homedir(), ".i18nizer");
-const TSCONFIG_PATH = path.join(CONFIG_DIR, "tsconfig.json");
+import { Project, ts } from "ts-morph";
 
 /**
- * Ensure the .i18nizer folder and tsconfig exist
- */
-function ensureTsConfig() {
-    if (!fs.existsSync(CONFIG_DIR)) {
-        fs.mkdirSync(CONFIG_DIR, { recursive: true });
-        console.log(`⚡ Created folder ${CONFIG_DIR}`);
-    }
-
-    if (!fs.existsSync(TSCONFIG_PATH)) {
-        const defaultTsConfig = {
-            compilerOptions: {
-                allowJs: true,
-                checkJs: false,
-                esModuleInterop: true,
-                jsx: "preserve",
-                module: "ESNext",
-                moduleResolution: "node",
-                skipLibCheck: true,
-                strict: false,
-                target: "ES2022"
-            },
-            include: ["../**/*.ts", "../**/*.tsx", "../**/*.js", "../**/*.jsx"]
-        };
-
-        fs.writeFileSync(TSCONFIG_PATH, JSON.stringify(defaultTsConfig, null, 2), "utf8");
-    }
-}
-
-/**
- * Parse a TSX/JSX file using ts-morph with the CLI's own tsconfig
+ * Parse a TSX/JSX file using ts-morph
+ * Works with any absolute or relative path
  */
 export function parseFile(filePath: string) {
-    ensureTsConfig();
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`File not found: ${filePath}`);
+    }
 
+    // Create a completely empty Project
     const project = new Project({
-        tsConfigFilePath: TSCONFIG_PATH,
+        compilerOptions: {
+            allowJs: true,
+            esModuleInterop: true,
+            jsx: ts.JsxEmit.React,
+            skipLibCheck: true,
+            strict: false,
+            target: 3 // ES2022
+        },
+        useInMemoryFileSystem: false
     });
 
+    // Add only the single file
     return project.addSourceFileAtPath(filePath);
 }

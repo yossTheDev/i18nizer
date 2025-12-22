@@ -24,6 +24,10 @@ export default class Keys extends Command {
       char: "h",
       description: "Set Hugging Face API key",
     }),
+    setOpenAI: Flags.string({
+      char: "o",
+      description: "Set OpenAI API key",
+    }),
     show: Flags.boolean({
       char: "s",
       description: "Show saved keys (masked)",

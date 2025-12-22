@@ -13,7 +13,7 @@ import { parseAiJson } from "../core/i18n/parse-ai-json.js";
 import { saveSourceFile } from "../core/i18n/sace-source-file.js";
 import { writeLocaleFiles } from "../core/i18n/write-files.js";
 
-const VALID_PROVIDERS: Provider[] = ["gemini", "huggingface"];
+const VALID_PROVIDERS: Provider[] = ["gemini", "huggingface", "openai"];
 
 export default class Extract extends Command {
   static override args = {

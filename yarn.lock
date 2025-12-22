@@ -5480,6 +5480,7 @@ __metadata:
     mocha: "npm:^10"
     node-fetch: "npm:^3.3.2"
     oclif: "npm:^4"
+    openai: "npm:^6.15.0"
     ora: "npm:^9.0.0"
     shx: "npm:^0.3.3"
     ts-morph: "npm:^27.0.2"
@@ -7254,6 +7255,23 @@ __metadata:
   dependencies:
     mimic-function: "npm:^5.0.0"
   checksum: 10c0/5cb9179d74b63f52a196a2e7037ba2b9a893245a5532d3f44360012005c9cadb60851d56716ebff18a6f47129dab7168022445df47c2aff3b276d92585ed1221
+  languageName: node
+  linkType: hard
+
+"openai@npm:^6.15.0":
+  version: 6.15.0
+  resolution: "openai@npm:6.15.0"
+  peerDependencies:
+    ws: ^8.18.0
+    zod: ^3.25 || ^4.0
+  peerDependenciesMeta:
+    ws:
+      optional: true
+    zod:
+      optional: true
+  bin:
+    openai: bin/cli
+  checksum: 10c0/08400449dac9be2629f051045fb46b0384a1e9ba9738b72c23853a443857e3a81f237c2d306fbd287689b9c15c18790203893fc31611976617a6be474489df8e
   languageName: node
   linkType: hard
 

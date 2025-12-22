@@ -1,8 +1,9 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { Project } from "ts-morph";
 
-const CONFIG_DIR = path.join(process.cwd(), ".i18nizer");
+const CONFIG_DIR = path.join(os.homedir(), ".i18nizer");
 const TSCONFIG_PATH = path.join(CONFIG_DIR, "tsconfig.json");
 
 /**

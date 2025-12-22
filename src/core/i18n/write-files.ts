@@ -1,8 +1,9 @@
 import chalk from "chalk";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
-const CONFIG_DIR = path.join(process.cwd(), ".i18nizer", "messages");
+const CONFIG_DIR = path.join(os.homedir(), ".i18nizer", "messages");
 
 export function writeLocaleFiles(
     namespace: string,

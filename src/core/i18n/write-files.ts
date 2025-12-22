@@ -2,6 +2,8 @@ import chalk from "chalk";
 import fs from "node:fs";
 import path from "node:path";
 
+const CONFIG_DIR = path.join(process.cwd(), ".i18nizer", "messages");
+
 export function writeLocaleFiles(
     namespace: string,
     data: Record<string, Record<string, Record<string, string>>>,
@@ -15,7 +17,7 @@ export function writeLocaleFiles(
             content[namespace][key] = data[namespace][key][locale];
         }
 
-        const dir = path.join(process.cwd(), "messages", locale);
+        const dir = path.join(CONFIG_DIR, locale);
         fs.mkdirSync(dir, { recursive: true });
 
         const filePath = path.join(dir, `${namespace}.json`);

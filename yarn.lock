@@ -5464,9 +5464,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18n-ai-cli@workspace:.":
+"i18nizer@workspace:.":
   version: 0.0.0-use.local
-  resolution: "i18n-ai-cli@workspace:."
+  resolution: "i18nizer@workspace:."
   dependencies:
     "@eslint/compat": "npm:^1"
     "@google/genai": "npm:^1.34.0"
@@ -5494,7 +5494,7 @@ __metadata:
     ts-node: "npm:^10"
     typescript: "npm:^5"
   bin:
-    i18ai: ./bin/run.js
+    i18nizer: ./bin/run.js
   languageName: unknown
   linkType: soft
 

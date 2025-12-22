@@ -3,9 +3,7 @@
   "description": "CLI to extract texts from JSX/TSX and generate i18n JSON with AI translations",
   "version": "0.1.0",
   "author": "Yoannis Sanchez Soto",
-  "bin": {
-    "i18nizer": "./bin/run.js"
-  },
+  "bin": "./bin/run.js",
   "bugs": "https://github.com/tools/i18nizer/issues",
   "dependencies": {
     "@google/genai": "^1.34.0",

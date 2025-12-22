@@ -11,6 +11,7 @@ const CONFIG_FILE = path.join(CONFIG_DIR, "api-keys.json");
 type ApiKeys = {
   gemini?: string;
   huggingface?: string;
+  openai?: string;
 };
 
 export default class Keys extends Command {
@@ -61,8 +62,13 @@ export default class Keys extends Command {
       this.log(chalk.green("✅ Hugging Face API key set"));
     }
 
+    if (flags.setOpenAI) {
+      keys.openai = flags.setOpenAI;
+      this.log(chalk.green("✅ OpenAI API key set"));
+    }
+
     // Save keys
-    if (flags.setGemini || flags.setHF) {
+    if (flags.setGemini || flags.setHF || flags.setOpenAI) {
       const spinner = ora("Saving keys...").start();
       try {
         fs.writeFileSync(CONFIG_FILE, JSON.stringify(keys, null, 2), { mode: 0o600 });

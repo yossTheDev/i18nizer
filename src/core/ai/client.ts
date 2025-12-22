@@ -7,7 +7,7 @@ import OpenAI from "openai";
 
 export type Provider = "gemini" | "huggingface" | "openai";
 
-const CONFIG_FILE = path.join(os.homedir(), ".18nizer", "api-keys.json");
+const CONFIG_FILE = path.join(os.homedir(), ".i18nizer", "api-keys.json");
 
 interface ApiKeys {
     gemini?: string;

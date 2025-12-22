@@ -5,6 +5,7 @@
 /dist
 /tmp
 /node_modules
+/messages/*
 oclif.manifest.json
 
 package-lock.json

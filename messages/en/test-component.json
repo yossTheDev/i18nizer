@@ -1,0 +1,21 @@
+{
+  "test-component": {
+    "counterIncrementedSuccessfully": "Counter incremented successfully",
+    "confirmResetCounter": "Are you sure you want to reset the counter?",
+    "counterHasBeenReset": "The counter has been reset",
+    "actionCancelledByUser": "Action cancelled by the user",
+    "pleaseEnterYourName": "Please enter your name",
+    "helloUsernameWelcome": "Hello {username}, welcome to the test system",
+    "translationTestComponent": "Translation test component",
+    "hello": "Hello",
+    "howIsEverything": "how is everything!!!",
+    "staticTextVerification": "This text serves to verify that static texts within JSX can be translated correctly.",
+    "currentCounterValue": "The current counter value is:",
+    "incrementCounter": "Increment counter",
+    "resetCounter": "Reset counter",
+    "enterYourName": "Enter your name:",
+    "writeYourNameHere": "Write your name here",
+    "greetUser": "Greet user",
+    "componentRenderedSuccessfully": "If you see this message, the component has been rendered correctly."
+  }
+}

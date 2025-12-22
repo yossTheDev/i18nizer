@@ -17,3 +17,6 @@
 * Automatically creates default `tsconfig.json` and `api-keys.json` if they do not exist
 * Ensures CLI works independently of user project tsconfig
   
+## 0.1.2
+
+* Minor Fixes

@@ -83,16 +83,16 @@ export default class Extract extends Command {
         texts: texts.map((t) => t.text),
       });
 
-      // Pasamos el provider a la función
       const raw = await generateTranslations(prompt, provider);
       if (!raw) throw new Error("AI did not return any data");
+
 
       const json = parseAiJson(raw);
       writeLocaleFiles(componentName, json, locales);
 
       spinner.succeed(`✅ Translations generated with ${provider}`);
 
-      const namespace = componentName.toLowerCase();
+      const namespace = componentName;
       const aiGeneratedKeys = Object.keys(json[namespace] || {});
       const mapped = texts.map((e, i) => ({
         key: aiGeneratedKeys[i],

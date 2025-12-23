@@ -1,7 +1,7 @@
 {
   "name": "i18nizer",
   "description": "CLI to extract texts from JSX/TSX and generate i18n JSON with AI translations",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "Yoannis Sanchez Soto",
   "bin": "./bin/run.js",
   "bugs": "https://github.com/yossTheDev/i18nizer/issues",

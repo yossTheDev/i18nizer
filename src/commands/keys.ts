@@ -100,7 +100,7 @@ export default class Keys extends Command {
         keys.huggingface ? keys.huggingface.slice(0, 4) + "****" : chalk.yellow("not set")
       );
       this.log(
-        "Ollama: ",
+        "Ollama URL: ",
         keys.ollama || chalk.yellow("not set (default: http://localhost:11434)")
       );
       this.log(

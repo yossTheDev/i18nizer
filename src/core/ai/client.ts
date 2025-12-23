@@ -93,7 +93,7 @@ export async function generateTranslations(
             try {
                 const response = await ollama.chat({
                     messages: [{ content: prompt, role: "user" }],
-                    model: "llama3.2",
+                    model: "llama2",
                 });
                 return response.message?.content || "";
             } catch (error) {

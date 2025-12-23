@@ -30,3 +30,11 @@
 * Always generate keys in English (camelCase).
 * Support any number of locales dynamically.
 * Ensure the AI outputs valid JSON only, with no explanations or markdown.
+
+## 0.1.4
+
+* Support for member function calls in text extraction and replacement (e.g., `toast.error`, `toast.success`, `toast.info`, `toast.warn`).
+* `getFullCallName` helper added to properly handle member expressions when replacing or extracting text.
+* Template literals inside allowed member functions are now correctly processed.
+* JSX attributes, string literals, and template literals inside allowed calls now support placeholders in `t("key", { ... })`.
+* Comments in replacement code updated to be fully in English for clarity.

@@ -38,3 +38,7 @@
 * Template literals inside allowed member functions are now correctly processed.
 * JSX attributes, string literals, and template literals inside allowed calls now support placeholders in `t("key", { ... })`.
 * Comments in replacement code updated to be fully in English for clarity.
+
+## 0.1.5
+
+* Minor Fixes

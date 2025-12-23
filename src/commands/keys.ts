@@ -11,6 +11,7 @@ const CONFIG_FILE = path.join(CONFIG_DIR, "api-keys.json");
 type ApiKeys = {
   gemini?: string;
   huggingface?: string;
+  ollama?: string;
   openai?: string;
 };
 
@@ -24,6 +25,10 @@ export default class Keys extends Command {
     setHF: Flags.string({
       char: "h",
       description: "Set Hugging Face API key",
+    }),
+    setOllama: Flags.string({
+      char: "l",
+      description: "Set Ollama base URL (default: http://localhost:11434)",
     }),
     setOpenAI: Flags.string({
       char: "o",
@@ -62,13 +67,18 @@ export default class Keys extends Command {
       this.log(chalk.green("✅ Hugging Face API key set"));
     }
 
+    if (flags.setOllama) {
+      keys.ollama = flags.setOllama;
+      this.log(chalk.green("✅ Ollama base URL set"));
+    }
+
     if (flags.setOpenAI) {
       keys.openai = flags.setOpenAI;
       this.log(chalk.green("✅ OpenAI API key set"));
     }
 
     // Save keys
-    if (flags.setGemini || flags.setHF || flags.setOpenAI) {
+    if (flags.setGemini || flags.setHF || flags.setOllama || flags.setOpenAI) {
       const spinner = ora("Saving keys...").start();
       try {
         fs.writeFileSync(CONFIG_FILE, JSON.stringify(keys, null, 2), { mode: 0o600 });
@@ -88,6 +98,14 @@ export default class Keys extends Command {
       this.log(
         "Hugging Face: ",
         keys.huggingface ? keys.huggingface.slice(0, 4) + "****" : chalk.yellow("not set")
+      );
+      this.log(
+        "Ollama: ",
+        keys.ollama || chalk.yellow("not set (default: http://localhost:11434)")
+      );
+      this.log(
+        "OpenAI: ",
+        keys.openai ? keys.openai.slice(0, 4) + "****" : chalk.yellow("not set")
       );
     }
   }

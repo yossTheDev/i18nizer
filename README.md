@@ -21,6 +21,7 @@ It is designed to be fast, scriptable, CI-friendly, and completely **independent
 - **OpenAI**
 - **Google Gemini**
 - **Hugging Face (DeepSeek)**
+- **Ollama (Local)**
 
 ---
 
@@ -40,6 +41,7 @@ npm install -g i18nizer
 i18nizer keys --setOpenAI <YOUR_OPENAI_API_KEY>
 i18nizer keys --setGemini <YOUR_GEMINI_API_KEY>
 i18nizer keys --setHF <YOUR_HUGGING_FACE_API_KEY>
+i18nizer keys --setOllama <OLLAMA_BASE_URL>  # Optional, defaults to http://localhost:11434
 ```
 
 Keys are stored inside:
@@ -47,6 +49,8 @@ Keys are stored inside:
 ```
 [HOME]/.i18nizer/api-keys.json
 ```
+
+> **Note:** For Ollama, you need to have Ollama running locally or specify a custom base URL. No API key is required.
 
 ---
 
@@ -59,7 +63,7 @@ i18nizer extract <file-path> --locales en,es,fr --provider openai
 Flags:
 
 - `--locales` → Languages to generate (default: `en,es`)
-- `--provider` → `openai | gemini | huggingface` (optional)
+- `--provider` → `openai | gemini | huggingface | ollama` (optional)
 
 ---
 

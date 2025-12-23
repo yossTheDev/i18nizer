@@ -3,15 +3,17 @@ import { InferenceClient as HFClient } from "@huggingface/inference";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { Ollama } from "ollama";
 import OpenAI from "openai";
 
-export type Provider = "gemini" | "huggingface" | "openai";
+export type Provider = "gemini" | "huggingface" | "ollama" | "openai";
 
 const CONFIG_FILE = path.join(os.homedir(), ".i18nizer", "api-keys.json");
 
 interface ApiKeys {
     gemini?: string;
     huggingface?: string;
+    ollama?: string;
     openai?: string;
 }
 
@@ -80,6 +82,22 @@ export async function generateTranslations(
                 return completion.choices?.[0]?.message?.content || "";
             } catch (error) {
                 console.error("❌ Error calling OpenAI:", error);
+                return "";
+            }
+        }
+
+        case "ollama": {
+            const baseUrl = keys.ollama || "http://localhost:11434";
+            console.log(`🤖 Using Ollama (${baseUrl})...`);
+            const ollama = new Ollama({ host: baseUrl });
+            try {
+                const response = await ollama.chat({
+                    messages: [{ content: prompt, role: "user" }],
+                    model: "llama3.2",
+                });
+                return response.message?.content || "";
+            } catch (error) {
+                console.error("❌ Error calling Ollama:", error);
                 return "";
             }
         }

@@ -43,10 +43,10 @@ function replaceStringLiteral(node: Node, key: string, placeholdersText: string)
     const parent = node.getParent();
 
     if (Node.isJsxAttribute(parent) && allowedProps.has(parent.getNameNode().getText())) {
-        // Props de JSX → {t("key")}
+        // JSX Props → {t("key")}
         node.replaceWithText(`{${buildTCallText(key, placeholdersText)}}`);
     } else if (Node.isCallExpression(parent) && allowedFunctions.has(parent.getExpression().getText())) {
-        // Literal dentro de alert/confirm/prompt → t("key", { ... })
+        // Literal inside alert/confirm/prompt → t("key", { ... })
         node.replaceWithText(buildTCallText(key, placeholdersText));
     } else if (isInsideJsxContext(node)) {
         // String literals inside JSX expressions (ternary, logical operators, etc.)
@@ -61,7 +61,7 @@ function replaceTemplateLiteral(node: Node, key: string, placeholdersText: strin
     const parent = node.getParent();
     
     if (Node.isCallExpression(parent) && allowedFunctions.has(parent.getExpression().getText())) {
-        // Template literal dentro de alert/confirm/prompt
+        // Template literal inside alert/confirm/prompt
         node.replaceWithText(buildTCallText(key, placeholdersText));
     } else if (isInsideJsxContext(node)) {
         // Template literals inside JSX expressions

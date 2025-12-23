@@ -87,6 +87,7 @@ function extractStringsFromExpression(node: Node, results: ExtractedText[]): voi
 
 export function extractTexts(sourceFile: Node): ExtractedText[] {
     const results: ExtractedText[] = [];
+    const processedNodes = new Set<Node>();
 
     sourceFile.forEachDescendant((node: Node) => {
         // JSX TEXT simple
@@ -109,13 +110,19 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
                 if (processed) {
                     const tempKey = `i$fdw_${tempIdCounter++}`;
                     results.push({ node: expr, placeholders: processed.placeholders, tempKey, text: processed.text });
+                    processedNodes.add(expr);
                 }
 
                 return;
             }
 
             // Handle conditional expressions, logical operators, and string literals in JSX children/attributes
+            const beforeCount = results.length;
             extractStringsFromExpression(expr, results);
+            // Mark all newly added nodes as processed
+            for (let i = beforeCount; i < results.length; i++) {
+                processedNodes.add(results[i].node);
+            }
         }
 
         // STRING LITERALS in JSX attributes
@@ -123,18 +130,15 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
             const text = node.getLiteralText();
             const parent = node.getParent();
 
-            // JSX Attributes permitidos
+            // Allowed JSX attributes
             const allowedProps = ["placeholder", "title", "alt", "aria-label"];
-            if (Node.isJsxAttribute(parent) && allowedProps.includes(parent.getNameNode().getText())) {
-                // Check if already processed by extractStringsFromExpression
-                const alreadyProcessed = results.some(r => r.node === node);
-                if (!alreadyProcessed) {
-                    const tempKey = `i$fdw_${tempIdCounter++}`;
-                    results.push({ node, placeholders: [], tempKey, text });
-                }
+            // Check if already processed by extractStringsFromExpression
+            if (Node.isJsxAttribute(parent) && allowedProps.includes(parent.getNameNode().getText()) && !processedNodes.has(node)) {
+                const tempKey = `i$fdw_${tempIdCounter++}`;
+                results.push({ node, placeholders: [], tempKey, text });
             }
 
-            // Funciones tipo alert, confirm, prompt
+            // Functions like alert, confirm, prompt
             if (Node.isCallExpression(parent)) {
                 const fnName = parent.getExpression().getText();
                 if (allowedFunctions.has(fnName)) {
@@ -144,7 +148,7 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
             }
         }
 
-        // TEMPLATE LITERALS para alert/confirm/prompt
+        // TEMPLATE LITERALS for alert/confirm/prompt
         if (Node.isTemplateExpression(node) || Node.isNoSubstitutionTemplateLiteral(node)) {
             const parent = node.getParent();
             if (Node.isCallExpression(parent)) {

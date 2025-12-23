@@ -121,9 +121,8 @@ describe('extractTexts', () => {
     const texts = extractTexts(sourceFile)
     expect(texts).to.have.lengthOf(3)
     
-    const tempKeys = texts.map(t => t.tempKey)
-    const uniqueTempKeys = new Set(tempKeys)
-    expect(uniqueTempKeys.size).to.equal(3)
+    const uniqueTempKeys = new Set(texts.map(t => t.tempKey))
+    expect(uniqueTempKeys).to.have.lengthOf(3, 'All tempKeys should be unique')
   })
 
   it('extracts text from simple JSX text nodes', () => {

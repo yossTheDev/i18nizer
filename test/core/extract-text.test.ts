@@ -76,6 +76,21 @@ describe('extractTexts', () => {
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Default placeholder');
     });
+
+    it('should extract strings from both sides of OR operator when both are literals', () => {
+      const code = `
+        const Component = () => (
+          <input placeholder={"Primary text" || "Fallback text"} />
+        );
+      `;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+      
+      expect(results).to.have.lengthOf(2);
+      const texts = results.map(r => r.text);
+      expect(texts).to.include('Primary text');
+      expect(texts).to.include('Fallback text');
+    });
   });
 
   describe('JSX children extraction', () => {

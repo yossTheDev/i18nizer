@@ -52,7 +52,7 @@ function getFullCallName(node: Node): null | string {
  * Recursively extract string literals from complex expressions
  * like ternary operators, logical operators, etc.
  */
-function extractStringsFromExpression(expr: Node, results: ExtractedText[], seenNodes: Set<Node>, context: "jsx-attribute" | "jsx-expression" | "call-expression"): void {
+function extractStringsFromExpression(expr: Node, results: ExtractedText[], seenNodes: Set<Node>): void {
     if (!expr || seenNodes.has(expr)) return;
 
     // String literal
@@ -79,8 +79,8 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
 
     // Ternary operator: condition ? whenTrue : whenFalse
     if (Node.isConditionalExpression(expr)) {
-        extractStringsFromExpression(expr.getWhenTrue(), results, seenNodes, context);
-        extractStringsFromExpression(expr.getWhenFalse(), results, seenNodes, context);
+        extractStringsFromExpression(expr.getWhenTrue(), results, seenNodes);
+        extractStringsFromExpression(expr.getWhenFalse(), results, seenNodes);
         return;
     }
 
@@ -88,16 +88,16 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
     if (Node.isBinaryExpression(expr)) {
         const operator = expr.getOperatorToken().getText();
         if (operator === "&&" || operator === "||") {
-            // For &&, extract from right side (the value that appears if condition is true)
-            // For ||, extract from right side (the fallback value)
-            extractStringsFromExpression(expr.getRight(), results, seenNodes, context);
+            // Extract from both sides to handle cases like 'text1' || 'text2'
+            extractStringsFromExpression(expr.getLeft(), results, seenNodes);
+            extractStringsFromExpression(expr.getRight(), results, seenNodes);
         }
         return;
     }
 
     // Parenthesized expression: (expression)
     if (Node.isParenthesizedExpression(expr)) {
-        extractStringsFromExpression(expr.getExpression(), results, seenNodes, context);
+        extractStringsFromExpression(expr.getExpression(), results, seenNodes);
         return;
     }
 }
@@ -128,7 +128,7 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
         else if (Node.isJsxExpression(node)) {
             const expr = node.getExpression();
             if (expr) {
-                extractStringsFromExpression(expr, results, seenNodes, "jsx-expression");
+                extractStringsFromExpression(expr, results, seenNodes);
             }
             return;
         }

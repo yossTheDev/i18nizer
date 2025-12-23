@@ -10,6 +10,18 @@ const IGNORED_PROPS = new Set([
 export function isTranslatableString(node: Node, text: string): boolean {
     const parent = node.getParent();
 
+    // Empty or whitespace-only strings
+    if (!text || text.trim().length === 0) {
+        return false;
+    }
+
+    // Single character symbols and punctuation-only strings
+    const trimmedText = text.trim();
+    // Check if the string is only punctuation/symbols (no letters or digits)
+    if (/^[^\w\s]+$/.test(trimmedText)) {
+        return false;
+    }
+
     // use client / use server
     if (text === "use client" || text === "use server") {
         return false;

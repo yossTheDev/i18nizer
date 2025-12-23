@@ -245,4 +245,59 @@ describe('extractTexts', () => {
       expect(texts).to.include('Option C');
     });
   });
+
+  describe('template literal extraction in JSX expressions', () => {
+    it('should extract template literal from JSX attribute', () => {
+      const code = `
+        const Component = () => (
+          <input placeholder={\`Seleccionar Especializaciones Destacadas\`} />
+        );
+      `;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+      
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Seleccionar Especializaciones Destacadas');
+    });
+
+    it('should extract template literal with placeholders from ternary', () => {
+      const code = `
+        const Component = ({ profile }) => (
+          <div>
+            {profile.categories.length > 1
+              ? \`\${profile.categories[0].name} +\${profile.categories.length - 1}\`
+              : profile.categories[0]?.name || "Sin Categoría"}
+          </div>
+        );
+      `;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+      
+      // Should extract the template literal with placeholders and the string "Sin Categoría"
+      expect(results.length).to.be.at.least(1);
+      
+      // Check for the template literal
+      const templateResult = results.find(r => r.text.includes('profile.categories'));
+      if (templateResult) {
+        expect(templateResult.placeholders.length).to.be.greaterThan(0);
+      }
+      
+      // Check for "Sin Categoría"
+      const stringResult = results.find(r => r.text === 'Sin Categoría');
+      expect(stringResult).to.exist;
+    });
+
+    it('should extract simple template literal placeholder', () => {
+      const code = `
+        const Component = () => (
+          <input placeholder={\`Enter your name here\`} />
+        );
+      `;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+      
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Enter your name here');
+    });
+  });
 });

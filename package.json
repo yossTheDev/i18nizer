@@ -4,7 +4,7 @@
   "version": "0.1.3",
   "author": "Yoannis Sanchez Soto",
   "bin": "./bin/run.js",
-  "bugs": "https://github.com/tools/i18nizer/issues",
+  "bugs": "https://github.com/yossTheDev/i18nizer/issues",
   "dependencies": {
     "@google/genai": "^1.34.0",
     "@huggingface/inference": "^4.13.5",
@@ -42,7 +42,7 @@
     "./dist",
     "./oclif.manifest.json"
   ],
-  "homepage": "https://github.com/tools/i18nizer#readme",
+  "homepage": "https://github.com/yossTheDev/i18nizer#readme",
   "keywords": [
     "oclif",
     "i18n",
@@ -70,7 +70,7 @@
       }
     }
   },
-  "repository": "tools/i18nizer",
+  "repository": "yossTheDev/i18nizer",
   "scripts": {
     "build": "shx rm -rf dist && tsc -b",
     "lint": "eslint",

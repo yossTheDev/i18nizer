@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Project, ts } from 'ts-morph';
-import { extractTexts } from '../../src/core/ast/extract-text.js';
+import { extractTexts, replaceTempKeysWithT } from '../../src/core/ast/extract-text.js';
 
 describe('extractTexts', () => {
   function createTestFile(code: string) {
@@ -298,6 +298,68 @@ describe('extractTexts', () => {
       
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Enter your name here');
+    });
+  });
+
+  describe('template literal replacement', () => {
+    it('should replace template literal in JSX attribute with t() call', () => {
+      const code = `
+        const Component = () => (
+          <input placeholder={\`Seleccionar Especializaciones\`} />
+        );
+      `;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+      
+      expect(results).to.have.lengthOf(1);
+      
+      // Replace with t() call
+      const mapped = results.map(r => ({
+        key: 'selectSpecialties',
+        node: r.node,
+        placeholders: r.placeholders
+      }));
+      
+      replaceTempKeysWithT(mapped);
+      
+      const replacedCode = sourceFile.getText();
+      expect(replacedCode).to.include('t("selectSpecialties")');
+      expect(replacedCode).not.to.include('Seleccionar Especializaciones');
+    });
+
+    it('should replace template literal with placeholders in ternary', () => {
+      const code = `
+        const Component = ({ name, count }) => (
+          <div>
+            {count > 1 ? \`\${name} +\${count}\` : "Default"}
+          </div>
+        );
+      `;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+      
+      expect(results.length).to.be.at.least(1);
+      
+      // Replace with t() calls
+      const mapped = results.map((r, i) => ({
+        key: `key${i}`,
+        node: r.node,
+        placeholders: r.placeholders
+      }));
+      
+      replaceTempKeysWithT(mapped);
+      
+      const replacedCode = sourceFile.getText();
+      
+      // Should have t() calls
+      expect(replacedCode).to.include('t(');
+      
+      // Should preserve placeholders if any
+      const templateResult = results.find(r => r.placeholders.length > 0);
+      if (templateResult) {
+        expect(replacedCode).to.include('name: name');
+        expect(replacedCode).to.include('count: count');
+      }
     });
   });
 });

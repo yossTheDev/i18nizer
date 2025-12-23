@@ -8,6 +8,7 @@
 <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff&style=for-the-badge" alt="TypeScript Badge">
 <img src="https://img.shields.io/npm/dw/i18nizer.svg?style=for-the-badge" alt="npm downloads">
 <img src="https://img.shields.io/github/license/yossTheDev/i18nizer?style=for-the-badge" alt="license">
+<img src="https://img.shields.io/github/actions/workflow/status/yossTheDev/i18nizer/test.yml?style=for-the-badge&label=tests" alt="test status">
 </div>
 
 ---

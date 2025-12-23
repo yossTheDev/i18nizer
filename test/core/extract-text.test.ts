@@ -176,6 +176,23 @@ describe('extractTexts', () => {
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('* Required field');
     });
+
+    it('should extract text with currency symbols', () => {
+      const code = `<span>Price: €100</span>`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+      
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Price: €100');
+    });
+
+    it('should not extract standalone currency symbols', () => {
+      const code = `<span>€</span>`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+      
+      expect(results).to.have.lengthOf(0);
+    });
   });
 
   describe('template literals', () => {

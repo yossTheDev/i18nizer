@@ -1,7 +1,9 @@
 import { Node } from "ts-morph";
 
 let tempIdCounter = 0;
+
 const allowedFunctions = new Set(["alert", "confirm", "prompt"]);
+const allowedMemberFunctions = new Set(["toast.error", "toast.info", "toast.success", "toast.warn"]);
 
 export interface ExtractedText {
     node: Node;
@@ -32,9 +34,25 @@ function processTemplateLiteral(node: Node): null | { placeholders: string[]; te
     return null;
 }
 
+function getFullCallName(node: Node): null | string {
+    if (Node.isIdentifier(node)) {
+        return node.getText();
+    }
+
+    if (Node.isPropertyAccessExpression(node)) {
+        const expr = getFullCallName(node.getExpression());
+        if (expr) {
+            return `${expr}.${node.getName()}`;
+        }
+    }
+
+    return null;
+}
+
 export function extractTexts(sourceFile: Node): ExtractedText[] {
     const results: ExtractedText[] = [];
 
+    // eslint-disable-next-line complexity
     sourceFile.forEachDescendant((node: Node) => {
         // JSX TEXT simple
         if (Node.isJsxText(node)) {
@@ -62,29 +80,26 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
             const text = node.getLiteralText();
             const parent = node.getParent();
 
-            // JSX Attributes permitidos
             const allowedProps = ["placeholder", "title", "alt", "aria-label"];
             if (Node.isJsxAttribute(parent) && allowedProps.includes(parent.getNameNode().getText())) {
                 const tempKey = `i$fdw_${tempIdCounter++}`;
                 results.push({ node, placeholders: [], tempKey, text });
             }
 
-            // Funciones tipo alert, confirm, prompt
             if (Node.isCallExpression(parent)) {
-                const fnName = parent.getExpression().getText();
-                if (allowedFunctions.has(fnName)) {
+                const fnName = getFullCallName(parent.getExpression());
+                if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
                     const tempKey = `i$fdw_${tempIdCounter++}`;
                     results.push({ node, placeholders: [], tempKey, text });
                 }
             }
         }
 
-        // TEMPLATE LITERALS para alert/confirm/prompt
         if (Node.isTemplateExpression(node) || Node.isNoSubstitutionTemplateLiteral(node)) {
             const parent = node.getParent();
             if (Node.isCallExpression(parent)) {
-                const fnName = parent.getExpression().getText();
-                if (allowedFunctions.has(fnName)) {
+                const fnName = getFullCallName(parent.getExpression());
+                if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
                     const processed = processTemplateLiteral(node);
                     if (processed) {
                         const tempKey = `i$fdw_${tempIdCounter++}`;

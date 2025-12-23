@@ -62,6 +62,7 @@ export default class Extract extends Command {
     const sourceFile = parseFile(args.file);
     const texts = extractTexts(sourceFile);
 
+
     if (texts.length === 0) {
       this.log(chalk.yellow("⚠️  No translatable texts found."));
       return;
@@ -80,26 +81,50 @@ export default class Extract extends Command {
       const prompt = buildPrompt({
         componentName,
         locales,
-        texts: texts.map((t) => t.text),
+        texts: texts.map((t) => ({ tempKey: t.tempKey, text: t.text })),
       });
 
       const raw = await generateTranslations(prompt, provider);
+
       if (!raw) throw new Error("AI did not return any data");
 
 
       const json = parseAiJson(raw);
-      writeLocaleFiles(componentName, json, locales);
+      const namespace = componentName;
+      const jsonNamespace = json[namespace] as Record<string, Record<string, string>> || {};
+
+      const i18nJson: Record<string, Record<string, string>> = {};
+
+      for (const [, translations] of Object.entries(jsonNamespace)) {
+        const { key } = translations;
+        i18nJson[key] = {};
+        for (const locale of locales) {
+          i18nJson[key][locale] = translations[locale];
+        }
+      }
+
+      writeLocaleFiles(componentName, { [componentName]: i18nJson }, locales);
+
 
       spinner.succeed(`✅ Translations generated with ${provider}`);
 
-      const namespace = componentName;
-      const aiGeneratedKeys = Object.keys(json[namespace] || {});
-      const mapped = texts.map((e, i) => ({
-        key: aiGeneratedKeys[i],
-        node: e.node,
-        placeholders: e.placeholders,
-        tempKey: e.tempKey,
-      }));
+      // const aiGeneratedKeys = Object.keys(json[namespace] || {});
+
+
+      const mapped = texts.map(t => {
+        const translations = jsonNamespace[t.tempKey];
+        if (!translations) {
+          throw new Error(`No translations found for tempKey: ${t.tempKey}`);
+        }
+
+        return {
+          key: translations.key,
+          node: t.node,
+          placeholders: t.placeholders,
+          tempKey: t.tempKey
+        };
+      });
+
 
       this.log(`🔗 Mapped ${chalk.green(mapped.length)} texts to keys`);
 

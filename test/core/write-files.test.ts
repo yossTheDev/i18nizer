@@ -3,8 +3,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+import { writeLocaleFiles } from '../../src/core/i18n/write-files.js';
+
 describe('writeLocaleFiles - JSON Output Quality', () => {
-  const testDir = path.join(os.homedir(), '.i18nizer-test-' + Date.now());
+  const testDir = path.join(os.tmpdir(), 'i18nizer-write-test-' + Date.now());
 
   before(() => {
     // Create test directory
@@ -17,33 +19,6 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
       fs.rmSync(testDir, { force: true, recursive: true });
     }
   });
-
-  // Helper to create a mock writeLocaleFiles that writes to test directory
-  function testWriteLocaleFiles(
-    namespace: string,
-    data: Record<string, Record<string, Record<string, string>>>,
-    locales: string[]
-  ) {
-    for (const locale of locales) {
-      const content: Record<string, Record<string, string>> = {};
-      content[namespace] = {};
-
-      // Sort keys for stable output
-      const sortedKeys = Object.keys(data[namespace]).sort();
-
-      for (const key of sortedKeys) {
-        content[namespace][key] = data[namespace][key][locale];
-      }
-
-      const dir = path.join(testDir, 'messages', locale);
-      fs.mkdirSync(dir, { recursive: true });
-
-      const filePath = path.join(dir, `${namespace}.json`);
-      
-      // Use 2-space indentation for clean, readable JSON
-      fs.writeFileSync(filePath, JSON.stringify(content, null, 2) + "\n");
-    }
-  }
 
   afterEach(() => {
     // Clean up after each test
@@ -68,11 +43,12 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
       },
     };
     const locales = ['en', 'es'];
+    const outputDir = path.join(testDir, 'messages');
 
-    testWriteLocaleFiles(namespace, data, locales);
+    writeLocaleFiles(namespace, data, locales, outputDir);
 
-    // Check en file
-    const enPath = path.join(testDir, 'messages', 'en', 'TestComponent.json');
+    // Check en file - should use lowercase-hyphen format
+    const enPath = path.join(outputDir, 'en', 'test-component.json');
     expect(fs.existsSync(enPath)).to.be.true;
 
     const enContent = JSON.parse(fs.readFileSync(enPath, 'utf8'));
@@ -84,7 +60,7 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     });
 
     // Check es file
-    const esPath = path.join(testDir, 'messages', 'es', 'TestComponent.json');
+    const esPath = path.join(outputDir, 'es', 'test-component.json');
     expect(fs.existsSync(esPath)).to.be.true;
 
     const esContent = JSON.parse(fs.readFileSync(esPath, 'utf8'));
@@ -94,6 +70,53 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
         welcomeBack: 'Bienvenido de nuevo',
       },
     });
+  });
+
+  it('should convert PascalCase namespace to lowercase-hyphen filename', () => {
+    const namespace = 'NotificationItem';
+    const data = {
+      NotificationItem: {
+        title: { en: 'Notification' },
+      },
+    };
+    const locales = ['en'];
+    const outputDir = path.join(testDir, 'messages');
+
+    writeLocaleFiles(namespace, data, locales, outputDir);
+
+    // Should create notification-item.json, not NotificationItem.json
+    const filePath = path.join(outputDir, 'en', 'notification-item.json');
+    expect(fs.existsSync(filePath)).to.be.true;
+
+    // Old format should NOT exist
+    const oldPath = path.join(outputDir, 'en', 'NotificationItem.json');
+    expect(fs.existsSync(oldPath)).to.be.false;
+  });
+
+  it('should handle multi-word component names', () => {
+    const testCases = [
+      { expected: 'collapsible-text.json', namespace: 'CollapsibleText' },
+      { expected: 'delete-model.json', namespace: 'DeleteModel' },
+      { expected: 'collection-online-status-column.json', namespace: 'CollectionOnlineStatusColumn' },
+      { expected: 'edit-permissions-dialog.json', namespace: 'EditPermissionsDialog' },
+    ];
+
+    for (const testCase of testCases) {
+      const data = {
+        [testCase.namespace]: {
+          test: { en: 'Test' },
+        },
+      };
+      const outputDir = path.join(testDir, 'messages');
+
+      writeLocaleFiles(testCase.namespace, data, ['en'], outputDir);
+
+      const filePath = path.join(outputDir, 'en', testCase.expected);
+      expect(fs.existsSync(filePath)).to.be.true;
+      
+      // Clean up for next test
+      fs.rmSync(filePath, { force: true });
+    }
   });
 
   it('should sort keys alphabetically for stable output', () => {
@@ -107,10 +130,11 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
       },
     };
     const locales = ['en'];
+    const outputDir = path.join(testDir, 'messages');
 
-    testWriteLocaleFiles(namespace, data, locales);
+    writeLocaleFiles(namespace, data, locales, outputDir);
 
-    const filePath = path.join(testDir, 'messages', 'en', 'Form.json');
+    const filePath = path.join(outputDir, 'en', 'form.json');
     const content = fs.readFileSync(filePath, 'utf8');
 
     // Parse and check key order
@@ -129,10 +153,11 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
       },
     };
     const locales = ['en'];
+    const outputDir = path.join(testDir, 'messages');
 
-    testWriteLocaleFiles(namespace, data, locales);
+    writeLocaleFiles(namespace, data, locales, outputDir);
 
-    const filePath = path.join(testDir, 'messages', 'en', 'Component.json');
+    const filePath = path.join(outputDir, 'en', 'component.json');
     const content = fs.readFileSync(filePath, 'utf8');
 
     // Check for 2-space indentation
@@ -148,10 +173,11 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
       },
     };
     const locales = ['en'];
+    const outputDir = path.join(testDir, 'messages');
 
-    testWriteLocaleFiles(namespace, data, locales);
+    writeLocaleFiles(namespace, data, locales, outputDir);
 
-    const filePath = path.join(testDir, 'messages', 'en', 'Component.json');
+    const filePath = path.join(outputDir, 'en', 'component.json');
     const content = fs.readFileSync(filePath, 'utf8');
 
     // Check for trailing newline
@@ -166,10 +192,11 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
       },
     };
     const locales = ['fr'];
+    const outputDir = path.join(testDir, 'messages');
 
-    testWriteLocaleFiles(namespace, data, locales);
+    writeLocaleFiles(namespace, data, locales, outputDir);
 
-    const filePath = path.join(testDir, 'messages', 'fr', 'NewComponent.json');
+    const filePath = path.join(outputDir, 'fr', 'new-component.json');
     expect(fs.existsSync(filePath)).to.be.true;
   });
 
@@ -183,14 +210,15 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
       },
     };
     const locales = ['en'];
+    const outputDir = path.join(testDir, 'messages');
 
     // Write once
-    testWriteLocaleFiles(namespace, data, locales);
-    const filePath = path.join(testDir, 'messages', 'en', 'Stable.json');
+    writeLocaleFiles(namespace, data, locales, outputDir);
+    const filePath = path.join(outputDir, 'en', 'stable.json');
     const content1 = fs.readFileSync(filePath, 'utf8');
 
     // Write again
-    testWriteLocaleFiles(namespace, data, locales);
+    writeLocaleFiles(namespace, data, locales, outputDir);
     const content2 = fs.readFileSync(filePath, 'utf8');
 
     // Should be identical

@@ -2,6 +2,8 @@ import chalk from "chalk";
 import fs from "node:fs";
 import path from "node:path";
 
+import { filenameToIdentifier } from "./filename-utils.js";
+
 /**
  * Generates the aggregator TypeScript file that imports all translation JSON files
  * and exports them as a single messages object.
@@ -29,15 +31,37 @@ export function generateAggregator(
     return;
   }
 
-  // Collect all JSON files organized by locale
-  const filesByLocale = new Map<string, string[]>();
+  // Recursively collect all JSON files organized by locale
+  const filesByLocale = new Map<string, Array<{ filename: string; relativePath: string }>>();
+
+  /**
+   * Recursively find all JSON files in a directory
+   */
+  function findJsonFiles(dir: string, baseDir: string): Array<{ filename: string; relativePath: string }> {
+    const results: Array<{ filename: string; relativePath: string }> = [];
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      
+      if (entry.isDirectory()) {
+        // Recursively scan subdirectories
+        results.push(...findJsonFiles(fullPath, baseDir));
+      } else if (entry.isFile() && entry.name.endsWith(".json")) {
+        // Get relative path from the base locale directory
+        const relativePath = path.relative(baseDir, fullPath);
+        results.push({ filename: entry.name, relativePath });
+      }
+    }
+
+    return results;
+  }
 
   for (const locale of locales) {
     const localeDir = path.join(baseMessagesDir, locale);
-    const files = fs
-      .readdirSync(localeDir)
-      .filter((file) => file.endsWith(".json"))
-      .sort();
+    const files = findJsonFiles(localeDir, localeDir).sort((a, b) => 
+      a.relativePath.localeCompare(b.relativePath)
+    );
 
     if (files.length > 0) {
       filesByLocale.set(locale, files);
@@ -56,10 +80,24 @@ export function generateAggregator(
   for (const [locale, files] of filesByLocale) {
     const localeExports: string[] = [];
 
-    for (const file of files) {
-      const namespace = path.basename(file, ".json");
-      const importName = `${namespace}_${locale}`;
-      const relativePath = `../messages/${locale}/${file}`;
+    for (const fileInfo of files) {
+      const namespace = path.basename(fileInfo.filename, ".json");
+      // Convert filename to valid TypeScript identifier (kebab-case to PascalCase)
+      const identifier = filenameToIdentifier(namespace);
+      
+      // Create unique import name including subdirectory path to avoid conflicts
+      // Replace path separators with underscores and sanitize
+      const pathPrefix = path.dirname(fileInfo.relativePath)
+        .split(path.sep)
+        .filter((part) => part !== ".")
+        .map((part) => filenameToIdentifier(part))
+        .join("");
+      
+      const importName = pathPrefix 
+        ? `${pathPrefix}_${identifier}_${locale}`
+        : `${identifier}_${locale}`;
+      
+      const relativePath = `../messages/${locale}/${fileInfo.relativePath.split(path.sep).join("/")}`;
 
       imports.push(`import ${importName} from "${relativePath}";`);
       localeExports.push(`    ...${importName},`);
@@ -81,13 +119,10 @@ export function generateAggregator(
   ];
 
   for (const [locale, exports] of exportsByLocale) {
-    lines.push(`  ${locale}: {`);
-    lines.push(...exports);
-    lines.push("  },");
+    lines.push(`  ${locale}: {`, ...exports, "  },");
   }
 
-  lines.push("} as const;");
-  lines.push("");
+  lines.push("} as const;", "");
 
   // Write the file
   const i18nDir = outputDir ?? path.join(path.dirname(baseMessagesDir), "i18n");
@@ -101,8 +136,8 @@ export function generateAggregator(
   // Log statistics
   const namespaces = new Set<string>();
   for (const files of filesByLocale.values()) {
-    for (const file of files) {
-      namespaces.add(path.basename(file, ".json"));
+    for (const fileInfo of files) {
+      namespaces.add(path.basename(fileInfo.filename, ".json"));
     }
   }
 

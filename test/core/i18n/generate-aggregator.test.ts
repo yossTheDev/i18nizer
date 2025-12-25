@@ -2,6 +2,7 @@ import { expect } from "chai";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+
 import { generateAggregator } from "../../../src/core/i18n/generate-aggregator.js";
 
 describe("generateAggregator", () => {
@@ -26,6 +27,7 @@ describe("generateAggregator", () => {
     if (fs.existsSync(messagesDir)) {
       fs.rmSync(messagesDir, { force: true, recursive: true });
     }
+
     if (fs.existsSync(i18nDir)) {
       fs.rmSync(i18nDir, { force: true, recursive: true });
     }
@@ -65,8 +67,8 @@ describe("generateAggregator", () => {
       path.join(enDir, "auth.json"),
       JSON.stringify({
         LoginForm: {
-          submit: "Submit",
           resetPassword: "Reset password",
+          submit: "Submit",
         },
       })
     );
@@ -75,8 +77,8 @@ describe("generateAggregator", () => {
       path.join(esDir, "auth.json"),
       JSON.stringify({
         LoginForm: {
-          submit: "Enviar",
           resetPassword: "Restablecer contraseña",
+          submit: "Enviar",
         },
       })
     );

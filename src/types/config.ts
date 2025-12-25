@@ -24,6 +24,7 @@ export interface I18nizerConfig {
     detectDuplicates: boolean;
     opinionatedStructure: boolean;
     autoInjectT: boolean;
+    useAiForKeys: boolean;
     allowedFunctions: string[];
     allowedMemberFunctions: string[];
     allowedProps: string[];
@@ -48,6 +49,7 @@ export const DEFAULT_CONFIG: I18nizerConfig = {
     autoInjectT: true, // Default enabled for React
     detectDuplicates: true,
     opinionatedStructure: true,
+    useAiForKeys: true, // Use AI to generate English keys
   },
   framework: "react",
   i18n: {

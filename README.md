@@ -264,6 +264,54 @@ behavior:
 
 You can override this setting in your `i18nizer.config.yml` if you know your setup.
 
+### AI-Powered English Key Generation (`useAiForKeys`)
+
+i18nizer uses AI to generate **English camelCase keys** regardless of your source language:
+
+```yaml
+behavior:
+  useAiForKeys: true  # Default: enabled
+```
+
+**Benefits:**
+- **Consistent keys**: Keys are always in English, even if your source text is in Spanish, French, German, etc.
+- **Readable**: `welcomeBack` instead of `bienvenidoDeNuevo`
+- **Stable**: Keys are cached per source text for deterministic behavior across runs
+- **Minimal diffs**: Same source text always produces the same key
+
+**How it works:**
+1. First run: AI generates an English key for each source text
+2. Key is cached with the source text hash
+3. Subsequent runs: Cached key is reused (no AI call needed)
+4. Fallback: If AI is unavailable, uses deterministic camelCase generation
+
+**Example:**
+
+Source text (Spanish):
+```tsx
+<h1>Bienvenido de nuevo</h1>
+<button>Iniciar sesión</button>
+```
+
+Generated keys (English):
+```json
+{
+  "welcomeBack": "Bienvenido de nuevo",
+  "signIn": "Iniciar sesión"
+}
+```
+
+**Disabling AI key generation:**
+
+If you prefer deterministic key generation based on source text:
+
+```yaml
+behavior:
+  useAiForKeys: false
+```
+
+Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish text).
+
 ---
 
 ## ✨ Features
@@ -275,13 +323,14 @@ You can override this setting in your `i18nizer.config.yml` if you know your set
 - **Framework presets** (Next.js + next-intl, React + react-i18next)
 - **Intelligent caching** to avoid redundant AI translation requests
 - **String deduplication** with deterministic key reuse
+- **AI-powered English key generation** for consistent, readable keys regardless of source language
 - **Configurable behavior** (allowed functions, props, member functions)
 - **Dry-run mode** to preview changes
 - **JSON output preview** with `--show-json`
 - Project-wide or single-file translation
 - Works with **JSX & TSX**
 - Rewrites components automatically (`t("key")`)
-- Always generates **English camelCase keys**
+- Generates **English camelCase keys** (AI-assisted with deterministic fallback)
 - Supports **any number of locales**
 - Isolated TypeScript parsing (no project tsconfig required)
 - Friendly logs with colors and spinners

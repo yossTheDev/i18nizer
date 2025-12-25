@@ -3,13 +3,16 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const CONFIG_DIR = path.join(os.homedir(), ".i18nizer", "messages");
+const DEFAULT_CONFIG_DIR = path.join(os.homedir(), ".i18nizer", "messages");
 
 export function writeLocaleFiles(
     namespace: string,
     data: Record<string, Record<string, Record<string, string>>>,
-    locales: string[]
+    locales: string[],
+    outputDir?: string
 ) {
+    const baseDir = outputDir ?? DEFAULT_CONFIG_DIR;
+    
     for (const locale of locales) {
         const content: Record<string, Record<string, string>> = {};
         content[namespace] = {};
@@ -21,7 +24,7 @@ export function writeLocaleFiles(
             content[namespace][key] = data[namespace][key][locale];
         }
 
-        const dir = path.join(CONFIG_DIR, locale);
+        const dir = path.join(baseDir, locale);
         fs.mkdirSync(dir, { recursive: true });
 
         const filePath = path.join(dir, `${namespace}.json`);

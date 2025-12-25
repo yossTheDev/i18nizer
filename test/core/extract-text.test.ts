@@ -2,7 +2,8 @@
 import { expect } from 'chai';
 import { Project, ts } from 'ts-morph';
 
-import { extractTexts, replaceTempKeysWithT } from '../../src/core/ast/extract-text.js';
+import { extractTexts } from '../../src/core/ast/extract-text.js';
+import { replaceTempKeysWithT } from '../../src/core/ast/replace-text-with-text.js';
 
 describe('extractTexts', () => {
   function createTestFile(code: string) {
@@ -396,7 +397,8 @@ describe('extractTexts', () => {
       const mapped = results.map(r => ({
         key: 'selectSpecialties',
         node: r.node,
-        placeholders: r.placeholders
+        placeholders: r.placeholders,
+        tempKey: r.tempKey
       }));
 
       replaceTempKeysWithT(mapped);
@@ -423,7 +425,8 @@ describe('extractTexts', () => {
       const mapped = results.map((r, i) => ({
         key: `key${i}`,
         node: r.node,
-        placeholders: r.placeholders
+        placeholders: r.placeholders,
+        tempKey: r.tempKey
       }));
 
       replaceTempKeysWithT(mapped);

@@ -57,13 +57,13 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     const namespace = 'TestComponent';
     const data = {
       TestComponent: {
-        welcomeBack: {
-          en: 'Welcome back',
-          es: 'Bienvenido de nuevo',
-        },
         signIn: {
           en: 'Sign in',
           es: 'Iniciar sesión',
+        },
+        welcomeBack: {
+          en: 'Welcome back',
+          es: 'Bienvenido de nuevo',
         },
       },
     };
@@ -75,7 +75,7 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     const enPath = path.join(testDir, 'messages', 'en', 'TestComponent.json');
     expect(fs.existsSync(enPath)).to.be.true;
 
-    const enContent = JSON.parse(fs.readFileSync(enPath, 'utf-8'));
+    const enContent = JSON.parse(fs.readFileSync(enPath, 'utf8'));
     expect(enContent).to.deep.equal({
       TestComponent: {
         signIn: 'Sign in',
@@ -87,7 +87,7 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     const esPath = path.join(testDir, 'messages', 'es', 'TestComponent.json');
     expect(fs.existsSync(esPath)).to.be.true;
 
-    const esContent = JSON.parse(fs.readFileSync(esPath, 'utf-8'));
+    const esContent = JSON.parse(fs.readFileSync(esPath, 'utf8'));
     expect(esContent).to.deep.equal({
       TestComponent: {
         signIn: 'Iniciar sesión',
@@ -100,10 +100,10 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     const namespace = 'Form';
     const data = {
       Form: {
-        submit: { en: 'Submit' },
+        apply: { en: 'Apply' },
         cancel: { en: 'Cancel' },
         reset: { en: 'Reset' },
-        apply: { en: 'Apply' },
+        submit: { en: 'Submit' },
       },
     };
     const locales = ['en'];
@@ -111,7 +111,7 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     testWriteLocaleFiles(namespace, data, locales);
 
     const filePath = path.join(testDir, 'messages', 'en', 'Form.json');
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const content = fs.readFileSync(filePath, 'utf8');
 
     // Parse and check key order
     const parsed = JSON.parse(content);
@@ -133,7 +133,7 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     testWriteLocaleFiles(namespace, data, locales);
 
     const filePath = path.join(testDir, 'messages', 'en', 'Component.json');
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const content = fs.readFileSync(filePath, 'utf8');
 
     // Check for 2-space indentation
     expect(content).to.include('  "Component":');
@@ -152,7 +152,7 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     testWriteLocaleFiles(namespace, data, locales);
 
     const filePath = path.join(testDir, 'messages', 'en', 'Component.json');
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const content = fs.readFileSync(filePath, 'utf8');
 
     // Check for trailing newline
     expect(content.endsWith('\n')).to.be.true;
@@ -177,9 +177,9 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     const namespace = 'Stable';
     const data = {
       Stable: {
-        zebra: { en: 'Zebra' },
         apple: { en: 'Apple' },
         mango: { en: 'Mango' },
+        zebra: { en: 'Zebra' },
       },
     };
     const locales = ['en'];
@@ -187,11 +187,11 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
     // Write once
     testWriteLocaleFiles(namespace, data, locales);
     const filePath = path.join(testDir, 'messages', 'en', 'Stable.json');
-    const content1 = fs.readFileSync(filePath, 'utf-8');
+    const content1 = fs.readFileSync(filePath, 'utf8');
 
     // Write again
     testWriteLocaleFiles(namespace, data, locales);
-    const content2 = fs.readFileSync(filePath, 'utf-8');
+    const content2 = fs.readFileSync(filePath, 'utf8');
 
     // Should be identical
     expect(content1).to.equal(content2);

@@ -8,8 +8,8 @@
  */
 function toCamelCase(str: string): string {
   return str
-    .replace(/[^\w\s]/g, " ") // Replace special chars with spaces
-    .replace(/_/g, " ") // Replace underscores with spaces
+    .replaceAll(/[^\w\s]/g, " ") // Replace special chars with spaces
+    .replaceAll('_', " ") // Replace underscores with spaces
     .split(/\s+/) // Split by whitespace
     .filter(Boolean) // Remove empty strings
     .map((word, index) => {
@@ -33,15 +33,15 @@ function toCamelCase(str: string): string {
  */
 export function generateKey(text: string): string {
   // Remove template literal placeholders like {name}
-  const cleanedText = text.replace(/\{[^}]+\}/g, "");
+  const cleanedText = text.replaceAll(/\{[^}]+\}/g, "");
   
   // Replace apostrophes followed by 's' with just 's' (e.g., "User's" -> "Users")
-  const normalizedText = cleanedText.replace(/'s\b/g, "s");
+  const normalizedText = cleanedText.replaceAll(/'s\b/g, "s");
   
   // Split into words and take first 4-5 significant words
   const words = normalizedText
-    .replace(/[^\w\s]/g, " ")
-    .replace(/_/g, " ")
+    .replaceAll(/[^\w\s]/g, " ")
+    .replaceAll('_', " ")
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 5);

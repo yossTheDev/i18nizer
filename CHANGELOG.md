@@ -1,6 +1,14 @@
 # CHANGELOG
 
-## 0.4.0 - Phase 1: Project Integration (Unreleased)
+## 0.5.0 AI Key Generation Improvements
+
+### ✨ New Features
+
+* AI-Powered Key Generation
+* Intelligent Caching
+* Graceful Fallback
+
+## 0.4.0 - Project Integration
 
 **This release completes Phase 1 - project-level integration with configuration, caching, and intelligent string management.**
 

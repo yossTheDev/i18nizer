@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.3.0 - Phase 0: Foundation & Reliability (Unreleased)
+## 0.3.0 - Phase 0: Foundation & Reliability
 
 **This release completes Phase 0 - stabilizing the core extraction, replacement, and reliability features.**
 

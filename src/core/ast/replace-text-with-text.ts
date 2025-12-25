@@ -8,8 +8,14 @@ interface MappedText {
     tempKey: string;
 }
 
-// Allowed JSX props to replace text
-const allowedProps = new Set([
+export interface ReplaceOptions {
+    allowedFunctions?: string[];
+    allowedMemberFunctions?: string[];
+    allowedProps?: string[];
+}
+
+// Default allowed JSX props to replace text
+const defaultAllowedProps = new Set([
     "alt",
     "aria-label",
     "aria-placeholder",
@@ -21,11 +27,11 @@ const allowedProps = new Set([
     "tooltip",
 ]);
 
-// Allowed functions for simple calls
-const allowedFunctions = new Set(["alert", "confirm", "prompt"]);
+// Default allowed functions for simple calls
+const defaultAllowedFunctions = new Set(["alert", "confirm", "prompt"]);
 
-// Allowed member functions (e.g., toast.error)
-const allowedMemberFunctions = new Set(["toast.error", "toast.info", "toast.success", "toast.warn"]);
+// Default allowed member functions (e.g., toast.error)
+const defaultAllowedMemberFunctions = new Set(["toast.error", "toast.info", "toast.success", "toast.warn"]);
 
 // Helper to get full call name for member expressions
 function getFullCallName(node: Node): null | string {
@@ -43,7 +49,11 @@ function getFullCallName(node: Node): null | string {
     return null;
 }
 
-export function replaceTempKeysWithT(mapped: MappedText[]) {
+export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptions = {}) {
+    const allowedProps = new Set(options.allowedProps ?? [...defaultAllowedProps]);
+    const allowedFunctions = new Set(options.allowedFunctions ?? [...defaultAllowedFunctions]);
+    const allowedMemberFunctions = new Set(options.allowedMemberFunctions ?? [...defaultAllowedMemberFunctions]);
+    
     for (const { key, node, placeholders = [] } of mapped) {
         // Build placeholders string if any
         const placeholdersText = placeholders.length > 0

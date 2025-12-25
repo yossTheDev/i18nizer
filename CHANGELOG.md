@@ -1,6 +1,95 @@
 # CHANGELOG
 
-## 0.3.0 - Phase 0: Foundation & Reliability
+## 0.4.0 - Phase 1: Project Integration (Unreleased)
+
+**This release completes Phase 1 - project-level integration with configuration, caching, and intelligent string management.**
+
+### ✨ New Features
+
+* **`i18nizer start` command**: Initialize i18nizer in your project
+  * **Interactive mode**: Prompts for framework and i18n library selection (like `yarn create vite`)
+  * **Automatic framework detection** (Next.js, React)
+  * **Automatic i18n library detection** (next-intl, react-i18next, i18next)
+  * **Manual configuration** with `--framework` and `--i18n` flags
+  * **Non-interactive mode** with `--yes` flag for CI/automation
+  * Framework presets with optimal defaults
+  * Generates `i18nizer.config.yml` configuration file with detected i18n library
+  * Creates `.i18nizer/` directory for caching and project data
+  * Sets up configurable `messages/` directory
+
+* **`i18nizer translate` command**: Enhanced translation workflow
+  * Project-level mode with `--all` flag to translate all components
+  * Single-file mode for targeted translation
+  * `--dry-run` flag to preview changes without modifying files
+  * `--show-json` flag to display generated translation output
+  * Integrated with project configuration system
+  * Supports both initialized projects and standalone mode
+
+* **Configuration system**:
+  * YAML-based configuration (`i18nizer.config.yml`)
+  * Framework presets (Next.js, React, Custom)
+  * I18n library-specific configurations (next-intl, react-i18next, i18next)
+  * Combined presets (e.g., Next.js + next-intl, React + react-i18next)
+  * **`autoInjectT` option**: Control automatic translation function injection
+    * Disabled by default for Next.js (avoids breaking Server Components)
+    * Enabled by default for React (safe for Client Components)
+    * User can override in config file
+  * Configurable i18n function and import source
+  * Customizable messages directory and default locale
+  * Configurable behavior (deduplication, allowed props/functions)
+
+* **Intelligent caching**:
+  * Translation cache in `.i18nizer/cache/`
+  * Avoids redundant AI translation requests
+  * String-to-key mapping for fast lookups
+  * Persistent across multiple runs
+
+* **String deduplication**:
+  * Detects duplicate strings across components
+  * Reuses deterministic keys for identical strings
+  * Reduces translation costs and ensures consistency
+
+* **Configurable extraction**:
+  * Allowed JSX props can be customized via config
+  * Allowed functions can be customized via config
+  * Allowed member functions can be customized via config
+  * All behavior configurable with sensible defaults
+
+* **Enhanced CLI feedback**:
+  * Colored output with chalk
+  * Progress spinners with ora
+  * Interactive prompts with inquirer
+  * Detailed summary statistics
+  * Clear error messages and guidance
+
+### 🏗️ Architecture
+
+* New modular structure:
+  * `src/core/config/` - Configuration management
+  * `src/core/cache/` - Translation caching
+  * `src/core/deduplication/` - String deduplication logic
+  * `src/core/scanner/` - File discovery and scanning
+  * `src/types/config.ts` - Configuration types and presets
+
+### 🔧 Internal Improvements
+
+* Separated extraction and replacement logic
+* Made extraction options configurable
+* Added project detection utilities
+* Improved file scanning with directory exclusions
+* Better organization of core modules
+
+### 📚 Documentation
+
+* Updated README with Phase 1 features
+* Added quick start guide
+* Documented all new commands and flags
+* Updated roadmap to reflect completion
+* Added project structure documentation
+
+---
+
+## 0.3.0 - Phase 0: Foundation & Reliability (Unreleased)
 
 **This release completes Phase 0 - stabilizing the core extraction, replacement, and reliability features.**
 

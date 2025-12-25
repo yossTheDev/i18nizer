@@ -3,7 +3,7 @@ import { InferenceClient as HFClient } from "@huggingface/inference";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import OpenAI from "openai";
+import { OpenAI } from "openai";
 
 export type Provider = "gemini" | "huggingface" | "openai";
 

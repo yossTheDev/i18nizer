@@ -51,7 +51,80 @@ Keys are stored inside:
 
 ---
 
-## ⚡ Usage
+## ⚡ Quick Start
+
+### Initialize Your Project
+
+#### Interactive Mode (Recommended)
+
+```bash
+i18nizer start
+```
+
+This launches an **interactive setup** that will:
+- 🔍 Auto-detect your framework (Next.js or React)
+- 🔍 Auto-detect your i18n library (next-intl, react-i18next, i18next)
+- ❓ Ask you to confirm or change the detected settings
+- ✅ Create `i18nizer.config.yml` with optimal defaults
+- 📁 Set up `.i18nizer/` directory for caching and project data
+- 📂 Create `messages/` directory for translation files
+
+#### Non-Interactive Mode (CI/Automation)
+
+```bash
+i18nizer start --yes
+```
+
+Auto-detects and uses default values without prompts.
+
+#### Manual Configuration
+
+Specify framework and i18n library explicitly:
+
+```bash
+# Next.js with next-intl
+i18nizer start --framework nextjs --i18n next-intl
+
+# React with react-i18next
+i18nizer start --framework react --i18n react-i18next
+
+# Custom setup
+i18nizer start --framework custom --i18n custom
+```
+
+**Available options:**
+- `--framework`: `nextjs`, `react`, `custom`
+- `--i18n`: `next-intl`, `react-i18next`, `i18next`, `custom`
+- `--yes`, `-y`: Skip interactive prompts
+- `--force`, `-f`: Re-initialize existing project
+
+### Translate Your Components
+
+**Translate a single file:**
+
+```bash
+i18nizer translate src/components/Login.tsx --locales en,es,fr
+```
+
+**Translate all components in your project:**
+
+```bash
+i18nizer translate --all --locales en,es,fr
+```
+
+**Preview changes without modifying files:**
+
+```bash
+i18nizer translate <file> --dry-run
+```
+
+**Show generated JSON output:**
+
+```bash
+i18nizer translate <file> --show-json
+```
+
+### Legacy Command (Still Supported)
 
 ```bash
 i18nizer extract <file-path> --locales en,es,fr --provider openai
@@ -102,7 +175,7 @@ export function Login() {
 
 ---
 
-### Generated JSON (`.i18nizer/messages/en/Login.json`)
+### Generated JSON (`messages/en/Login.json`)
 
 ```json
 {
@@ -116,10 +189,30 @@ export function Login() {
 
 ---
 
-## 📂 Output Structure
+## 📂 Project Structure
+
+When initialized with `i18nizer start`:
 
 ```
-.i18nizer/
+your-project/
+├─ i18nizer.config.yml       # Configuration file
+├─ .i18nizer/
+│  ├─ cache/
+│  │  └─ translations.json   # Translation cache
+│  └─ ...
+└─ messages/                 # Translation files (configurable path)
+   ├─ en/
+   │  └─ Login.json
+   ├─ es/
+   │  └─ Login.json
+   └─ fr/
+      └─ Login.json
+```
+
+Legacy standalone mode (without `i18nizer start`):
+
+```
+[HOME]/.i18nizer/
 ├─ api-keys.json
 ├─ tsconfig.json
 └─ messages/
@@ -133,14 +226,114 @@ export function Login() {
 
 ---
 
+## ⚙️ Configuration
+
+### Translation Function Injection (`autoInjectT`)
+
+i18nizer can automatically inject translation hooks into your components:
+
+```ts
+const t = useTranslations("ComponentName");
+```
+
+This behavior is controlled by `behavior.autoInjectT` in `i18nizer.config.yml`:
+
+**Next.js Projects** (disabled by default):
+```yaml
+behavior:
+  autoInjectT: false  # Disabled to avoid breaking Server Components
+```
+
+- Server Components cannot use hooks like `useTranslations`
+- i18nizer will replace strings with `t("key")` but won't inject the hook
+- You manually add the translation hook where appropriate
+
+**React Projects** (enabled by default):
+```yaml
+behavior:
+  autoInjectT: true  # Safe for Client Components
+```
+
+- Full automation: injects hooks and replaces strings
+- Works seamlessly with React components
+
+**Why disabled for Next.js?**
+- Automatically detecting Server vs Client Components is ambiguous
+- Injecting hooks in Server Components causes runtime errors
+- User has full control over translation function placement
+
+You can override this setting in your `i18nizer.config.yml` if you know your setup.
+
+### AI-Powered English Key Generation (`useAiForKeys`)
+
+i18nizer uses AI to generate **English camelCase keys** regardless of your source language:
+
+```yaml
+behavior:
+  useAiForKeys: true  # Default: enabled
+```
+
+**Benefits:**
+- **Consistent keys**: Keys are always in English, even if your source text is in Spanish, French, German, etc.
+- **Readable**: `welcomeBack` instead of `bienvenidoDeNuevo`
+- **Stable**: Keys are cached per source text for deterministic behavior across runs
+- **Minimal diffs**: Same source text always produces the same key
+
+**How it works:**
+1. First run: AI generates an English key for each source text
+2. Key is cached with the source text hash
+3. Subsequent runs: Cached key is reused (no AI call needed)
+4. Fallback: If AI is unavailable, uses deterministic camelCase generation
+
+**Example:**
+
+Source text (Spanish):
+```tsx
+<h1>Bienvenido de nuevo</h1>
+<button>Iniciar sesión</button>
+```
+
+Generated keys (English):
+```json
+{
+  "welcomeBack": "Bienvenido de nuevo",
+  "signIn": "Iniciar sesión"
+}
+```
+
+**Disabling AI key generation:**
+
+If you prefer deterministic key generation based on source text:
+
+```yaml
+behavior:
+  useAiForKeys: false
+```
+
+Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish text).
+
+---
+
 ## ✨ Features
 
+### Phase 1 (Current)
+
+- **Project-level integration** with `i18nizer start` and `i18nizer translate`
+- **Configuration system** with `i18nizer.config.yml`
+- **Framework presets** (Next.js + next-intl, React + react-i18next)
+- **Intelligent caching** to avoid redundant AI translation requests
+- **String deduplication** with deterministic key reuse
+- **AI-powered English key generation** for consistent, readable keys regardless of source language
+- **Configurable behavior** (allowed functions, props, member functions)
+- **Dry-run mode** to preview changes
+- **JSON output preview** with `--show-json`
+- Project-wide or single-file translation
 - Works with **JSX & TSX**
 - Rewrites components automatically (`t("key")`)
-- Always generates **English camelCase keys**
+- Generates **English camelCase keys** (AI-assisted with deterministic fallback)
 - Supports **any number of locales**
 - Isolated TypeScript parsing (no project tsconfig required)
-- Friendly logs and errors
+- Friendly logs with colors and spinners
 
 ### Supported Extraction Cases
 
@@ -166,19 +359,35 @@ export function Login() {
 
 ## 🔮 Roadmap
 
-- [ ] Cross-file string deduplication
-- [ ] Key reuse mechanism
-- [ ] Configurable output directory
-- [ ] Framework support (Vue, Svelte)
-- [ ] i18n library presets (`next-intl`, `react-i18next`)
-- [ ] Watch mode
+### ✅ Phase 0: Foundation & Reliability (Complete)
+- Stable extraction and replacement
+- Deterministic key generation
+- Comprehensive test coverage
+- JSON output quality
+
+### ✅ Phase 1: Project Integration (Complete)
+- `i18nizer start` command for project initialization
+- `i18nizer translate` command with `--all` flag
+- Configuration system with YAML
+- Framework detection and presets
+- Intelligent caching system
+- Cross-file string deduplication
+- Configurable behavior (allowed props, functions, etc.)
+- Dry-run and JSON preview modes
+
+### 🚧 Phase 2: Advanced Features (Planned)
+- [ ] Watch mode for continuous translation
 - [ ] Non-AI fallback mode
+- [ ] Framework support (Vue, Svelte)
+- [ ] Additional i18n library presets
+- [ ] Pluralization support
+- [ ] Context-aware translations
+- [ ] Translation memory and glossary
 
 ---
 
 ## ⚠️ Current Limitations
 
-- Does not yet deduplicate identical strings across files
 - AI-generated keys may vary between runs (deterministic fallback available)
 - Only supports React JSX/TSX (no Vue, Svelte yet)
 - Does not handle runtime-only string generation

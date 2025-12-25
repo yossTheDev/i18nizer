@@ -3,9 +3,11 @@
  */
 
 export type Framework = "nextjs" | "react" | "custom";
+export type I18nLibrary = "next-intl" | "react-i18next" | "i18next" | "custom";
 
 export interface I18nizerConfig {
   framework: Framework;
+  i18nLibrary?: I18nLibrary; // Optional field to track detected library
   i18n: {
     function: string;
     import: {
@@ -64,6 +66,7 @@ export const FRAMEWORK_PRESETS: Record<Framework, Partial<I18nizerConfig>> = {
   custom: {},
   nextjs: {
     framework: "nextjs",
+    i18nLibrary: "next-intl",
     i18n: {
       function: "t",
       import: {
@@ -74,11 +77,58 @@ export const FRAMEWORK_PRESETS: Record<Framework, Partial<I18nizerConfig>> = {
   },
   react: {
     framework: "react",
+    i18nLibrary: "react-i18next",
     i18n: {
       function: "t",
       import: {
         named: "useTranslation",
         source: "react-i18next",
+      },
+    },
+  },
+};
+
+/**
+ * I18n library-specific configurations
+ */
+export const I18N_LIBRARY_CONFIGS: Record<I18nLibrary, Partial<I18nizerConfig>> = {
+  "next-intl": {
+    i18nLibrary: "next-intl",
+    i18n: {
+      function: "t",
+      import: {
+        named: "useTranslations",
+        source: "next-intl",
+      },
+    },
+  },
+  "react-i18next": {
+    i18nLibrary: "react-i18next",
+    i18n: {
+      function: "t",
+      import: {
+        named: "useTranslation",
+        source: "react-i18next",
+      },
+    },
+  },
+  "i18next": {
+    i18nLibrary: "i18next",
+    i18n: {
+      function: "t",
+      import: {
+        named: "useTranslation",
+        source: "react-i18next", // i18next typically used with react-i18next
+      },
+    },
+  },
+  custom: {
+    i18nLibrary: "custom",
+    i18n: {
+      function: "t",
+      import: {
+        named: "useTranslations",
+        source: "next-intl",
       },
     },
   },

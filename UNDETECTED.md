@@ -1,4 +1,4 @@
-# Undetectable Code Righ Now
+# Undetectable Code Right Now
 
 ``` tsx
    <span

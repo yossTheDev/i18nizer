@@ -1,8 +1,75 @@
 import { generateTranslations, Provider } from "./client.js";
 
 /**
+ * Generate English camelCase keys for multiple texts in a single AI request
+ * This is the preferred method for efficiency
+ * 
+ * @param texts - Array of texts to generate keys for
+ * @param provider - AI provider to use
+ * @returns Map of text to generated key, or empty map on failure
+ */
+export async function generateEnglishKeysBatch(
+  texts: string[],
+  provider: Provider = "huggingface"
+): Promise<Map<string, string>> {
+  if (texts.length === 0) {
+    return new Map();
+  }
+
+  const prompt = `
+You are an i18n key generator. Generate concise, meaningful camelCase keys in English for the following texts.
+
+RULES:
+- Output ONLY a JSON object mapping each text to its camelCase key
+- Keys should be 2-4 words maximum
+- Keys must be in English
+- Keys should describe the content/purpose
+- Do NOT include explanations, comments, or any other text
+- Output format: { "original text": "camelCaseKey" }
+
+TEXTS:
+${texts.map((t, i) => `${i + 1}. "${t.replaceAll('"', '\\"')}"`).join("\n")}
+
+EXAMPLES:
+{ "Bienvenido de nuevo": "welcomeBack", "Por favor inicia sesión": "pleaseSignIn" }
+
+OUTPUT (JSON only):`.trim();
+
+  try {
+    const response = await generateTranslations(prompt, provider);
+    if (!response) return new Map();
+
+    // Extract JSON from response (handle cases where AI adds markdown or extra text)
+    let jsonText = response.trim();
+    
+    // Remove markdown code blocks if present
+    if (jsonText.startsWith("```")) {
+      jsonText = jsonText.replace(/^```(?:json)?\s*\n/, "").replace(/\n```\s*$/, "");
+    }
+
+    const parsed = JSON.parse(jsonText) as Record<string, string>;
+    const result = new Map<string, string>();
+
+    // Validate and add each key
+    for (const [text, key] of Object.entries(parsed)) {
+      // Validate it's a valid camelCase identifier
+      if (typeof key === "string" && /^[a-z][a-zA-Z0-9]*$/.test(key)) {
+        result.set(text, key);
+      }
+    }
+
+    return result;
+  } catch (error) {
+    console.error("❌ Error generating English keys with AI:", error);
+    return new Map();
+  }
+}
+
+/**
  * Generate an English camelCase key from text using AI
  * This ensures keys are always in English regardless of source language
+ * 
+ * @deprecated Use generateEnglishKeysBatch for better efficiency
  */
 export async function generateEnglishKey(
   text: string,

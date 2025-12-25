@@ -11,7 +11,6 @@ import { generateAggregator } from "../core/i18n/generate-aggregator.js";
 export default class Regenerate extends Command {
   static override description =
     "♻️  Regenerate the messages.generated.ts aggregator file from JSON files";
-
   static override examples = [
     "<%= config.bin %> <%= command.id %>",
   ];

@@ -95,10 +95,10 @@ describe('writeLocaleFiles - JSON Output Quality', () => {
 
   it('should handle multi-word component names', () => {
     const testCases = [
-      { namespace: 'CollapsibleText', expected: 'collapsible-text.json' },
-      { namespace: 'DeleteModel', expected: 'delete-model.json' },
-      { namespace: 'CollectionOnlineStatusColumn', expected: 'collection-online-status-column.json' },
-      { namespace: 'EditPermissionsDialog', expected: 'edit-permissions-dialog.json' },
+      { expected: 'collapsible-text.json', namespace: 'CollapsibleText' },
+      { expected: 'delete-model.json', namespace: 'DeleteModel' },
+      { expected: 'collection-online-status-column.json', namespace: 'CollectionOnlineStatusColumn' },
+      { expected: 'edit-permissions-dialog.json', namespace: 'EditPermissionsDialog' },
     ];
 
     for (const testCase of testCases) {

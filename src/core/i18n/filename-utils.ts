@@ -20,9 +20,8 @@ export function componentNameToFilename(componentName: string): string {
   // Convert PascalCase/camelCase to lowercase-hyphen format
   return componentName
     // Insert hyphen before uppercase letters (except first)
-    .replace(/([A-Z])/g, (match, letter, index) => {
-      return index === 0 ? letter.toLowerCase() : `-${letter.toLowerCase()}`;
-    })
+    .replaceAll(/([A-Z])/g, (match, letter, index) =>
+      index === 0 ? letter.toLowerCase() : `-${letter.toLowerCase()}`)
     // Remove leading hyphen if any
     .replace(/^-/, "");
 }

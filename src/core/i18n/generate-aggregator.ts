@@ -85,13 +85,10 @@ export function generateAggregator(
   ];
 
   for (const [locale, exports] of exportsByLocale) {
-    lines.push(`  ${locale}: {`);
-    lines.push(...exports);
-    lines.push("  },");
+    lines.push(`  ${locale}: {`, ...exports, "  },");
   }
 
-  lines.push("} as const;");
-  lines.push("");
+  lines.push("} as const;", "");
 
   // Write the file
   const i18nDir = outputDir ?? path.join(path.dirname(baseMessagesDir), "i18n");

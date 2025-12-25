@@ -126,8 +126,8 @@ describe("generateAggregator", () => {
       path.join(enDir, "notification-item.json"),
       JSON.stringify({
         NotificationItem: {
-          title: "New Notification",
           dismiss: "Dismiss",
+          title: "New Notification",
         },
       })
     );
@@ -136,8 +136,8 @@ describe("generateAggregator", () => {
       path.join(esDir, "notification-item.json"),
       JSON.stringify({
         NotificationItem: {
-          title: "Nueva Notificación",
           dismiss: "Descartar",
+          title: "Nueva Notificación",
         },
       })
     );
@@ -147,8 +147,8 @@ describe("generateAggregator", () => {
       path.join(enDir, "collapsible-text.json"),
       JSON.stringify({
         CollapsibleText: {
-          showMore: "Show more",
           showLess: "Show less",
+          showMore: "Show more",
         },
       })
     );
@@ -157,8 +157,8 @@ describe("generateAggregator", () => {
       path.join(esDir, "collapsible-text.json"),
       JSON.stringify({
         CollapsibleText: {
-          showMore: "Mostrar más",
           showLess: "Mostrar menos",
+          showMore: "Mostrar más",
         },
       })
     );

@@ -170,29 +170,32 @@ export default class Translate extends Command {
 
         totalExtracted += texts.length;
 
-        // Deduplicate and assign keys (now async)
+        // Deduplicate and assign keys using batch processing
+        const textList = texts.map((t) => t.text);
+        
         // eslint-disable-next-line no-await-in-loop
-        const mappedTexts = await Promise.all(
-          texts.map(async (t) => {
-            const result = await deduplicator.deduplicate(
-              t.text,
-              componentName,
-              config.behavior.detectDuplicates
-            );
-
-            if (result.isReused) totalReused++;
-            if (result.isCached) totalCached++;
-
-            return {
-              isCached: result.isCached,
-              key: result.key,
-              node: t.node,
-              placeholders: t.placeholders,
-              tempKey: t.tempKey,
-              text: t.text,
-            };
-          })
+        const deduplicationResults = await deduplicator.deduplicateBatch(
+          textList,
+          componentName,
+          config.behavior.detectDuplicates
         );
+
+        // Map results back to texts
+        const mappedTexts = texts.map((t) => {
+          const result = deduplicationResults.get(t.text)!;
+          
+          if (result.isReused) totalReused++;
+          if (result.isCached) totalCached++;
+
+          return {
+            isCached: result.isCached,
+            key: result.key,
+            node: t.node,
+            placeholders: t.placeholders,
+            tempKey: t.tempKey,
+            text: t.text,
+          };
+        });
 
         // Build translations JSON
         const i18nJson: Record<string, Record<string, string>> = {};
@@ -315,14 +318,19 @@ export default class Translate extends Command {
       cache.save();
     }
 
+    // Get statistics from deduplicator
+    const stats = deduplicator.getStats();
+
     // Summary
     this.log("");
     this.log(chalk.green("🎉 Translation complete!"));
     this.log(chalk.cyan("📊 Summary:"));
     this.log(`  Files processed: ${chalk.bold(filesToProcess.length)}`);
     this.log(`  Strings extracted: ${chalk.bold(totalExtracted)}`);
+    this.log(`  Unique strings: ${chalk.bold(stats.uniqueStrings)}`);
     this.log(`  Keys reused: ${chalk.bold(totalReused)}`);
     this.log(`  Cached translations: ${chalk.bold(totalCached)}`);
+    this.log(`  AI requests (keys): ${chalk.bold(stats.aiRequestsUsed)}`);
     this.log("");
   }
 }

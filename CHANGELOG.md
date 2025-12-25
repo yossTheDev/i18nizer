@@ -1,5 +1,39 @@
 # CHANGELOG
 
+## 0.6.1 Some Improvements
+
+### Added
+
+* `messages.generated.ts` aggregator file consolidating all JSON translations by language.
+* `regenerate` CLI command to rebuild `messages.generated.ts` automatically.
+* Automatic addition of `i18nizer.config.yml` to `.gitignore` if present.
+* Option to use aggregator as single import point instead of multiple dynamic imports.
+
+### Changed
+
+* JSON file naming convention standardized to **lowercase with hyphens** (e.g., `notification-item.json`) for valid TypeScript imports.
+* Auto-generated aggregator now sanitizes identifiers for TypeScript, converting JSON filenames into valid import identifiers.
+* Namespaces inside JSON remain in PascalCase, keys remain camelCase.
+
+### Fixed
+
+* Resolved invalid import errors caused by hyphens in JSON filenames.
+* Eliminated the need for multiple dynamic imports per component or page.
+
+### Notes
+
+* All messages for a given locale can now be accessed via `messages.generated.ts`:
+
+```ts
+import { messages } from './messages.generated';
+
+const localeMessages = messages[locale];
+```
+
+* This consolidates translations, simplifies imports, and improves performance by avoiding multiple dynamic imports.
+
+---
+
 ## 0.6.0 - Opinionated System & Generated Aggregator
 
 **This release introduces an opinionated system with automatic aggregator generation and enhanced configuration options.**

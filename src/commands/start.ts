@@ -10,6 +10,7 @@ import {
   getMessagesDir,
   getProjectDir,
   isProjectInitialized,
+  normalizeI18nLibrary,
   writeConfig,
 } from "../core/config/config-manager.js";
 import { Framework, I18nLibrary } from "../types/config.js";
@@ -115,16 +116,13 @@ export default class Start extends Command {
         ]);
 
         framework = answers.framework;
-        i18nLibrary = answers.i18nLibrary === "custom" ? undefined : answers.i18nLibrary;
+        i18nLibrary = normalizeI18nLibrary(answers.i18nLibrary);
       }
     }
 
     // Override with CLI flag if provided
     if (flags.i18n) {
-      i18nLibrary = flags.i18n as I18nLibrary;
-      if (i18nLibrary === "custom") {
-        i18nLibrary = undefined;
-      }
+      i18nLibrary = normalizeI18nLibrary(flags.i18n);
     }
 
     const spinner = ora("Initializing i18nizer...").start();

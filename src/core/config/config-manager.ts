@@ -118,10 +118,17 @@ function mergeConfig(base: I18nizerConfig, override: Partial<I18nizerConfig>): I
 export function generateConfig(framework: Framework, i18nLibrary?: I18nLibrary): I18nizerConfig {
   const frameworkPreset = FRAMEWORK_PRESETS[framework];
   
-  // If i18n library is specified, merge it with framework preset
+  // If i18n library is specified, apply it after framework preset
+  // Framework settings take precedence for non-i18n specific fields
   if (i18nLibrary) {
     const i18nConfig = I18N_LIBRARY_CONFIGS[i18nLibrary];
-    return mergeConfig(DEFAULT_CONFIG, { ...frameworkPreset, ...i18nConfig });
+    // Merge: defaults -> framework -> i18n library (i18n-specific fields only)
+    const merged = mergeConfig(DEFAULT_CONFIG, frameworkPreset);
+    return {
+      ...merged,
+      i18nLibrary: i18nConfig.i18nLibrary,
+      i18n: i18nConfig.i18n ?? merged.i18n,
+    };
   }
   
   return mergeConfig(DEFAULT_CONFIG, frameworkPreset);
@@ -172,4 +179,14 @@ export function getMessagesDir(cwd: string, config: I18nizerConfig): string {
  */
 export function isProjectInitialized(cwd: string): boolean {
   return fs.existsSync(path.join(cwd, CONFIG_FILE_NAME));
+}
+
+/**
+ * Normalize i18n library value (converts "custom" to undefined)
+ */
+export function normalizeI18nLibrary(library: I18nLibrary | string | undefined): I18nLibrary | undefined {
+  if (library === "custom" || !library) {
+    return undefined;
+  }
+  return library as I18nLibrary;
 }

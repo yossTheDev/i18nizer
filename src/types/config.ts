@@ -118,7 +118,7 @@ export const I18N_LIBRARY_CONFIGS: Record<I18nLibrary, Partial<I18nizerConfig>> 
       function: "t",
       import: {
         named: "useTranslation",
-        source: "react-i18next", // i18next typically used with react-i18next
+        source: "react-i18next", // Default to react-i18next for React apps
       },
     },
   },

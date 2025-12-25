@@ -13,7 +13,7 @@ import { parseAiJson } from "../core/i18n/parse-ai-json.js";
 import { saveSourceFile } from "../core/i18n/sace-source-file.js";
 import { writeLocaleFiles } from "../core/i18n/write-files.js";
 
-const VALID_PROVIDERS: Provider[] = ["gemini", "huggingface", "openai"];
+const VALID_PROVIDERS: Provider[] = ["gemini", "huggingface", "ollama", "openai"];
 
 export default class Extract extends Command {
   static override args = {
@@ -32,7 +32,7 @@ export default class Extract extends Command {
     }),
     provider: Flags.string({
       char: "p",
-      description: "AI provider (gemini | huggingface), optional",
+      description: "AI provider (gemini | huggingface | ollama | openai), optional",
     }),
   };
 

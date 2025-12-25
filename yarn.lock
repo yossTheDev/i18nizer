@@ -5758,6 +5758,7 @@ __metadata:
     mocha: "npm:^10"
     node-fetch: "npm:^3.3.2"
     oclif: "npm:^4"
+    ollama: "npm:0.6.3"
     openai: "npm:^6.15.0"
     ora: "npm:^9.0.0"
     shx: "npm:^0.3.3"
@@ -7542,6 +7543,15 @@ __metadata:
   bin:
     oclif: bin/run.js
   checksum: 10c0/47a49ae916555f27fd40bc071db025137c5715107d37a4aea60afeef993a6d9348acb10c3bba917f538fc7b9a65c196199d7ffb5122bc8ee3d4c995c102fcf33
+  languageName: node
+  linkType: hard
+
+"ollama@npm:0.6.3":
+  version: 0.6.3
+  resolution: "ollama@npm:0.6.3"
+  dependencies:
+    whatwg-fetch: "npm:^3.6.20"
+  checksum: 10c0/040742dd1f96ad06d5508e387d8d953b3cfab527427f5dd463be7ccd589877eccfbf13ccea0bcb4d6b044a90a327c82c3089834fd3c0ea7243bb830a9c07295d
   languageName: node
   linkType: hard
 
@@ -9415,6 +9425,13 @@ __metadata:
   version: 3.3.3
   resolution: "web-streams-polyfill@npm:3.3.3"
   checksum: 10c0/64e855c47f6c8330b5436147db1c75cb7e7474d924166800e8e2aab5eb6c76aac4981a84261dd2982b3e754490900b99791c80ae1407a9fa0dcff74f82ea3a7f
+  languageName: node
+  linkType: hard
+
+"whatwg-fetch@npm:^3.6.20":
+  version: 3.6.20
+  resolution: "whatwg-fetch@npm:3.6.20"
+  checksum: 10c0/fa972dd14091321d38f36a4d062298df58c2248393ef9e8b154493c347c62e2756e25be29c16277396046d6eaa4b11bd174f34e6403fff6aaca9fb30fa1ff46d
   languageName: node
   linkType: hard
 

@@ -8,8 +8,8 @@
  */
 function toCamelCase(str: string): string {
   return str
-    .replaceAll(/[^\w\s]/g, " ") // Replace special chars with spaces
-    .replaceAll('_', " ") // Replace underscores with spaces
+    .replaceAll(/[^\w\s]/g, " ") // Replace special chars (note: \w includes underscores, so this won't replace them)
+    .replaceAll("_", " ") // Explicitly replace underscores with spaces
     .split(/\s+/) // Split by whitespace
     .filter(Boolean) // Remove empty strings
     .map((word, index) => {
@@ -40,8 +40,8 @@ export function generateKey(text: string): string {
   
   // Split into words and take first 4-5 significant words
   const words = normalizedText
-    .replaceAll(/[^\w\s]/g, " ")
-    .replaceAll('_', " ")
+    .replaceAll(/[^\w\s]/g, " ") // Replace special chars (note: \w includes underscores, so this won't replace them)
+    .replaceAll("_", " ") // Explicitly replace underscores with spaces
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 5);

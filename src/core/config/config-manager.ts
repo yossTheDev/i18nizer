@@ -118,20 +118,26 @@ function mergeConfig(base: I18nizerConfig, override: Partial<I18nizerConfig>): I
 export function generateConfig(framework: Framework, i18nLibrary?: I18nLibrary): I18nizerConfig {
   const frameworkPreset = FRAMEWORK_PRESETS[framework];
   
+  // Start with defaults merged with framework preset
+  const baseConfig = mergeConfig(DEFAULT_CONFIG, frameworkPreset);
+  
+  // Set autoInjectT based on framework (disabled for Next.js by default)
+  if (framework === "nextjs") {
+    baseConfig.behavior.autoInjectT = false;
+  }
+  
   // If i18n library is specified, apply it after framework preset
   // Framework settings take precedence for non-i18n specific fields
   if (i18nLibrary) {
     const i18nConfig = I18N_LIBRARY_CONFIGS[i18nLibrary];
-    // Merge: defaults -> framework -> i18n library (i18n-specific fields only)
-    const merged = mergeConfig(DEFAULT_CONFIG, frameworkPreset);
     return {
-      ...merged,
+      ...baseConfig,
       i18nLibrary: i18nConfig.i18nLibrary,
-      i18n: i18nConfig.i18n ?? merged.i18n,
+      i18n: i18nConfig.i18n ?? baseConfig.i18n,
     };
   }
   
-  return mergeConfig(DEFAULT_CONFIG, frameworkPreset);
+  return baseConfig;
 }
 
 /**

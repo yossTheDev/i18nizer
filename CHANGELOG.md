@@ -30,6 +30,10 @@
   * Framework presets (Next.js, React, Custom)
   * I18n library-specific configurations (next-intl, react-i18next, i18next)
   * Combined presets (e.g., Next.js + next-intl, React + react-i18next)
+  * **`autoInjectT` option**: Control automatic translation function injection
+    * Disabled by default for Next.js (avoids breaking Server Components)
+    * Enabled by default for React (safe for Client Components)
+    * User can override in config file
   * Configurable i18n function and import source
   * Customizable messages directory and default locale
   * Configurable behavior (deduplication, allowed props/functions)

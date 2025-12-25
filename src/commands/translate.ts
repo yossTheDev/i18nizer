@@ -272,7 +272,11 @@ export default class Translate extends Command {
           }
 
           // Rewrite component
-          insertUseTranslations(sourceFile, componentName);
+          // Only inject t function if autoInjectT is enabled
+          if (config.behavior.autoInjectT) {
+            insertUseTranslations(sourceFile, componentName);
+          }
+          
           replaceTempKeysWithT(
             mappedTexts.map((m) => ({
               key: m.key,

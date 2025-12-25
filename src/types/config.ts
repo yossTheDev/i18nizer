@@ -23,6 +23,7 @@ export interface I18nizerConfig {
   behavior: {
     detectDuplicates: boolean;
     opinionatedStructure: boolean;
+    autoInjectT: boolean;
     allowedFunctions: string[];
     allowedMemberFunctions: string[];
     allowedProps: string[];
@@ -44,6 +45,7 @@ export const DEFAULT_CONFIG: I18nizerConfig = {
       "title",
       "tooltip",
     ],
+    autoInjectT: true, // Default enabled for React
     detectDuplicates: true,
     opinionatedStructure: true,
   },

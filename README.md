@@ -226,6 +226,46 @@ Legacy standalone mode (without `i18nizer start`):
 
 ---
 
+## ⚙️ Configuration
+
+### Translation Function Injection (`autoInjectT`)
+
+i18nizer can automatically inject translation hooks into your components:
+
+```ts
+const t = useTranslations("ComponentName");
+```
+
+This behavior is controlled by `behavior.autoInjectT` in `i18nizer.config.yml`:
+
+**Next.js Projects** (disabled by default):
+```yaml
+behavior:
+  autoInjectT: false  # Disabled to avoid breaking Server Components
+```
+
+- Server Components cannot use hooks like `useTranslations`
+- i18nizer will replace strings with `t("key")` but won't inject the hook
+- You manually add the translation hook where appropriate
+
+**React Projects** (enabled by default):
+```yaml
+behavior:
+  autoInjectT: true  # Safe for Client Components
+```
+
+- Full automation: injects hooks and replaces strings
+- Works seamlessly with React components
+
+**Why disabled for Next.js?**
+- Automatically detecting Server vs Client Components is ambiguous
+- Injecting hooks in Server Components causes runtime errors
+- User has full control over translation function placement
+
+You can override this setting in your `i18nizer.config.yml` if you know your setup.
+
+---
+
 ## ✨ Features
 
 ### Phase 1 (Current)

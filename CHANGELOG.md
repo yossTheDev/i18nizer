@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## 0.3.0 - Phase 0: Foundation & Reliability (Unreleased)
+
+**This release completes Phase 0 - stabilizing the core extraction, replacement, and reliability features.**
+
+### ✨ New Features
+
+* **Expanded prop support**: Added support for `aria-placeholder`, `label`, `text`, `tooltip`, and `helperText` attributes
+* **Deterministic key generation**: Implemented fallback key generation algorithm that produces stable, human-readable camelCase keys
+* **Improved JSON output quality**:
+  * Keys are now alphabetically sorted for stable, predictable output
+  * Consistent 2-space indentation for clean, diff-friendly JSON
+  * Trailing newlines added to all JSON files
+* **Enhanced non-translatable filtering**: Better detection of symbols, punctuation-only strings, and meaningless tokens
+
+### 🧪 Testing
+
+* Expanded test suite from 26 to 60+ tests
+* Added comprehensive tests for:
+  * All new supported props
+  * Non-translatable content filtering edge cases
+  * Deterministic key generation
+  * JSON output quality and stability
+* All tests passing on Node 18, 20, and latest
+
+### 📚 Documentation
+
+* Updated README with:
+  * Complete list of supported extraction cases
+  * Filtering and quality features
+  * Current limitations
+* Updated roadmap to reflect Phase 0 completion
+
+### 🔧 Internal Improvements
+
+* Improved code organization and maintainability
+* Better test coverage for core functionality
+* More predictable and stable output
+
+---
+
 ## 0.2.0
 
 * **Enhanced text extraction for complex JSX expressions**:

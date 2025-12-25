@@ -157,7 +157,7 @@ export function Login() {
 ## ⚠️ Notes
 
 - API keys are **never committed**
-- JSON files are stored per project in `.i18nizer/`
+- JSON files are stored in `/{HOME}/.i18nizer/`
 - Designed for incremental adoption
 
 ---

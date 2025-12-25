@@ -18,7 +18,7 @@ RULES:
 - Key should describe the content/purpose
 - Do NOT include quotes, explanations, or any other text
 
-TEXT: "${text.replaceAll('"', String.raw`\"`)}"
+TEXT: "${text.replaceAll('"', '\\"')}"
 
 EXAMPLES:
 TEXT: "Bienvenido de nuevo" -> welcomeBack

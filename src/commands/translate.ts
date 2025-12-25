@@ -154,7 +154,11 @@ export default class Translate extends Command {
       try {
         // Parse and extract
         const sourceFile = parseFile(filePath);
-        const texts = extractTexts(sourceFile);
+        const texts = extractTexts(sourceFile, {
+          allowedFunctions: config.behavior.allowedFunctions,
+          allowedMemberFunctions: config.behavior.allowedMemberFunctions,
+          allowedProps: config.behavior.allowedProps,
+        });
 
         if (texts.length === 0) {
           spinner.info(`⏭️  ${componentName}: No translatable texts found`);
@@ -275,7 +279,12 @@ export default class Translate extends Command {
               node: m.node,
               placeholders: m.placeholders,
               tempKey: m.tempKey,
-            }))
+            })),
+            {
+              allowedFunctions: config.behavior.allowedFunctions,
+              allowedMemberFunctions: config.behavior.allowedMemberFunctions,
+              allowedProps: config.behavior.allowedProps,
+            }
           );
           saveSourceFile(sourceFile);
         }

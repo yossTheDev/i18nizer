@@ -5,9 +5,10 @@ import { isTranslatableString } from "./is-translatable.js";
 
 let tempIdCounter = 0;
 
-const allowedFunctions = new Set(["alert", "confirm", "prompt"]);
-const allowedMemberFunctions = new Set(["toast.error", "toast.info", "toast.success", "toast.warn"]);
-const allowedProps = new Set([
+// Default sets - can be overridden via extractTexts options
+const defaultAllowedFunctions = new Set(["alert", "confirm", "prompt"]);
+const defaultAllowedMemberFunctions = new Set(["toast.error", "toast.info", "toast.success", "toast.warn"]);
+const defaultAllowedProps = new Set([
     "alt",
     "aria-label",
     "aria-placeholder",
@@ -24,6 +25,12 @@ export interface ExtractedText {
     placeholders: string[];
     tempKey: string;
     text: string;
+}
+
+export interface ExtractOptions {
+    allowedFunctions?: string[];
+    allowedMemberFunctions?: string[];
+    allowedProps?: string[];
 }
 
 // --- Helpers ---
@@ -117,7 +124,11 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
 }
 
 // --- Extractor ---
-export function extractTexts(sourceFile: Node): ExtractedText[] {
+export function extractTexts(sourceFile: Node, options: ExtractOptions = {}): ExtractedText[] {
+    const allowedFunctions = new Set(options.allowedFunctions ?? [...defaultAllowedFunctions]);
+    const allowedMemberFunctions = new Set(options.allowedMemberFunctions ?? [...defaultAllowedMemberFunctions]);
+    const allowedProps = new Set(options.allowedProps ?? [...defaultAllowedProps]);
+    
     const results: ExtractedText[] = [];
     const seenNodes = new Set<Node>();
 
@@ -197,77 +208,4 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
     });
 
     return results;
-}
-
-// --- Replacer ---
-interface MappedText {
-    key: string;
-    node: Node;
-    placeholders?: string[];
-}
-
-export function replaceTempKeysWithT(mapped: MappedText[]) {
-    for (const { key, node, placeholders = [] } of mapped) {
-        const placeholdersText = placeholders.length > 0
-            ? `{ ${placeholders.map(p => `${p}: ${p}`).join(", ")} }`
-            : "";
-
-        const tCall = `t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`;
-
-        if (Node.isJsxText(node)) {
-            node.replaceWithText(`{${tCall}}`);
-        } else if (Node.isStringLiteral(node)) {
-            const parent = node.getParent();
-
-            // Direct JSX attribute: placeholder="text"
-            if (Node.isJsxAttribute(parent) && allowedProps.has(parent.getNameNode().getText())) {
-                node.replaceWithText(`{${tCall}}`);
-            }
-            // String in JSX expression (e.g., within ternary): placeholder={condition ? "text" : ...}
-            else if (Node.isJsxExpression(parent)) {
-                node.replaceWithText(tCall);
-            }
-            // String in conditional expression
-            else if (Node.isConditionalExpression(parent)) {
-                node.replaceWithText(tCall);
-            }
-            // String in binary expression (&&, ||)
-            else if (Node.isBinaryExpression(parent)) {
-                node.replaceWithText(tCall);
-            }
-            // String in parenthesized expression
-            else if (Node.isParenthesizedExpression(parent)) {
-                node.replaceWithText(tCall);
-            }
-            // String in function call
-            else if (Node.isCallExpression(parent)) {
-                const fnName = getFullCallName(parent.getExpression());
-                if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
-                    node.replaceWithText(tCall);
-                }
-            }
-        } else if (Node.isTemplateExpression(node) || Node.isNoSubstitutionTemplateLiteral(node)) {
-            const parent = node.getParent();
-
-            // Template in JSX expression
-            if (Node.isJsxExpression(parent)) {
-                node.replaceWithText(tCall);
-            }
-            // Template in conditional expression
-            else if (Node.isConditionalExpression(parent)) {
-                node.replaceWithText(tCall);
-            }
-            // Template in binary expression
-            else if (Node.isBinaryExpression(parent)) {
-                node.replaceWithText(tCall);
-            }
-            // Template in function call
-            else if (Node.isCallExpression(parent)) {
-                const fnName = getFullCallName(parent.getExpression());
-                if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
-                    node.replaceWithText(tCall);
-                }
-            }
-        }
-    }
 }

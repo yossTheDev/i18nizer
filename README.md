@@ -51,7 +51,54 @@ Keys are stored inside:
 
 ---
 
-## ⚡ Usage
+## ⚡ Quick Start
+
+### Initialize Your Project
+
+```bash
+i18nizer start
+```
+
+This command will:
+- Detect your framework (Next.js or React)
+- Create `i18nizer.config.yml` with optimal defaults
+- Set up `.i18nizer/` directory for caching and project data
+- Create `messages/` directory for translation files
+
+You can also specify a framework preset:
+
+```bash
+i18nizer start --preset nextjs
+i18nizer start --preset react
+```
+
+### Translate Your Components
+
+**Translate a single file:**
+
+```bash
+i18nizer translate src/components/Login.tsx --locales en,es,fr
+```
+
+**Translate all components in your project:**
+
+```bash
+i18nizer translate --all --locales en,es,fr
+```
+
+**Preview changes without modifying files:**
+
+```bash
+i18nizer translate <file> --dry-run
+```
+
+**Show generated JSON output:**
+
+```bash
+i18nizer translate <file> --show-json
+```
+
+### Legacy Command (Still Supported)
 
 ```bash
 i18nizer extract <file-path> --locales en,es,fr --provider openai
@@ -102,7 +149,7 @@ export function Login() {
 
 ---
 
-### Generated JSON (`.i18nizer/messages/en/Login.json`)
+### Generated JSON (`messages/en/Login.json`)
 
 ```json
 {
@@ -116,10 +163,30 @@ export function Login() {
 
 ---
 
-## 📂 Output Structure
+## 📂 Project Structure
+
+When initialized with `i18nizer start`:
 
 ```
-.i18nizer/
+your-project/
+├─ i18nizer.config.yml       # Configuration file
+├─ .i18nizer/
+│  ├─ cache/
+│  │  └─ translations.json   # Translation cache
+│  └─ ...
+└─ messages/                 # Translation files (configurable path)
+   ├─ en/
+   │  └─ Login.json
+   ├─ es/
+   │  └─ Login.json
+   └─ fr/
+      └─ Login.json
+```
+
+Legacy standalone mode (without `i18nizer start`):
+
+```
+[HOME]/.i18nizer/
 ├─ api-keys.json
 ├─ tsconfig.json
 └─ messages/
@@ -135,12 +202,23 @@ export function Login() {
 
 ## ✨ Features
 
+### Phase 1 (Current)
+
+- **Project-level integration** with `i18nizer start` and `i18nizer translate`
+- **Configuration system** with `i18nizer.config.yml`
+- **Framework presets** (Next.js + next-intl, React + react-i18next)
+- **Intelligent caching** to avoid redundant AI translation requests
+- **String deduplication** with deterministic key reuse
+- **Configurable behavior** (allowed functions, props, member functions)
+- **Dry-run mode** to preview changes
+- **JSON output preview** with `--show-json`
+- Project-wide or single-file translation
 - Works with **JSX & TSX**
 - Rewrites components automatically (`t("key")`)
 - Always generates **English camelCase keys**
 - Supports **any number of locales**
 - Isolated TypeScript parsing (no project tsconfig required)
-- Friendly logs and errors
+- Friendly logs with colors and spinners
 
 ### Supported Extraction Cases
 
@@ -166,19 +244,35 @@ export function Login() {
 
 ## 🔮 Roadmap
 
-- [ ] Cross-file string deduplication
-- [ ] Key reuse mechanism
-- [ ] Configurable output directory
-- [ ] Framework support (Vue, Svelte)
-- [ ] i18n library presets (`next-intl`, `react-i18next`)
-- [ ] Watch mode
+### ✅ Phase 0: Foundation & Reliability (Complete)
+- Stable extraction and replacement
+- Deterministic key generation
+- Comprehensive test coverage
+- JSON output quality
+
+### ✅ Phase 1: Project Integration (Complete)
+- `i18nizer start` command for project initialization
+- `i18nizer translate` command with `--all` flag
+- Configuration system with YAML
+- Framework detection and presets
+- Intelligent caching system
+- Cross-file string deduplication
+- Configurable behavior (allowed props, functions, etc.)
+- Dry-run and JSON preview modes
+
+### 🚧 Phase 2: Advanced Features (Planned)
+- [ ] Watch mode for continuous translation
 - [ ] Non-AI fallback mode
+- [ ] Framework support (Vue, Svelte)
+- [ ] Additional i18n library presets
+- [ ] Pluralization support
+- [ ] Context-aware translations
+- [ ] Translation memory and glossary
 
 ---
 
 ## ⚠️ Current Limitations
 
-- Does not yet deduplicate identical strings across files
 - AI-generated keys may vary between runs (deterministic fallback available)
 - Only supports React JSX/TSX (no Vue, Svelte yet)
 - Does not handle runtime-only string generation

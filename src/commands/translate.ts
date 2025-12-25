@@ -102,7 +102,7 @@ export default class Translate extends Command {
     // Override config with flags if provided
     const locales = flags.locales
       ? flags.locales.split(",")
-      : [config.messages.defaultLocale, "es"]; // Default fallback
+      : config.messages.locales || [config.messages.defaultLocale, "es"]; // Use config locales or default fallback
 
     let provider: Provider = "huggingface";
     if (flags.provider) {

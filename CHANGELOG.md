@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.5.1
+
+* Implement batch key generation to minimize AI requests
+* Minor Fixes
+
 ## 0.5.0 AI Key Generation Improvements
 
 ### ✨ New Features

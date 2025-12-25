@@ -1,5 +1,6 @@
 /* eslint-disable complexity */
 import { Node } from "ts-morph";
+
 import { isTranslatableString } from "./is-translatable.js";
 
 let tempIdCounter = 0;
@@ -63,6 +64,7 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
             results.push({ node: expr, placeholders: [], tempKey, text });
             seenNodes.add(expr);
         }
+
         return;
     }
 
@@ -74,6 +76,7 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
             results.push({ node: expr, placeholders: processed.placeholders, tempKey, text: processed.text });
             seenNodes.add(expr);
         }
+
         return;
     }
 
@@ -92,13 +95,14 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
             extractStringsFromExpression(expr.getLeft(), results, seenNodes);
             extractStringsFromExpression(expr.getRight(), results, seenNodes);
         }
+
         return;
     }
 
     // Parenthesized expression: (expression)
     if (Node.isParenthesizedExpression(expr)) {
         extractStringsFromExpression(expr.getExpression(), results, seenNodes);
-        return;
+
     }
 }
 
@@ -121,20 +125,22 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
                 results.push({ node, placeholders, tempKey, text });
                 seenNodes.add(node);
             }
+
             return;
         }
 
         // JSXExpression - handle complex expressions
-        else if (Node.isJsxExpression(node)) {
+        if (Node.isJsxExpression(node)) {
             const expr = node.getExpression();
             if (expr) {
                 extractStringsFromExpression(expr, results, seenNodes);
             }
+
             return;
         }
 
         // StringLiteral in JSX attributes or function calls
-        else if (Node.isStringLiteral(node)) {
+        if (Node.isStringLiteral(node)) {
             text = node.getLiteralText();
         }
 
@@ -157,7 +163,7 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
         // Check if this is in a JSX attribute that we care about
         if (Node.isJsxAttribute(parent) && allowedProps.has(parent.getNameNode().getText())) {
             shouldExtract = true;
-        } 
+        }
         // Check if this is in an allowed function call
         else if (Node.isCallExpression(parent)) {
             const fnName = getFullCallName(parent.getExpression());
@@ -202,11 +208,11 @@ export function replaceTempKeysWithT(mapped: MappedText[]) {
             node.replaceWithText(`{${tCall}}`);
         } else if (Node.isStringLiteral(node)) {
             const parent = node.getParent();
-            
+
             // Direct JSX attribute: placeholder="text"
             if (Node.isJsxAttribute(parent) && allowedProps.has(parent.getNameNode().getText())) {
                 node.replaceWithText(`{${tCall}}`);
-            } 
+            }
             // String in JSX expression (e.g., within ternary): placeholder={condition ? "text" : ...}
             else if (Node.isJsxExpression(parent)) {
                 node.replaceWithText(tCall);
@@ -232,7 +238,7 @@ export function replaceTempKeysWithT(mapped: MappedText[]) {
             }
         } else if (Node.isTemplateExpression(node) || Node.isNoSubstitutionTemplateLiteral(node)) {
             const parent = node.getParent();
-            
+
             // Template in JSX expression
             if (Node.isJsxExpression(parent)) {
                 node.replaceWithText(tCall);

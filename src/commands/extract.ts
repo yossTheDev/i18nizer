@@ -1,5 +1,6 @@
 import { Args, Command, Flags } from "@oclif/core";
 import chalk from "chalk";
+import os from "node:os";
 import path from "node:path";
 import ora, { Ora } from "ora";
 
@@ -198,8 +199,8 @@ export default class Extract extends Command {
       cache.save();
 
       // Generate aggregator (extract uses home directory for standalone mode)
-      const homeDir = require("node:os").homedir();
-      const standaloneMessagesDir = require("node:path").join(homeDir, ".i18nizer", "messages");
+      const homeDir = os.homedir();
+      const standaloneMessagesDir = path.join(homeDir, ".i18nizer", "messages");
       generateAggregator(standaloneMessagesDir);
 
       this.log(chalk.green("✨ Component rewritten with t() calls"));

@@ -40,9 +40,9 @@ export function ensureConfigInGitignore(cwd: string): boolean {
   const newContent =
     gitignoreContent.trim() === ""
       ? `${CONFIG_FILE_NAME}\n`
-      : `${gitignoreContent.endsWith("\n") ? "" : "\n"}${CONFIG_FILE_NAME}\n`;
+      : `${gitignoreContent}${gitignoreContent.endsWith("\n") ? "" : "\n"}${CONFIG_FILE_NAME}\n`;
 
-  fs.writeFileSync(gitignorePath, gitignoreContent + (gitignoreContent.trim() === "" ? CONFIG_FILE_NAME + "\n" : (gitignoreContent.endsWith("\n") ? "" : "\n") + CONFIG_FILE_NAME + "\n"), "utf8");
+  fs.writeFileSync(gitignorePath, newContent, "utf8");
 
   return true;
 }

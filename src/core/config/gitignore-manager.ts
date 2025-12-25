@@ -1,17 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const CONFIG_FILE_NAME = "i18nizer.config.yml";
+const I18NIZER_DIR = ".i18nizer/";
 
 /**
- * Ensures that i18nizer.config.yml is added to .gitignore if it exists
+ * Ensures that .i18nizer/ folder is added to .gitignore
  */
-export function ensureConfigInGitignore(cwd: string): boolean {
-  const configPath = path.join(cwd, CONFIG_FILE_NAME);
+export function ensureI18nizerDirInGitignore(cwd: string): boolean {
   const gitignorePath = path.join(cwd, ".gitignore");
+  const i18nizerDirPath = path.join(cwd, ".i18nizer");
 
-  // Check if config file exists
-  if (!fs.existsSync(configPath)) {
+  // Check if .i18nizer directory exists
+  if (!fs.existsSync(i18nizerDirPath)) {
     return false;
   }
 
@@ -24,23 +24,26 @@ export function ensureConfigInGitignore(cwd: string): boolean {
   const gitignoreContent = fs.readFileSync(gitignorePath, "utf8");
   const lines = gitignoreContent.split("\n");
 
-  // Check if config is already ignored (exact match or pattern match)
+  // Check if .i18nizer/ is already ignored (exact match or pattern match)
   const isAlreadyIgnored = lines.some(
     (line) =>
-      line.trim() === CONFIG_FILE_NAME ||
-      line.trim() === `/${CONFIG_FILE_NAME}` ||
-      line.trim() === `**/${CONFIG_FILE_NAME}`
+      line.trim() === I18NIZER_DIR ||
+      line.trim() === `/${I18NIZER_DIR}` ||
+      line.trim() === ".i18nizer" ||
+      line.trim() === "/.i18nizer" ||
+      line.trim() === "**/.i18nizer/" ||
+      line.trim() === "**/.i18nizer"
   );
 
   if (isAlreadyIgnored) {
     return false;
   }
 
-  // Add config to .gitignore
+  // Add .i18nizer/ to .gitignore
   const newContent =
     gitignoreContent.trim() === ""
-      ? `${CONFIG_FILE_NAME}\n`
-      : `${gitignoreContent}${gitignoreContent.endsWith("\n") ? "" : "\n"}${CONFIG_FILE_NAME}\n`;
+      ? `${I18NIZER_DIR}\n`
+      : `${gitignoreContent}${gitignoreContent.endsWith("\n") ? "" : "\n"}${I18NIZER_DIR}\n`;
 
   fs.writeFileSync(gitignorePath, newContent, "utf8");
 

@@ -15,7 +15,9 @@
   * Displays statistics about processed locales and namespaces
 
 * **Automatic .gitignore Management**
-  * `i18nizer.config.yml` is automatically added to `.gitignore` during `i18nizer start`
+  * `.i18nizer/` folder is automatically added to `.gitignore` during `i18nizer start`
+  * Keeps cache and temporary files out of version control
+  * `i18nizer.config.yml` remains tracked in git for team collaboration
   * Prevents duplicate entries with intelligent pattern detection
   * Handles various gitignore patterns (exact match, leading slash, wildcard)
 

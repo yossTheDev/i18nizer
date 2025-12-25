@@ -37,6 +37,7 @@ export default class Extract extends Command {
       description: "AI provider (gemini | huggingface), optional",
     }),
     "use-ai-keys": Flags.boolean({
+      allowNo: true,
       default: true,
       description: "Use AI to generate human-readable keys (default: true)",
     }),
@@ -95,6 +96,8 @@ export default class Extract extends Command {
     let keySpinner: Ora | undefined;
     if (flags["use-ai-keys"]) {
       keySpinner = ora("🧠 Generating keys (batch)...").start();
+    } else {
+      this.log("🔑 Generating keys (deterministic)...");
     }
 
     const textList = texts.map((t) => t.text);
@@ -110,9 +113,12 @@ export default class Extract extends Command {
       keySpinner.succeed(
         `🧠 Generated ${chalk.green(uniqueTexts.size)} keys`
       );
-      this.log(`💾 Cache hits: ${chalk.green(stats.cacheHits)}`);
-      this.log(`🤖 AI requests used: ${chalk.green(stats.aiRequestsUsed)}`);
+    } else {
+      this.log(`✅ Generated ${chalk.green(uniqueTexts.size)} keys (deterministic)`);
     }
+    
+    this.log(`💾 Cache hits: ${chalk.green(stats.cacheHits)}`);
+    this.log(`🤖 AI requests used: ${chalk.green(stats.aiRequestsUsed)}`);
 
     // Map results back to texts
     const mappedTexts = texts.map((t) => {

@@ -46,7 +46,7 @@ export function loadConfig(cwd: string): I18nizerConfig | null {
   
   try {
     const fileContent = fs.readFileSync(configPath, "utf8");
-    const parsed = yaml.load(fileContent) as Partial<I18nizerConfig>;
+    const parsed = yaml.load(fileContent, { schema: yaml.CORE_SCHEMA }) as Partial<I18nizerConfig>;
     
     // Deep merge with defaults
     return mergeConfig(DEFAULT_CONFIG, parsed);

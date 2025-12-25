@@ -265,7 +265,7 @@ export default class Translate extends Command {
           // Write locale files
           if (isInitialized) {
             const messagesDir = getMessagesDir(cwd, config);
-            writeLocaleFiles(componentName, { [componentName]: i18nJson }, locales);
+            writeLocaleFiles(componentName, { [componentName]: i18nJson }, locales, messagesDir);
           } else {
             // Standalone mode: use home directory
             writeLocaleFiles(componentName, { [componentName]: i18nJson }, locales);

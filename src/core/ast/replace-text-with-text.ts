@@ -40,9 +40,11 @@ export function replaceTempKeysWithT(mapped: MappedText[]) {
             ? `{ ${placeholders.map(p => `${p}: ${p}`).join(", ")} }`
             : "";
 
+        const tCall = `t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`;
+
         // Replace JSXText nodes → {t("key")}
         if (Node.isJsxText(node)) {
-            node.replaceWithText(`{t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})}`);
+            node.replaceWithText(`{${tCall}}`);
         }
         // Replace string literals
         else if (Node.isStringLiteral(node)) {
@@ -50,23 +52,53 @@ export function replaceTempKeysWithT(mapped: MappedText[]) {
 
             // JSX attributes allowed → {t("key")}
             if (Node.isJsxAttribute(parent) && allowedProps.has(parent.getNameNode().getText())) {
-                node.replaceWithText(`{t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})}`);
+                node.replaceWithText(`{${tCall}}`);
+            }
+            // String in JSX expression (e.g., within ternary): placeholder={condition ? "text" : ...}
+            else if (Node.isJsxExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // String in conditional expression
+            else if (Node.isConditionalExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // String in binary expression (&&, ||)
+            else if (Node.isBinaryExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // String in parenthesized expression
+            else if (Node.isParenthesizedExpression(parent)) {
+                node.replaceWithText(tCall);
             }
             // Simple or member function calls (alert, confirm, prompt, toast.*)
             else if (Node.isCallExpression(parent)) {
                 const fnName = getFullCallName(parent.getExpression());
                 if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
-                    node.replaceWithText(`t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`);
+                    node.replaceWithText(tCall);
                 }
             }
         }
-        // Replace template literals inside allowed calls
+        // Replace template literals
         else if (Node.isNoSubstitutionTemplateLiteral(node) || Node.isTemplateExpression(node)) {
             const parent = node.getParent();
-            if (Node.isCallExpression(parent)) {
+            
+            // Template in JSX expression
+            if (Node.isJsxExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // Template in conditional expression
+            else if (Node.isConditionalExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // Template in binary expression
+            else if (Node.isBinaryExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // Template in function calls
+            else if (Node.isCallExpression(parent)) {
                 const fnName = getFullCallName(parent.getExpression());
                 if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
-                    node.replaceWithText(`t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`);
+                    node.replaceWithText(tCall);
                 }
             }
         }

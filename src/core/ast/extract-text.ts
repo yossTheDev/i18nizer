@@ -1,6 +1,8 @@
 /* eslint-disable complexity */
 import { Node } from "ts-morph";
 
+import { isTranslatableString } from "./is-translatable.js";
+
 let tempIdCounter = 0;
 
 const allowedFunctions = new Set(["alert", "confirm", "prompt"]);
@@ -47,6 +49,63 @@ function getFullCallName(node: Node): null | string {
     return null;
 }
 
+/**
+ * Recursively extract string literals from complex expressions
+ * like ternary operators, logical operators, etc.
+ */
+function extractStringsFromExpression(expr: Node, results: ExtractedText[], seenNodes: Set<Node>): void {
+    if (!expr || seenNodes.has(expr)) return;
+
+    // String literal
+    if (Node.isStringLiteral(expr)) {
+        const text = expr.getLiteralText();
+        if (isTranslatableString(expr, text)) {
+            const tempKey = `i$fdw_${tempIdCounter++}`;
+            results.push({ node: expr, placeholders: [], tempKey, text });
+            seenNodes.add(expr);
+        }
+
+        return;
+    }
+
+    // Template literal
+    if (Node.isTemplateExpression(expr) || Node.isNoSubstitutionTemplateLiteral(expr)) {
+        const processed = processTemplateLiteral(expr);
+        if (processed && isTranslatableString(expr, processed.text)) {
+            const tempKey = `i$fdw_${tempIdCounter++}`;
+            results.push({ node: expr, placeholders: processed.placeholders, tempKey, text: processed.text });
+            seenNodes.add(expr);
+        }
+
+        return;
+    }
+
+    // Ternary operator: condition ? whenTrue : whenFalse
+    if (Node.isConditionalExpression(expr)) {
+        extractStringsFromExpression(expr.getWhenTrue(), results, seenNodes);
+        extractStringsFromExpression(expr.getWhenFalse(), results, seenNodes);
+        return;
+    }
+
+    // Binary expressions: logical AND (&&) and OR (||)
+    if (Node.isBinaryExpression(expr)) {
+        const operator = expr.getOperatorToken().getText();
+        if (operator === "&&" || operator === "||") {
+            // Extract from both sides to handle cases like 'text1' || 'text2'
+            extractStringsFromExpression(expr.getLeft(), results, seenNodes);
+            extractStringsFromExpression(expr.getRight(), results, seenNodes);
+        }
+
+        return;
+    }
+
+    // Parenthesized expression: (expression)
+    if (Node.isParenthesizedExpression(expr)) {
+        extractStringsFromExpression(expr.getExpression(), results, seenNodes);
+
+    }
+}
+
 // --- Extractor ---
 export function extractTexts(sourceFile: Node): ExtractedText[] {
     const results: ExtractedText[] = [];
@@ -61,43 +120,61 @@ export function extractTexts(sourceFile: Node): ExtractedText[] {
         // JSXText
         if (Node.isJsxText(node)) {
             text = node.getText().trim();
-        }
-
-        // JSXExpression con TemplateLiteral
-        else if (Node.isJsxExpression(node)) {
-            const expr = node.getExpression();
-            if (expr && (Node.isTemplateExpression(expr) || Node.isNoSubstitutionTemplateLiteral(expr))) {
-                const processed = processTemplateLiteral(expr);
-                if (processed) {
-                    text = processed.text;
-                    placeholders = processed.placeholders;
-                }
+            if (text && isTranslatableString(node, text)) {
+                const tempKey = `i$fdw_${tempIdCounter++}`;
+                results.push({ node, placeholders, tempKey, text });
+                seenNodes.add(node);
             }
+
+            return;
         }
 
-        // StringLiteral
-        else if (Node.isStringLiteral(node)) {
+        // JSXExpression - handle complex expressions
+        if (Node.isJsxExpression(node)) {
+            const expr = node.getExpression();
+            if (expr) {
+                extractStringsFromExpression(expr, results, seenNodes);
+            }
+
+            return;
+        }
+
+        // StringLiteral in JSX attributes or function calls
+        if (Node.isStringLiteral(node)) {
             text = node.getLiteralText();
         }
 
+        // Template literals in function calls
         else if (Node.isTemplateExpression(node) || Node.isNoSubstitutionTemplateLiteral(node)) {
-            text = processTemplateLiteral(node)?.text ?? null;
-            placeholders = processTemplateLiteral(node)?.placeholders ?? [];
+            const processed = processTemplateLiteral(node);
+            if (processed) {
+                text = processed.text;
+                placeholders = processed.placeholders;
+            }
         }
 
         if (!text) return;
+        if (!isTranslatableString(node, text)) return;
 
         const parent = node.getParent();
 
         let shouldExtract = false;
 
-        if (Node.isJsxText(node)) {
+        // Check if this is in a JSX attribute that we care about
+        if (Node.isJsxAttribute(parent) && allowedProps.has(parent.getNameNode().getText())) {
             shouldExtract = true;
-        } else if (Node.isJsxAttribute(parent) && allowedProps.has(parent.getNameNode().getText())) {
-            shouldExtract = true;
-        } else if (Node.isCallExpression(parent)) {
+        }
+        // Check if this is in an allowed function call
+        else if (Node.isCallExpression(parent)) {
             const fnName = getFullCallName(parent.getExpression());
             if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
+                shouldExtract = true;
+            }
+        }
+        // Check if string is inside a JSX expression within an attribute
+        else if (Node.isJsxExpression(parent)) {
+            const jsxExprParent = parent.getParent();
+            if (Node.isJsxAttribute(jsxExprParent) && allowedProps.has(jsxExprParent.getNameNode().getText())) {
                 shouldExtract = true;
             }
         }
@@ -125,24 +202,60 @@ export function replaceTempKeysWithT(mapped: MappedText[]) {
             ? `{ ${placeholders.map(p => `${p}: ${p}`).join(", ")} }`
             : "";
 
+        const tCall = `t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`;
+
         if (Node.isJsxText(node)) {
-            node.replaceWithText(`{t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})}`);
+            node.replaceWithText(`{${tCall}}`);
         } else if (Node.isStringLiteral(node)) {
             const parent = node.getParent();
+
+            // Direct JSX attribute: placeholder="text"
             if (Node.isJsxAttribute(parent) && allowedProps.has(parent.getNameNode().getText())) {
-                node.replaceWithText(`{t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})}`);
-            } else if (Node.isCallExpression(parent)) {
+                node.replaceWithText(`{${tCall}}`);
+            }
+            // String in JSX expression (e.g., within ternary): placeholder={condition ? "text" : ...}
+            else if (Node.isJsxExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // String in conditional expression
+            else if (Node.isConditionalExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // String in binary expression (&&, ||)
+            else if (Node.isBinaryExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // String in parenthesized expression
+            else if (Node.isParenthesizedExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // String in function call
+            else if (Node.isCallExpression(parent)) {
                 const fnName = getFullCallName(parent.getExpression());
                 if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
-                    node.replaceWithText(`t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`);
+                    node.replaceWithText(tCall);
                 }
             }
         } else if (Node.isTemplateExpression(node) || Node.isNoSubstitutionTemplateLiteral(node)) {
             const parent = node.getParent();
-            if (Node.isCallExpression(parent)) {
+
+            // Template in JSX expression
+            if (Node.isJsxExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // Template in conditional expression
+            else if (Node.isConditionalExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // Template in binary expression
+            else if (Node.isBinaryExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
+            // Template in function call
+            else if (Node.isCallExpression(parent)) {
                 const fnName = getFullCallName(parent.getExpression());
                 if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
-                    node.replaceWithText(`t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`);
+                    node.replaceWithText(tCall);
                 }
             }
         }

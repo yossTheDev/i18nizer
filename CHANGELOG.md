@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 0.2.0 (Upcoming)
+
+### Features
+* **Enhanced text extraction for complex JSX expressions**:
+  * Added support for extracting strings from ternary operators in JSX attributes and children (`condition ? "text1" : "text2"`)
+  * Added support for logical AND (`&&`) and OR (`||`) operators
+  * Added support for curly-braced string literals in JSX attributes (`placeholder={"text"}`)
+  * Improved filtering to skip non-translatable content (punctuation-only strings, single symbols like `*`, whitespace)
+* **Improved test coverage**:
+  * Added comprehensive test suite for all extraction edge cases
+  * Tests verify ternary operators, logical operators, nested expressions, and filtering logic
+* **CI/CD improvements**:
+  * Added test status badge to README
+  * Test workflow runs automatically on every push
+
 ## 0.1.0
 
 * Initial release

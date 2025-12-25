@@ -14,7 +14,10 @@ export function writeLocaleFiles(
         const content: Record<string, Record<string, string>> = {};
         content[namespace] = {};
 
-        for (const key of Object.keys(data[namespace])) {
+        // Sort keys for stable output
+        const sortedKeys = Object.keys(data[namespace]).sort();
+
+        for (const key of sortedKeys) {
             content[namespace][key] = data[namespace][key][locale];
         }
 
@@ -22,7 +25,9 @@ export function writeLocaleFiles(
         fs.mkdirSync(dir, { recursive: true });
 
         const filePath = path.join(dir, `${namespace}.json`);
-        fs.writeFileSync(filePath, JSON.stringify(content, null, 2));
+        
+        // Use 2-space indentation for clean, readable JSON
+        fs.writeFileSync(filePath, JSON.stringify(content, null, 2) + "\n");
 
         console.log(chalk.green(`💾 Locale file saved: ${filePath}`));
     }

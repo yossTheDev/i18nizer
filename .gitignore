@@ -1,5 +1,6 @@
 *-debug.log
 *-error.log
+*.tsbuildinfo
 **/.DS_Store
 /.idea
 /dist

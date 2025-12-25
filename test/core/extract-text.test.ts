@@ -1,5 +1,7 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 import { expect } from 'chai';
 import { Project, ts } from 'ts-morph';
+
 import { extractTexts, replaceTempKeysWithT } from '../../src/core/ast/extract-text.js';
 
 describe('extractTexts', () => {
@@ -23,7 +25,7 @@ describe('extractTexts', () => {
       const code = `<input placeholder="Enter your name" />`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Enter your name');
     });
@@ -32,7 +34,7 @@ describe('extractTexts', () => {
       const code = `<input placeholder={"Some text"} />`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Some text');
     });
@@ -45,7 +47,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(2);
       expect(results[0].text).to.equal('Select a city');
       expect(results[1].text).to.equal('Please select a state first');
@@ -59,7 +61,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Enter text here');
     });
@@ -72,7 +74,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Default placeholder');
     });
@@ -85,7 +87,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(2);
       const texts = results.map(r => r.text);
       expect(texts).to.include('Primary text');
@@ -98,7 +100,7 @@ describe('extractTexts', () => {
       const code = `<div>Hello World</div>`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Hello World');
     });
@@ -111,7 +113,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Select a date');
     });
@@ -124,7 +126,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('This is a message');
     });
@@ -137,7 +139,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Default message');
     });
@@ -148,7 +150,7 @@ describe('extractTexts', () => {
       const code = `<span>*</span>`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(0);
     });
 
@@ -156,7 +158,7 @@ describe('extractTexts', () => {
       const code = `<span>...</span>`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(0);
     });
 
@@ -164,7 +166,7 @@ describe('extractTexts', () => {
       const code = `<span>   </span>`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(0);
     });
 
@@ -172,7 +174,7 @@ describe('extractTexts', () => {
       const code = `<span>* Required field</span>`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('* Required field');
     });
@@ -181,7 +183,7 @@ describe('extractTexts', () => {
       const code = `<span>Price: €100</span>`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Price: €100');
     });
@@ -190,7 +192,7 @@ describe('extractTexts', () => {
       const code = `<span>€</span>`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(0);
     });
   });
@@ -200,7 +202,7 @@ describe('extractTexts', () => {
       const code = `alert(\`Hello \${name}, welcome!\`)`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Hello {name}, welcome!');
       expect(results[0].placeholders).to.include('name');
@@ -218,7 +220,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(3);
       const tempKeys = results.map(r => r.tempKey);
       const uniqueKeys = new Set(tempKeys);
@@ -237,7 +239,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results.length).to.be.at.least(2);
       const texts = results.map(r => r.text);
       expect(texts).to.include('Option A');
@@ -255,7 +257,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Seleccionar Especializaciones Destacadas');
     });
@@ -272,16 +274,16 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       // Should extract the template literal with placeholders and the string "Sin Categoría"
       expect(results.length).to.be.at.least(1);
-      
+
       // Check for the template literal
       const templateResult = results.find(r => r.text.includes('profile.categories'));
       if (templateResult) {
         expect(templateResult.placeholders.length).to.be.greaterThan(0);
       }
-      
+
       // Check for "Sin Categoría"
       const stringResult = results.find(r => r.text === 'Sin Categoría');
       expect(stringResult).to.exist;
@@ -295,7 +297,7 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
       expect(results[0].text).to.equal('Enter your name here');
     });
@@ -310,18 +312,18 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results).to.have.lengthOf(1);
-      
+
       // Replace with t() call
       const mapped = results.map(r => ({
         key: 'selectSpecialties',
         node: r.node,
         placeholders: r.placeholders
       }));
-      
+
       replaceTempKeysWithT(mapped);
-      
+
       const replacedCode = sourceFile.getText();
       expect(replacedCode).to.include('t("selectSpecialties")');
       expect(replacedCode).not.to.include('Seleccionar Especializaciones');
@@ -337,23 +339,23 @@ describe('extractTexts', () => {
       `;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
-      
+
       expect(results.length).to.be.at.least(1);
-      
+
       // Replace with t() calls
       const mapped = results.map((r, i) => ({
         key: `key${i}`,
         node: r.node,
         placeholders: r.placeholders
       }));
-      
+
       replaceTempKeysWithT(mapped);
-      
+
       const replacedCode = sourceFile.getText();
-      
+
       // Should have t() calls
       expect(replacedCode).to.include('t(');
-      
+
       // Should preserve placeholders if any
       const templateResult = results.find(r => r.placeholders.length > 0);
       if (templateResult) {

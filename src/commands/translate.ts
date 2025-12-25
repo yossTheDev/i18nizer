@@ -140,7 +140,11 @@ export default class Translate extends Command {
     // Initialize cache and deduplicator
     const projectDir = getProjectDir(cwd);
     const cache = new TranslationCache(projectDir);
-    const deduplicator = new Deduplicator(cache);
+    const deduplicator = new Deduplicator(
+      cache,
+      config.behavior.useAiForKeys,
+      provider
+    );
 
     let totalExtracted = 0;
     let totalReused = 0;
@@ -167,26 +171,28 @@ export default class Translate extends Command {
 
         totalExtracted += texts.length;
 
-        // Deduplicate and assign keys
-        const mappedTexts = texts.map((t) => {
-          const result = deduplicator.deduplicate(
-            t.text,
-            componentName,
-            config.behavior.detectDuplicates
-          );
+        // Deduplicate and assign keys (now async)
+        const mappedTexts = await Promise.all(
+          texts.map(async (t) => {
+            const result = await deduplicator.deduplicate(
+              t.text,
+              componentName,
+              config.behavior.detectDuplicates
+            );
 
-          if (result.isReused) totalReused++;
-          if (result.isCached) totalCached++;
+            if (result.isReused) totalReused++;
+            if (result.isCached) totalCached++;
 
-          return {
-            key: result.key,
-            node: t.node,
-            placeholders: t.placeholders,
-            tempKey: t.tempKey,
-            text: t.text,
-            isCached: result.isCached,
-          };
-        });
+            return {
+              key: result.key,
+              node: t.node,
+              placeholders: t.placeholders,
+              tempKey: t.tempKey,
+              text: t.text,
+              isCached: result.isCached,
+            };
+          })
+        );
 
         // Build translations JSON
         const i18nJson: Record<string, Record<string, string>> = {};

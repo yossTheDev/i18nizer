@@ -1,3 +1,5 @@
+import { generateEnglishKey } from "../ai/generate-english-key.js";
+import { Provider } from "../ai/client.js";
 import { generateKey, generateUniqueKey } from "../i18n/generate-key.js";
 import { TranslationCache } from "../cache/translation-cache.js";
 
@@ -25,20 +27,28 @@ export interface DeduplicationResult {
 export class Deduplicator {
   private cache: TranslationCache;
   private usedKeys = new Set<string>();
+  private useAiForKeys: boolean;
+  private provider: Provider;
 
-  constructor(cache: TranslationCache) {
+  constructor(
+    cache: TranslationCache,
+    useAiForKeys: boolean = true,
+    provider: Provider = "huggingface"
+  ) {
     this.cache = cache;
+    this.useAiForKeys = useAiForKeys;
+    this.provider = provider;
   }
 
   /**
    * Process a text and return a deterministic key
    * Reuses existing keys if the text was seen before
    */
-  deduplicate(
+  async deduplicate(
     text: string,
     componentName: string,
     detectDuplicates: boolean
-  ): DeduplicationResult {
+  ): Promise<DeduplicationResult> {
     // Check cache first
     const cached = this.cache.get(text);
 
@@ -53,7 +63,22 @@ export class Deduplicator {
     }
 
     // Generate a new deterministic key
-    const baseKey = generateKey(text);
+    let baseKey: string;
+
+    if (this.useAiForKeys && !cached) {
+      // Try to generate English key using AI
+      const aiKey = await generateEnglishKey(text, this.provider);
+      if (aiKey) {
+        baseKey = aiKey;
+      } else {
+        // Fallback to deterministic key generation
+        baseKey = generateKey(text);
+      }
+    } else {
+      // Use deterministic key generation (fallback or when AI is disabled)
+      baseKey = generateKey(text);
+    }
+
     const uniqueKey = generateUniqueKey(baseKey, this.usedKeys);
     this.usedKeys.add(uniqueKey);
 

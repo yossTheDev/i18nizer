@@ -310,4 +310,109 @@ describe("generateAggregator", () => {
     const outputPath = path.join(i18nDir, "messages.generated.ts");
     expect(fs.existsSync(outputPath)).to.be.true;
   });
+
+  it("should recursively scan all subdirectories for JSON files", () => {
+    // Setup: Create nested directory structure with JSON files
+    const enDir = path.join(messagesDir, "en");
+    const esDir = path.join(messagesDir, "es");
+
+    // Create nested folders: components/forms and components/buttons
+    const enFormsDir = path.join(enDir, "components", "forms");
+    const enButtonsDir = path.join(enDir, "components", "buttons");
+    const esFormsDir = path.join(esDir, "components", "forms");
+    const esButtonsDir = path.join(esDir, "components", "buttons");
+
+    fs.mkdirSync(enFormsDir, { recursive: true });
+    fs.mkdirSync(enButtonsDir, { recursive: true });
+    fs.mkdirSync(esFormsDir, { recursive: true });
+    fs.mkdirSync(esButtonsDir, { recursive: true });
+
+    // Create JSON files in nested directories
+    fs.writeFileSync(
+      path.join(enFormsDir, "login-form.json"),
+      JSON.stringify({
+        LoginForm: {
+          submit: "Submit",
+        },
+      })
+    );
+
+    fs.writeFileSync(
+      path.join(esFormsDir, "login-form.json"),
+      JSON.stringify({
+        LoginForm: {
+          submit: "Enviar",
+        },
+      })
+    );
+
+    fs.writeFileSync(
+      path.join(enButtonsDir, "submit-button.json"),
+      JSON.stringify({
+        SubmitButton: {
+          label: "Submit",
+        },
+      })
+    );
+
+    fs.writeFileSync(
+      path.join(esButtonsDir, "submit-button.json"),
+      JSON.stringify({
+        SubmitButton: {
+          label: "Enviar",
+        },
+      })
+    );
+
+    // Also add a top-level file
+    fs.writeFileSync(
+      path.join(enDir, "top-level.json"),
+      JSON.stringify({
+        TopLevel: {
+          test: "Test",
+        },
+      })
+    );
+
+    fs.writeFileSync(
+      path.join(esDir, "top-level.json"),
+      JSON.stringify({
+        TopLevel: {
+          test: "Prueba",
+        },
+      })
+    );
+
+    // Generate aggregator
+    generateAggregator(messagesDir, i18nDir);
+
+    // Verify file was created
+    const outputPath = path.join(i18nDir, "messages.generated.ts");
+    expect(fs.existsSync(outputPath)).to.be.true;
+
+    const content = fs.readFileSync(outputPath, "utf8");
+
+    // Check for imports from nested directories with valid identifiers
+    expect(content).to.include('ComponentsButtons_SubmitButton_en');
+    expect(content).to.include('ComponentsForms_LoginForm_en');
+    expect(content).to.include('TopLevel_en');
+    expect(content).to.include('ComponentsButtons_SubmitButton_es');
+    expect(content).to.include('ComponentsForms_LoginForm_es');
+    expect(content).to.include('TopLevel_es');
+
+    // Check paths include nested directories
+    expect(content).to.include('../messages/en/components/buttons/submit-button.json');
+    expect(content).to.include('../messages/en/components/forms/login-form.json');
+    expect(content).to.include('../messages/en/top-level.json');
+
+    // Verify no invalid identifiers with hyphens
+    const invalidPattern = /^import [a-zA-Z0-9_]+-[a-zA-Z0-9_]+ from/m;
+    expect(content).to.not.match(invalidPattern);
+
+    // Check export structure includes all files
+    expect(content).to.include("...ComponentsButtons_SubmitButton_en,");
+    expect(content).to.include("...ComponentsForms_LoginForm_en,");
+    expect(content).to.include("...TopLevel_en,");
+  });
 });
+

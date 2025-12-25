@@ -1,5 +1,6 @@
 import { Args, Command, Flags } from "@oclif/core";
 import chalk from "chalk";
+import os from "node:os";
 import path from "node:path";
 import ora, { Ora } from "ora";
 
@@ -11,6 +12,7 @@ import { parseFile } from "../core/ast/parse-file.js";
 import { replaceTempKeysWithT } from "../core/ast/replace-text-with-text.js";
 import { TranslationCache } from "../core/cache/translation-cache.js";
 import { Deduplicator } from "../core/deduplication/deduplicator.js";
+import { generateAggregator } from "../core/i18n/generate-aggregator.js";
 import { parseAiJson } from "../core/i18n/parse-ai-json.js";
 import { saveSourceFile } from "../core/i18n/sace-source-file.js";
 import { writeLocaleFiles } from "../core/i18n/write-files.js";
@@ -195,6 +197,11 @@ export default class Extract extends Command {
 
       // Save cache
       cache.save();
+
+      // Generate aggregator (extract uses home directory for standalone mode)
+      const homeDir = os.homedir();
+      const standaloneMessagesDir = path.join(homeDir, ".i18nizer", "messages");
+      generateAggregator(standaloneMessagesDir);
 
       this.log(chalk.green("✨ Component rewritten with t() calls"));
       this.log(chalk.green(`🌍 JSON files generated using ${provider}`));

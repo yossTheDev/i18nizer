@@ -1,5 +1,73 @@
 # CHANGELOG
 
+## 0.6.0 - Opinionated System & Generated Aggregator
+
+**This release introduces an opinionated system with automatic aggregator generation and enhanced configuration options.**
+
+### ✨ New Features
+
+* **Auto-Generated Aggregator** (`/i18n/messages.generated.ts`)
+  * Automatically scans `/messages/<locale>/` directories and generates a TypeScript aggregator file
+  * Imports all translation JSON files and exports them as a unified `messages` object
+  * Compatible with i18next and next-intl
+  * Includes warning comment to prevent manual editing
+  * Regenerates automatically after `translate` and `extract` commands
+  * Displays statistics about processed locales and namespaces
+
+* **Automatic .gitignore Management**
+  * `.i18nizer/` folder is automatically added to `.gitignore` during `i18nizer start`
+  * Keeps cache and temporary files out of version control
+  * `i18nizer.config.yml` remains tracked in git for team collaboration
+  * Prevents duplicate entries with intelligent pattern detection
+  * Handles various gitignore patterns (exact match, leading slash, wildcard)
+
+* **Configurable Locales**
+  * New `locales` field in `i18nizer.config.yml` under `messages` section
+  * Define project locales once in config instead of passing `--locales` flag every time
+  * Commands still accept `--locales` flag to override config setting
+  * Default locales: `["en", "es"]`
+
+### 🏗️ Opinionated Structure
+
+* **Messages Directory**: `/messages/<lang>/<namespace>.json`
+  * Separate folders per language for easier versioning
+  * Namespace = PascalCase (component name)
+  * Keys = camelCase
+  * No language mixing in files
+
+* **Generated Aggregator**: `/i18n/messages.generated.ts`
+  * Spread operator pattern for compatibility
+  * Sorted imports for consistency
+  * Auto-regenerated, never edited manually
+
+### 📝 Configuration Example
+
+```yaml
+messages:
+  path: messages
+  defaultLocale: en
+  locales:
+    - en
+    - es
+    - fr
+  format: json
+```
+
+### 🧪 Testing
+
+* Added 15 new comprehensive tests
+  * 7 tests for aggregator generation (edge cases, sorting, multiple locales)
+  * 8 tests for .gitignore management (patterns, duplicates, empty files)
+* All 118 tests passing with no regressions
+
+### 📚 Documentation
+
+* Updated README with aggregator usage examples
+* Added documentation for configurable locales
+* Updated project structure documentation
+
+---
+
 ## 0.5.1
 
 * Implement batch key generation to minimize AI requests

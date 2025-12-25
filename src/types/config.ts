@@ -18,6 +18,7 @@ export interface I18nizerConfig {
   messages: {
     path: string;
     defaultLocale: string;
+    locales: string[];
     format: "json";
   };
   behavior: {
@@ -62,6 +63,7 @@ export const DEFAULT_CONFIG: I18nizerConfig = {
   messages: {
     defaultLocale: "en",
     format: "json",
+    locales: ["en", "es"],
     path: "messages",
   },
 };

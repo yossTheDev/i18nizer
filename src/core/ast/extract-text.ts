@@ -7,7 +7,17 @@ let tempIdCounter = 0;
 
 const allowedFunctions = new Set(["alert", "confirm", "prompt"]);
 const allowedMemberFunctions = new Set(["toast.error", "toast.info", "toast.success", "toast.warn"]);
-const allowedProps = new Set(["alt", "aria-label", "placeholder", "title"]);
+const allowedProps = new Set([
+    "alt",
+    "aria-label",
+    "aria-placeholder",
+    "helperText",
+    "label",
+    "placeholder",
+    "text",
+    "title",
+    "tooltip",
+]);
 
 export interface ExtractedText {
     node: Node;

@@ -33,10 +33,8 @@ export default class Translate extends Command {
       description: "Path to a specific TSX/JSX file (optional, use --all for project-level)",
     }),
   };
-
   static override description =
     "🌍 Extract and translate strings from components (project-level or standalone)";
-
   static override flags = {
     all: Flags.boolean({
       char: "a",
@@ -63,6 +61,7 @@ export default class Translate extends Command {
     }),
   };
 
+  // eslint-disable-next-line complexity
   async run() {
     const { args, flags } = await this.parse(Translate);
     const cwd = process.cwd();
@@ -150,7 +149,7 @@ export default class Translate extends Command {
     let totalReused = 0;
     let totalCached = 0;
 
-    // Process each file
+    // Process each file sequentially
     for (const filePath of filesToProcess) {
       const componentName = path.basename(filePath).replace(/\.(tsx|jsx)$/, "");
       const spinner = ora(`Processing ${componentName}...`).start();
@@ -172,6 +171,7 @@ export default class Translate extends Command {
         totalExtracted += texts.length;
 
         // Deduplicate and assign keys (now async)
+        // eslint-disable-next-line no-await-in-loop
         const mappedTexts = await Promise.all(
           texts.map(async (t) => {
             const result = await deduplicator.deduplicate(
@@ -184,12 +184,12 @@ export default class Translate extends Command {
             if (result.isCached) totalCached++;
 
             return {
+              isCached: result.isCached,
               key: result.key,
               node: t.node,
               placeholders: t.placeholders,
               tempKey: t.tempKey,
               text: t.text,
-              isCached: result.isCached,
             };
           })
         );
@@ -230,6 +230,7 @@ export default class Translate extends Command {
             })),
           });
 
+          // eslint-disable-next-line no-await-in-loop
           const raw = await generateTranslations(prompt, provider);
           if (!raw) throw new Error("AI did not return any data");
 
@@ -243,7 +244,6 @@ export default class Translate extends Command {
           for (const mapped of textsNeedingTranslation) {
             const aiTranslations = namespace[mapped.tempKey];
             if (aiTranslations) {
-              const aiKey = aiTranslations.key;
               for (const locale of locales) {
                 i18nJson[mapped.key][locale] = aiTranslations[locale] ?? mapped.text;
               }

@@ -39,6 +39,7 @@ export class Deduplicator {
   private provider: Provider;
   private useAiForKeys: boolean;
   private usedKeys = new Set<string>();
+  private seenTexts = new Set<string>(); // Track all texts seen across all batches
   private stats: DeduplicationStats = {
     aiRequestsUsed: 0,
     cacheHits: 0,
@@ -88,9 +89,13 @@ export class Deduplicator {
       }
     }
 
-    // Track unique strings
-    const uniqueTexts = new Set(texts);
-    this.stats.uniqueStrings += uniqueTexts.size;
+    // Track unique strings across all batches
+    for (const text of texts) {
+      if (!this.seenTexts.has(text)) {
+        this.seenTexts.add(text);
+        this.stats.uniqueStrings++;
+      }
+    }
 
     // Second pass: generate keys for uncached texts
     if (uncachedTexts.length > 0) {
@@ -173,5 +178,6 @@ export class Deduplicator {
       totalStrings: 0,
       uniqueStrings: 0,
     };
+    this.seenTexts.clear();
   }
 }

@@ -104,7 +104,7 @@ export default class Extract extends Command {
     const deduplicationResults = await deduplicator.deduplicateBatch(
       textList,
       componentName,
-      false // Don't detect duplicates for standalone extract
+      false // Standalone extraction: generate fresh keys without reusing from cache
     );
 
     const stats = deduplicator.getStats();

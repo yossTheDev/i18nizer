@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.2
+
+* Minor Fixes
+
 ## 0.6.1 Some Improvements
 
 ### Added

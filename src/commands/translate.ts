@@ -19,6 +19,7 @@ import {
   loadConfig,
 } from "../core/config/config-manager.js";
 import { Deduplicator } from "../core/deduplication/deduplicator.js";
+import { generateAggregator } from "../core/i18n/generate-aggregator.js";
 import { parseAiJson } from "../core/i18n/parse-ai-json.js";
 import { saveSourceFile } from "../core/i18n/sace-source-file.js";
 import { writeLocaleFiles } from "../core/i18n/write-files.js";
@@ -316,6 +317,12 @@ export default class Translate extends Command {
     // Save cache
     if (!flags["dry-run"]) {
       cache.save();
+
+      // Generate aggregator if project is initialized
+      if (isInitialized) {
+        const messagesDir = getMessagesDir(cwd, config);
+        generateAggregator(messagesDir);
+      }
     }
 
     // Get statistics from deduplicator

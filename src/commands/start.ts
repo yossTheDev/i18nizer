@@ -13,6 +13,7 @@ import {
   normalizeI18nLibrary,
   writeConfig,
 } from "../core/config/config-manager.js";
+import { ensureConfigInGitignore } from "../core/config/gitignore-manager.js";
 import { Framework, I18nLibrary } from "../types/config.js";
 
 export default class Start extends Command {
@@ -155,6 +156,15 @@ export default class Start extends Command {
       spinner.succeed(
         `✅ Created ${chalk.cyan(config.messages.path + "/")} directory`
       );
+
+      // Add config to .gitignore
+      spinner.start("Adding config to .gitignore...");
+      const addedToGitignore = ensureConfigInGitignore(cwd);
+      if (addedToGitignore) {
+        spinner.succeed(`✅ Added ${chalk.cyan("i18nizer.config.yml")} to .gitignore`);
+      } else {
+        spinner.info(`ℹ️  ${chalk.cyan("i18nizer.config.yml")} already in .gitignore`);
+      }
 
       // Summary
       this.log("");

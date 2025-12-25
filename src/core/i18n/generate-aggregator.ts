@@ -2,6 +2,8 @@ import chalk from "chalk";
 import fs from "node:fs";
 import path from "node:path";
 
+import { filenameToIdentifier } from "./filename-utils.js";
+
 /**
  * Generates the aggregator TypeScript file that imports all translation JSON files
  * and exports them as a single messages object.
@@ -58,7 +60,9 @@ export function generateAggregator(
 
     for (const file of files) {
       const namespace = path.basename(file, ".json");
-      const importName = `${namespace}_${locale}`;
+      // Convert filename to valid TypeScript identifier (kebab-case to PascalCase)
+      const identifier = filenameToIdentifier(namespace);
+      const importName = `${identifier}_${locale}`;
       const relativePath = `../messages/${locale}/${file}`;
 
       imports.push(`import ${importName} from "${relativePath}";`);

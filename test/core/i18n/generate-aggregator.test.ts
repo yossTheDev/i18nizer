@@ -93,24 +93,101 @@ describe("generateAggregator", () => {
     // Read and verify content
     const content = fs.readFileSync(outputPath, "utf8");
 
-    // Check for imports
-    expect(content).to.include('import common_en from "../messages/en/common.json"');
-    expect(content).to.include('import auth_en from "../messages/en/auth.json"');
-    expect(content).to.include('import common_es from "../messages/es/common.json"');
-    expect(content).to.include('import auth_es from "../messages/es/auth.json"');
+    // Check for imports - should use PascalCase identifiers
+    expect(content).to.include('import Common_en from "../messages/en/common.json"');
+    expect(content).to.include('import Auth_en from "../messages/en/auth.json"');
+    expect(content).to.include('import Common_es from "../messages/es/common.json"');
+    expect(content).to.include('import Auth_es from "../messages/es/auth.json"');
 
     // Check for export structure
     expect(content).to.include("export const messages = {");
     expect(content).to.include("en: {");
     expect(content).to.include("es: {");
-    expect(content).to.include("...common_en,");
-    expect(content).to.include("...auth_en,");
-    expect(content).to.include("...common_es,");
-    expect(content).to.include("...auth_es,");
+    expect(content).to.include("...Common_en,");
+    expect(content).to.include("...Auth_en,");
+    expect(content).to.include("...Common_es,");
+    expect(content).to.include("...Auth_es,");
     expect(content).to.include("} as const;");
 
     // Check for warning comment
     expect(content).to.include("DO NOT EDIT MANUALLY");
+  });
+
+  it("should handle hyphenated filenames with valid TypeScript identifiers", () => {
+    // Setup: Create test JSON files with hyphenated names
+    const enDir = path.join(messagesDir, "en");
+    const esDir = path.join(messagesDir, "es");
+
+    fs.mkdirSync(enDir, { recursive: true });
+    fs.mkdirSync(esDir, { recursive: true });
+
+    // Create notification-item.json
+    fs.writeFileSync(
+      path.join(enDir, "notification-item.json"),
+      JSON.stringify({
+        NotificationItem: {
+          title: "New Notification",
+          dismiss: "Dismiss",
+        },
+      })
+    );
+
+    fs.writeFileSync(
+      path.join(esDir, "notification-item.json"),
+      JSON.stringify({
+        NotificationItem: {
+          title: "Nueva Notificación",
+          dismiss: "Descartar",
+        },
+      })
+    );
+
+    // Create collapsible-text.json
+    fs.writeFileSync(
+      path.join(enDir, "collapsible-text.json"),
+      JSON.stringify({
+        CollapsibleText: {
+          showMore: "Show more",
+          showLess: "Show less",
+        },
+      })
+    );
+
+    fs.writeFileSync(
+      path.join(esDir, "collapsible-text.json"),
+      JSON.stringify({
+        CollapsibleText: {
+          showMore: "Mostrar más",
+          showLess: "Mostrar menos",
+        },
+      })
+    );
+
+    // Generate aggregator
+    generateAggregator(messagesDir, i18nDir);
+
+    // Verify file was created
+    const outputPath = path.join(i18nDir, "messages.generated.ts");
+    expect(fs.existsSync(outputPath)).to.be.true;
+
+    // Read and verify content
+    const content = fs.readFileSync(outputPath, "utf8");
+
+    // Check for imports with valid TypeScript identifiers (PascalCase)
+    expect(content).to.include('import NotificationItem_en from "../messages/en/notification-item.json"');
+    expect(content).to.include('import CollapsibleText_en from "../messages/en/collapsible-text.json"');
+    expect(content).to.include('import NotificationItem_es from "../messages/es/notification-item.json"');
+    expect(content).to.include('import CollapsibleText_es from "../messages/es/collapsible-text.json"');
+
+    // Check for export structure with valid identifiers
+    expect(content).to.include("...NotificationItem_en,");
+    expect(content).to.include("...CollapsibleText_en,");
+    expect(content).to.include("...NotificationItem_es,");
+    expect(content).to.include("...CollapsibleText_es,");
+
+    // Verify no invalid identifiers with hyphens
+    expect(content).to.not.include("notification-item_en");
+    expect(content).to.not.include("collapsible-text_en");
   });
 
   it("should handle single locale with multiple namespaces", () => {

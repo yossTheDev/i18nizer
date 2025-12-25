@@ -3,6 +3,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+import { componentNameToFilename } from "./filename-utils.js";
+
 const DEFAULT_CONFIG_DIR = path.join(os.homedir(), ".i18nizer", "messages");
 
 export function writeLocaleFiles(
@@ -12,6 +14,9 @@ export function writeLocaleFiles(
     outputDir?: string
 ) {
     const baseDir = outputDir ?? DEFAULT_CONFIG_DIR;
+    
+    // Convert namespace to lowercase-hyphen format for filename
+    const filename = componentNameToFilename(namespace);
     
     for (const locale of locales) {
         const content: Record<string, Record<string, string>> = {};
@@ -27,7 +32,7 @@ export function writeLocaleFiles(
         const dir = path.join(baseDir, locale);
         fs.mkdirSync(dir, { recursive: true });
 
-        const filePath = path.join(dir, `${namespace}.json`);
+        const filePath = path.join(dir, `${filename}.json`);
         
         // Use 2-space indentation for clean, readable JSON
         fs.writeFileSync(filePath, JSON.stringify(content, null, 2) + "\n");

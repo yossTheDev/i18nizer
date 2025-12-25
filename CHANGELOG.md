@@ -7,9 +7,13 @@
 ### ✨ New Features
 
 * **`i18nizer start` command**: Initialize i18nizer in your project
-  * Automatic framework detection (Next.js, React)
+  * **Interactive mode**: Prompts for framework and i18n library selection (like `yarn create vite`)
+  * **Automatic framework detection** (Next.js, React)
+  * **Automatic i18n library detection** (next-intl, react-i18next, i18next)
+  * **Manual configuration** with `--framework` and `--i18n` flags
+  * **Non-interactive mode** with `--yes` flag for CI/automation
   * Framework presets with optimal defaults
-  * Generates `i18nizer.config.yml` configuration file
+  * Generates `i18nizer.config.yml` configuration file with detected i18n library
   * Creates `.i18nizer/` directory for caching and project data
   * Sets up configurable `messages/` directory
 
@@ -23,7 +27,9 @@
 
 * **Configuration system**:
   * YAML-based configuration (`i18nizer.config.yml`)
-  * Framework presets (Next.js + next-intl, React + react-i18next)
+  * Framework presets (Next.js, React, Custom)
+  * I18n library-specific configurations (next-intl, react-i18next, i18next)
+  * Combined presets (e.g., Next.js + next-intl, React + react-i18next)
   * Configurable i18n function and import source
   * Customizable messages directory and default locale
   * Configurable behavior (deduplication, allowed props/functions)
@@ -48,6 +54,7 @@
 * **Enhanced CLI feedback**:
   * Colored output with chalk
   * Progress spinners with ora
+  * Interactive prompts with inquirer
   * Detailed summary statistics
   * Clear error messages and guidance
 

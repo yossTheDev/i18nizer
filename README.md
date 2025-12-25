@@ -55,22 +55,48 @@ Keys are stored inside:
 
 ### Initialize Your Project
 
+#### Interactive Mode (Recommended)
+
 ```bash
 i18nizer start
 ```
 
-This command will:
-- Detect your framework (Next.js or React)
-- Create `i18nizer.config.yml` with optimal defaults
-- Set up `.i18nizer/` directory for caching and project data
-- Create `messages/` directory for translation files
+This launches an **interactive setup** that will:
+- 🔍 Auto-detect your framework (Next.js or React)
+- 🔍 Auto-detect your i18n library (next-intl, react-i18next, i18next)
+- ❓ Ask you to confirm or change the detected settings
+- ✅ Create `i18nizer.config.yml` with optimal defaults
+- 📁 Set up `.i18nizer/` directory for caching and project data
+- 📂 Create `messages/` directory for translation files
 
-You can also specify a framework preset:
+#### Non-Interactive Mode (CI/Automation)
 
 ```bash
-i18nizer start --preset nextjs
-i18nizer start --preset react
+i18nizer start --yes
 ```
+
+Auto-detects and uses default values without prompts.
+
+#### Manual Configuration
+
+Specify framework and i18n library explicitly:
+
+```bash
+# Next.js with next-intl
+i18nizer start --framework nextjs --i18n next-intl
+
+# React with react-i18next
+i18nizer start --framework react --i18n react-i18next
+
+# Custom setup
+i18nizer start --framework custom --i18n custom
+```
+
+**Available options:**
+- `--framework`: `nextjs`, `react`, `custom`
+- `--i18n`: `next-intl`, `react-i18next`, `i18next`, `custom`
+- `--yes`, `-y`: Skip interactive prompts
+- `--force`, `-f`: Re-initialize existing project
 
 ### Translate Your Components
 

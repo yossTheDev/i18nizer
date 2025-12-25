@@ -1,8 +1,7 @@
 # CHANGELOG
 
-## 0.2.0 (Upcoming)
+## 0.2.0
 
-### Features
 * **Enhanced text extraction for complex JSX expressions**:
   * Added support for extracting strings from ternary operators in JSX attributes and children (`condition ? "text1" : "text2"`)
   * Added support for logical AND (`&&`) and OR (`||`) operators
@@ -15,26 +14,17 @@
   * Added test status badge to README
   * Test workflow runs automatically on every push
 
-## 0.1.0
-
-* Initial release
-* Supported AI providers: OpenAI, Hugging Face, Gemini
-* CLI works with JSX and TSX files
-* Console logs show paths of saved locale files
-* Ensures CLI works independently of user project tsconfig
-
-## 0.1.1
-
-* Added `.i18nizer` folder in project root for CLI data
-  * `.i18nizer/tsconfig.json` for isolated TypeScript analysis
-  * `.i18nizer/api-keys.json` for storing API keys locally per project
-  * `.i18nizer/messages/` to store generated locale JSON files
-* Automatically creates default `tsconfig.json` and `api-keys.json` if they do not exist
-* Ensures CLI works independently of user project tsconfig
-  
-## 0.1.2
+## 0.1.5
 
 * Minor Fixes
+  
+## 0.1.4
+
+* Support for member function calls in text extraction and replacement (e.g., `toast.error`, `toast.success`, `toast.info`, `toast.warn`).
+* `getFullCallName` helper added to properly handle member expressions when replacing or extracting text.
+* Template literals inside allowed member functions are now correctly processed.
+* JSX attributes, string literals, and template literals inside allowed calls now support placeholders in `t("key", { ... })`.
+* Comments in replacement code updated to be fully in English for clarity.
 
 ## 0.1.3
 
@@ -46,14 +36,23 @@
 * Support any number of locales dynamically.
 * Ensure the AI outputs valid JSON only, with no explanations or markdown.
 
-## 0.1.4
-
-* Support for member function calls in text extraction and replacement (e.g., `toast.error`, `toast.success`, `toast.info`, `toast.warn`).
-* `getFullCallName` helper added to properly handle member expressions when replacing or extracting text.
-* Template literals inside allowed member functions are now correctly processed.
-* JSX attributes, string literals, and template literals inside allowed calls now support placeholders in `t("key", { ... })`.
-* Comments in replacement code updated to be fully in English for clarity.
-
-## 0.1.5
+## 0.1.2
 
 * Minor Fixes
+
+## 0.1.1
+
+* Added `.i18nizer` folder in project root for CLI data
+  * `.i18nizer/tsconfig.json` for isolated TypeScript analysis
+  * `.i18nizer/api-keys.json` for storing API keys locally per project
+  * `.i18nizer/messages/` to store generated locale JSON files
+* Automatically creates default `tsconfig.json` and `api-keys.json` if they do not exist
+* Ensures CLI works independently of user project tsconfig
+  
+## 0.1.0
+
+* Initial release
+* Supported AI providers: OpenAI, Hugging Face, Gemini
+* CLI works with JSX and TSX files
+* Console logs show paths of saved locale files
+* Ensures CLI works independently of user project tsconfig

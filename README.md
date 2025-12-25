@@ -124,6 +124,21 @@ i18nizer translate <file> --dry-run
 i18nizer translate <file> --show-json
 ```
 
+### Regenerate Aggregator
+
+**Rebuild the auto-generated aggregator file:**
+
+```bash
+i18nizer regenerate
+```
+
+This command regenerates the `i18n/messages.generated.ts` file by scanning all JSON files in your messages directory. Use this when:
+- You manually add or remove translation JSON files
+- You rename JSON files
+- The aggregator becomes out of sync with your messages
+
+The aggregator automatically uses valid TypeScript identifiers for imports, converting hyphenated filenames (e.g., `notification-item.json`) to PascalCase identifiers (e.g., `NotificationItem_en`).
+
 ### Legacy Command (Still Supported)
 
 ```bash
@@ -175,7 +190,7 @@ export function Login() {
 
 ---
 
-### Generated JSON (`messages/en/Login.json`)
+### Generated JSON (`messages/en/login.json`)
 
 ```json
 {
@@ -186,6 +201,8 @@ export function Login() {
   }
 }
 ```
+
+**Note:** The filename uses lowercase-hyphen format (`login.json`), while the namespace inside uses PascalCase (`Login`).
 
 ---
 
@@ -200,14 +217,18 @@ your-project/
 │  ├─ cache/
 │  │  └─ translations.json   # Translation cache
 │  └─ ...
+├─ i18n/
+│  └─ messages.generated.ts  # Auto-generated aggregator (imports all JSON files)
 └─ messages/                 # Translation files (configurable path)
    ├─ en/
-   │  └─ Login.json
+   │  └─ login.json          # Lowercase-hyphen format for filenames
    ├─ es/
-   │  └─ Login.json
+   │  └─ login.json
    └─ fr/
-      └─ Login.json
+      └─ login.json
 ```
+
+**Note:** JSON filenames use lowercase-hyphen format (e.g., `notification-item.json`, `user-profile.json`), while the namespace inside the JSON file uses PascalCase (e.g., `NotificationItem`, `UserProfile`). The auto-generated aggregator converts filenames to valid TypeScript identifiers.
 
 Legacy standalone mode (without `i18nizer start`):
 
@@ -215,13 +236,15 @@ Legacy standalone mode (without `i18nizer start`):
 [HOME]/.i18nizer/
 ├─ api-keys.json
 ├─ tsconfig.json
+├─ i18n/
+│  └─ messages.generated.ts  # Auto-generated aggregator
 └─ messages/
    ├─ en/
-   │  └─ Login.json
+   │  └─ login.json
    ├─ es/
-   │  └─ Login.json
+   │  └─ login.json
    └─ fr/
-      └─ Login.json
+      └─ login.json
 ```
 
 ---

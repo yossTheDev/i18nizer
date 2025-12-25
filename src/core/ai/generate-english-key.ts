@@ -28,7 +28,7 @@ RULES:
 - Output format: { "original text": "camelCaseKey" }
 
 TEXTS:
-${texts.map((t, i) => `${i + 1}. "${t.replaceAll('"', '\\"')}"`).join("\n")}
+${texts.map((t, i) => `${i + 1}. ${JSON.stringify(t)}`).join("\n")}
 
 EXAMPLES:
 { "Bienvenido de nuevo": "welcomeBack", "Por favor inicia sesión": "pleaseSignIn" }
@@ -69,7 +69,19 @@ OUTPUT (JSON only):`.trim();
  * Generate an English camelCase key from text using AI
  * This ensures keys are always in English regardless of source language
  * 
- * @deprecated Use generateEnglishKeysBatch for better efficiency
+ * @deprecated Use generateEnglishKeysBatch for better efficiency. This method
+ * will be removed in a future version. To migrate, collect all texts and call
+ * generateEnglishKeysBatch once:
+ * 
+ * @example
+ * // Before:
+ * const key1 = await generateEnglishKey(text1);
+ * const key2 = await generateEnglishKey(text2);
+ * 
+ * // After:
+ * const keyMap = await generateEnglishKeysBatch([text1, text2]);
+ * const key1 = keyMap.get(text1);
+ * const key2 = keyMap.get(text2);
  */
 export async function generateEnglishKey(
   text: string,
@@ -85,7 +97,7 @@ RULES:
 - Key should describe the content/purpose
 - Do NOT include quotes, explanations, or any other text
 
-TEXT: "${text.replaceAll('"', '\\"')}"
+TEXT: ${JSON.stringify(text)}
 
 EXAMPLES:
 TEXT: "Bienvenido de nuevo" -> welcomeBack

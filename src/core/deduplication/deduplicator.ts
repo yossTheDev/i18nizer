@@ -126,7 +126,18 @@ export class Deduplicator {
    * Process a single text and return a deterministic key
    * Reuses existing keys if the text was seen before
    * 
-   * @deprecated Use deduplicateBatch for better efficiency
+   * @deprecated Use deduplicateBatch for better efficiency. This method will be
+   * removed in v1.0. To migrate, collect texts and call deduplicateBatch once:
+   * 
+   * @example
+   * // Before:
+   * const result1 = await deduplicator.deduplicate(text1, comp, true);
+   * const result2 = await deduplicator.deduplicate(text2, comp, true);
+   * 
+   * // After:
+   * const results = await deduplicator.deduplicateBatch([text1, text2], comp, true);
+   * const result1 = results.get(text1);
+   * const result2 = results.get(text2);
    */
   async deduplicate(
     text: string,

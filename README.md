@@ -140,17 +140,48 @@ export function Login() {
 - Always generates **English camelCase keys**
 - Supports **any number of locales**
 - Isolated TypeScript parsing (no project tsconfig required)
-- Friendly logs, and errors
+- Friendly logs and errors
+
+### Supported Extraction Cases
+
+- **JSX text children**: `<div>Hello</div>`
+- **JSX attributes**: `placeholder`, `title`, `alt`, `aria-label`, `aria-placeholder`, `label`, `text`, `tooltip`, `helperText`
+- **String literals**: `placeholder="Enter name"`
+- **Curly-braced strings**: `placeholder={"Enter name"}`
+- **Template literals**: `` placeholder={`Enter name`} ``
+- **Template literals with placeholders**: `` <p>{`Hello ${name}`}</p> ``
+- **Ternary operators**: `placeholder={condition ? "Text A" : "Text B"}`
+- **Logical AND**: `{condition && "Visible text"}`
+- **Logical OR**: `{condition || "Fallback text"}`
+- **Nested expressions**: Complex combinations of the above
+
+### Filtering & Quality
+
+- **Skips non-translatable content**: Single symbols (`*`, `|`), punctuation-only strings (`...`), whitespace
+- **Deterministic key generation**: Same input always produces the same key
+- **Stable JSON output**: Alphabetically sorted keys, consistent formatting
+- **2-space indentation**: Clean and diff-friendly JSON files
 
 ---
 
 ## 🔮 Roadmap
 
-- Configurable output directory
-- Framework support (Vue, Svelte)
-- i18n library presets (`next-intl`, `react-i18next`)
-- Watch mode
-- Non-AI fallback mode
+- [ ] Cross-file string deduplication
+- [ ] Key reuse mechanism
+- [ ] Configurable output directory
+- [ ] Framework support (Vue, Svelte)
+- [ ] i18n library presets (`next-intl`, `react-i18next`)
+- [ ] Watch mode
+- [ ] Non-AI fallback mode
+
+---
+
+## ⚠️ Current Limitations
+
+- Does not yet deduplicate identical strings across files
+- AI-generated keys may vary between runs (deterministic fallback available)
+- Only supports React JSX/TSX (no Vue, Svelte yet)
+- Does not handle runtime-only string generation
 
 ---
 

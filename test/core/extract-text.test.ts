@@ -30,6 +30,51 @@ describe('extractTexts', () => {
       expect(results[0].text).to.equal('Enter your name');
     });
 
+    it('should extract from label prop', () => {
+      const code = `<button label="Click me" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Click me');
+    });
+
+    it('should extract from text prop', () => {
+      const code = `<Component text="Some text content" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Some text content');
+    });
+
+    it('should extract from tooltip prop', () => {
+      const code = `<button tooltip="Help text" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Help text');
+    });
+
+    it('should extract from helperText prop', () => {
+      const code = `<input helperText="Enter at least 8 characters" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Enter at least 8 characters');
+    });
+
+    it('should extract from aria-placeholder prop', () => {
+      const code = `<input aria-placeholder="Type your message" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Type your message');
+    });
+
     it('should extract string wrapped in curly braces', () => {
       const code = `<input placeholder={"Some text"} />`;
       const sourceFile = createTestFile(code);
@@ -164,6 +209,38 @@ describe('extractTexts', () => {
 
     it('should not extract whitespace-only strings', () => {
       const code = `<span>   </span>`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should not extract symbols like pipe', () => {
+      const code = `<span>|</span>`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should not extract symbols like dash', () => {
+      const code = `<span>-</span>`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should not extract multiple symbols without text', () => {
+      const code = `<span>***</span>`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should not extract combinations of punctuation', () => {
+      const code = `<span>-|-</span>`;
       const sourceFile = createTestFile(code);
       const results = extractTexts(sourceFile);
 

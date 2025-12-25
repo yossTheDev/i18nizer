@@ -9,7 +9,17 @@ interface MappedText {
 }
 
 // Allowed JSX props to replace text
-const allowedProps = new Set(["alt", "aria-label", "placeholder", "title"]);
+const allowedProps = new Set([
+    "alt",
+    "aria-label",
+    "aria-placeholder",
+    "helperText",
+    "label",
+    "placeholder",
+    "text",
+    "title",
+    "tooltip",
+]);
 
 // Allowed functions for simple calls
 const allowedFunctions = new Set(["alert", "confirm", "prompt"]);

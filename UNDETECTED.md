@@ -1,5 +1,7 @@
 # Undetectable Code Right Now
 
+## code 1
+
 ``` tsx
    <span
           className={clsx(
@@ -20,6 +22,12 @@
                   return `Hace ${Math.floor(diff / 86400)} días`;
                 return createdAt.toLocaleString();
               })()
-            : t("justNow")}
+            : "Justo ahora"}
         </span>
+```
+
+### code 2
+
+``` jsx
+   {some.property ?? "Not specified"}
 ```

@@ -31,3 +31,22 @@
 ``` jsx
    {some.property ?? "Not specified"}
 ```
+
+### code 3
+
+No processing strings in className and key
+
+``` jsx
+<button
+              key={`${name.id}-other-${lastname}`}
+              onClick={() => setAction(lastname)}
+              className={`relative whitespace-nowrap px-4 py-2 font-medium focus:outline-none transition duration-150 ${
+                active === name
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600 hover:text-gray-800"
+              } ${namesApproved[name] ? "border-green-600 text-green-600" : ""}`}
+            >
+              {role}
+            </button>
+
+```

@@ -13,15 +13,43 @@
 
 ---
 
-**i18nizer** is a developer-first CLI that **extracts translatable strings from JSX/TSX files**, automatically generates **i18n JSON files**, and **rewrites your components to use `t()`**.
+**i18nizer automates the boring parts of i18n.**
 
-It is designed to be fast, scriptable, CI-friendly, and completely **independent from your project configuration**.
+If your project already uses **i18next** or **next-intl**, i18nizer:
 
-### Supported AI Providers
+- extracts hardcoded strings from JSX/TSX
+- generates i18n JSON files using **AI-assisted translations**
+- creates readable English keys (**AI-powered & cached**)
+- rewrites your components to use `t("key")`
+
+No runtime, no lock-in, no SaaS.  
+Just a CLI that fits into your existing development workflow.
+
+## 🤖 How translations work
+
+i18nizer uses AI providers (OpenAI, Gemini, Hugging Face) to generate translations
+at development time.
+
+- Translations are generated once and stored as plain JSON files
+- Output is fully editable and version-controlled
+- No AI is required at runtime
+- Cached translations avoid repeated AI requests
+
+You own the result — i18nizer only automates the process.
+
+## Who is this for?
+
+- React / Next.js developers already using i18next or next-intl
+- Teams tired of manually extracting strings and managing i18n JSONs
+- Projects that want automation without changing runtime behavior
+
+## Supported AI Providers
 
 - **OpenAI**
 - **Google Gemini**
 - **Hugging Face (DeepSeek)**
+
+      Used for development-time translations and key generation.
 
 ---
 
@@ -62,6 +90,7 @@ i18nizer start
 ```
 
 This launches an **interactive setup** that will:
+
 - 🔍 Auto-detect your framework (Next.js or React)
 - 🔍 Auto-detect your i18n library (next-intl, react-i18next, i18next)
 - ❓ Ask you to confirm or change the detected settings
@@ -93,6 +122,7 @@ i18nizer start --framework custom --i18n custom
 ```
 
 **Available options:**
+
 - `--framework`: `nextjs`, `react`, `custom`
 - `--i18n`: `next-intl`, `react-i18next`, `i18next`, `custom`
 - `--yes`, `-y`: Skip interactive prompts
@@ -133,6 +163,7 @@ i18nizer regenerate
 ```
 
 This command regenerates the `i18n/messages.generated.ts` file by scanning all JSON files in your messages directory. Use this when:
+
 - You manually add or remove translation JSON files
 - You rename JSON files
 - The aggregator becomes out of sync with your messages
@@ -262,6 +293,7 @@ const t = useTranslations("ComponentName");
 This behavior is controlled by `behavior.autoInjectT` in `i18nizer.config.yml`:
 
 **Next.js Projects** (disabled by default):
+
 ```yaml
 behavior:
   autoInjectT: false  # Disabled to avoid breaking Server Components
@@ -272,6 +304,7 @@ behavior:
 - You manually add the translation hook where appropriate
 
 **React Projects** (enabled by default):
+
 ```yaml
 behavior:
   autoInjectT: true  # Safe for Client Components
@@ -281,6 +314,7 @@ behavior:
 - Works seamlessly with React components
 
 **Why disabled for Next.js?**
+
 - Automatically detecting Server vs Client Components is ambiguous
 - Injecting hooks in Server Components causes runtime errors
 - User has full control over translation function placement
@@ -297,12 +331,14 @@ behavior:
 ```
 
 **Benefits:**
+
 - **Consistent keys**: Keys are always in English, even if your source text is in Spanish, French, German, etc.
 - **Readable**: `welcomeBack` instead of `bienvenidoDeNuevo`
 - **Stable**: Keys are cached per source text for deterministic behavior across runs
 - **Minimal diffs**: Same source text always produces the same key
 
 **How it works:**
+
 1. First run: AI generates an English key for each source text
 2. Key is cached with the source text hash
 3. Subsequent runs: Cached key is reused (no AI call needed)
@@ -311,12 +347,14 @@ behavior:
 **Example:**
 
 Source text (Spanish):
+
 ```tsx
 <h1>Bienvenido de nuevo</h1>
 <button>Iniciar sesión</button>
 ```
 
 Generated keys (English):
+
 ```json
 {
   "welcomeBack": "Bienvenido de nuevo",
@@ -383,12 +421,14 @@ Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish
 ## 🔮 Roadmap
 
 ### ✅ Phase 0: Foundation & Reliability (Complete)
+
 - Stable extraction and replacement
 - Deterministic key generation
 - Comprehensive test coverage
 - JSON output quality
 
 ### ✅ Phase 1: Project Integration (Complete)
+
 - `i18nizer start` command for project initialization
 - `i18nizer translate` command with `--all` flag
 - Configuration system with YAML
@@ -399,6 +439,7 @@ Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish
 - Dry-run and JSON preview modes
 
 ### 🚧 Phase 2: Advanced Features (Planned)
+
 - [ ] Watch mode for continuous translation
 - [ ] Non-AI fallback mode
 - [ ] Framework support (Vue, Svelte)
@@ -412,6 +453,7 @@ Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish
 ## ⚠️ Current Limitations
 
 - AI-generated keys may vary between runs (deterministic fallback available)
+- Cached keys minimize diffs across runs.
 - Only supports React JSX/TSX (no Vue, Svelte yet)
 - Does not handle runtime-only string generation
 

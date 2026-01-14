@@ -1,0 +1,211 @@
+export const metadata = {
+  title: 'i18nizer - Automated i18n for React & Next.js',
+  description: 'CLI tool to extract translatable strings from JSX/TSX files, generate i18n JSON with AI translations, and rewrite components automatically.',
+}
+
+# i18nizer
+
+<div className="text-center py-12">
+  <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary-600 to-green-600 bg-clip-text text-transparent">
+    i18nizer
+  </h1>
+  <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+    Automate the boring parts of internationalization for React and Next.js projects
+  </p>
+  <div className="flex gap-4 justify-center">
+    <a
+      href="/getting-started"
+      className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+    >
+      Get Started
+    </a>
+    <a
+      href="https://github.com/yossTheDev/i18nizer"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-600 dark:hover:border-primary-600 transition-colors font-medium"
+    >
+      View on GitHub
+    </a>
+  </div>
+</div>
+
+## What is i18nizer?
+
+i18nizer is a CLI tool that automates the tedious process of internationalization in React and Next.js projects. It extracts hardcoded strings from your JSX/TSX files, generates AI-powered translations, and rewrites your components to use translation functions.
+
+No runtime dependencies, no SaaS, no lock-in. Just a CLI that fits into your existing development workflow.
+
+## Key Features
+
+<div className="grid md:grid-cols-2 gap-6 my-8">
+  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-600 dark:hover:border-primary-600 transition-colors">
+    <div className="text-4xl mb-3">🤖</div>
+    <h3 className="text-xl font-semibold mb-2">AI-Powered Translations</h3>
+    <p className="text-gray-600 dark:text-gray-300">Generate translations using OpenAI, Google Gemini, or Hugging Face at development time</p>
+  </div>
+  
+  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-600 dark:hover:border-primary-600 transition-colors">
+    <div className="text-4xl mb-3">⚡</div>
+    <h3 className="text-xl font-semibold mb-2">Automatic Extraction</h3>
+    <p className="text-gray-600 dark:text-gray-300">Extract translatable strings from JSX/TSX files with intelligent filtering</p>
+  </div>
+  
+  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-600 dark:hover:border-primary-600 transition-colors">
+    <div className="text-4xl mb-3">🔄</div>
+    <h3 className="text-xl font-semibold mb-2">Component Rewriting</h3>
+    <p className="text-gray-600 dark:text-gray-300">Automatically rewrite components to use t() translation functions</p>
+  </div>
+  
+  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-600 dark:hover:border-primary-600 transition-colors">
+    <div className="text-4xl mb-3">🎯</div>
+    <h3 className="text-xl font-semibold mb-2">Smart Key Generation</h3>
+    <p className="text-gray-600 dark:text-gray-300">AI-powered English camelCase keys for consistent, readable translation keys</p>
+  </div>
+  
+  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-600 dark:hover:border-primary-600 transition-colors">
+    <div className="text-4xl mb-3">💾</div>
+    <h3 className="text-xl font-semibold mb-2">Intelligent Caching</h3>
+    <p className="text-gray-600 dark:text-gray-300">Cache translations and keys to avoid redundant AI requests and ensure consistency</p>
+  </div>
+  
+  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-primary-600 dark:hover:border-primary-600 transition-colors">
+    <div className="text-4xl mb-3">🔧</div>
+    <h3 className="text-xl font-semibold mb-2">Framework Integration</h3>
+    <p className="text-gray-600 dark:text-gray-300">Built-in support for i18next, next-intl, and react-i18next</p>
+  </div>
+</div>
+
+## Why i18nizer?
+
+Internationalization is essential but tedious. The manual process involves:
+
+- Finding and extracting every hardcoded string
+- Creating translation keys that are consistent and readable
+- Manually translating content to multiple languages
+- Rewriting components to use translation functions
+- Maintaining JSON files across locales
+
+i18nizer automates all of this, letting you focus on building features instead of managing i18n boilerplate. It works with your existing i18n setup—no runtime changes, no vendor lock-in.
+
+## Quick Start
+
+<div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 space-y-4 my-8">
+  <div>
+    <h3 className="font-semibold mb-2">1. Install i18nizer</h3>
+    <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
+      <code>npm install -g i18nizer</code>
+    </pre>
+  </div>
+  <div>
+    <h3 className="font-semibold mb-2">2. Initialize your project</h3>
+    <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
+      <code>i18nizer start</code>
+    </pre>
+  </div>
+  <div>
+    <h3 className="font-semibold mb-2">3. Translate your components</h3>
+    <pre className="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto">
+      <code>i18nizer translate src/components/Login.tsx --locales en,es,fr</code>
+    </pre>
+  </div>
+</div>
+
+<div className="mt-6">
+  <a
+    href="/getting-started"
+    className="text-primary-600 hover:text-primary-700 font-medium"
+  >
+    Read the full guide →
+  </a>
+</div>
+
+## Supported Features
+
+### Extraction Patterns
+
+i18nizer intelligently extracts translatable content from:
+
+- **JSX text children**: `<div>Hello</div>`
+- **JSX attributes**: `placeholder`, `title`, `alt`, `aria-label`, etc.
+- **String literals**: `placeholder="Enter name"`
+- **Template literals**: `` placeholder={`Enter name`} ``
+- **Template with variables**: `` <p>{`Hello ${name}`}</p> ``
+- **Ternary operators**: `{condition ? "Text A" : "Text B"}`
+- **Logical operators**: `{condition && "Visible text"}`
+
+### Smart Filtering
+
+Automatically skips:
+- Single symbols (`*`, `|`)
+- Punctuation-only strings (`...`)
+- Whitespace
+- Non-translatable content
+
+### Framework Support
+
+- ✅ **Next.js** with next-intl
+- ✅ **React** with react-i18next
+- ✅ **Vanilla i18next**
+- 🔄 **Vue & Svelte** (coming soon)
+
+## Real-World Example
+
+**Before i18nizer:**
+
+```tsx
+export function Login() {
+  return (
+    <div>
+      <h1>Welcome back</h1>
+      <p>Please sign in to continue</p>
+      <button>Sign in</button>
+    </div>
+  )
+}
+```
+
+**After running `i18nizer translate`:**
+
+```tsx
+import { useTranslations } from "next-intl"
+
+export function Login() {
+  const t = useTranslations("Login")
+
+  return (
+    <div>
+      <h1>{t("welcomeBack")}</h1>
+      <p>{t("pleaseSignInToContinue")}</p>
+      <button>{t("signIn")}</button>
+    </div>
+  )
+}
+```
+
+**Generated translations** (`messages/en/login.json`):
+
+```json
+{
+  "Login": {
+    "welcomeBack": "Welcome back",
+    "pleaseSignInToContinue": "Please sign in to continue",
+    "signIn": "Sign in"
+  }
+}
+```
+
+Ready in English, Spanish, French, German, Japanese, and any other language you need!
+
+## Community & Support
+
+- 📖 [Documentation](/getting-started)
+- 🐛 [Report Issues](https://github.com/yossTheDev/i18nizer/issues)
+- 💬 [Discussions](https://github.com/yossTheDev/i18nizer/discussions)
+- ⭐ [Star on GitHub](https://github.com/yossTheDev/i18nizer)
+
+---
+
+<div className="text-center text-gray-600 dark:text-gray-400 mt-12">
+  Made with ❤️ by <a href="https://github.com/yossTheDev" className="text-primary-600 hover:text-primary-700" target="_blank" rel="noopener">Yoannis Sánchez Soto</a>
+</div>

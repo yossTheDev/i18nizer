@@ -1,3 +1,5 @@
+import createMDX from '@next/mdx'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
@@ -5,9 +7,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    mdxRs: true,
-  },
 }
 
-export default nextConfig
+const withMDX = createMDX({
+  // No rehype plugins due to Turbopack serialization issues
+  // Syntax highlighting will be added client-side
+})
+
+export default withMDX(nextConfig)

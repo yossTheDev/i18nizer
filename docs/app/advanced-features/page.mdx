@@ -1,19 +1,19 @@
 export const metadata = {
   title: 'Advanced Features - Pluralization & Rich Text',
-  description: 'Learn how to use advanced i18n patterns like pluralization and rich text formatting with i18nizer',
+  description: 'i18nizer automatically detects and converts pluralization and rich text patterns using ICU message format',
 }
 
 # Advanced Features
 
-i18nizer extracts translatable strings from your components and generates standard i18n JSON files. For advanced patterns like pluralization and rich text formatting, you can enhance the extracted translations using the powerful built-in features of i18next and next-intl.
+i18nizer **automatically detects and converts** advanced i18n patterns like pluralization and rich text formatting. When you run i18nizer on your components, it intelligently recognizes these patterns and generates the appropriate ICU message format translations.
 
-## Pluralization Support
+## Automatic Pluralization Detection
 
 ### Overview
 
-Pluralization allows you to handle different text variations based on counts. Both i18next and next-intl support the ICU (International Components for Unicode) message format, which provides a standardized way to handle plurals across different languages.
+i18nizer automatically detects pluralization patterns in your code (like `count === 1 ? 'item' : 'items'`) and converts them to ICU message format. This works seamlessly with both i18next and next-intl, and handles different plural rules across languages automatically.
 
-### Why Use ICU Message Format?
+### Why ICU Message Format?
 
 Different languages have different plural rules:
 - **English**: 2 forms (one, other)
@@ -23,9 +23,9 @@ Different languages have different plural rules:
 
 ICU message format automatically selects the correct form based on the locale.
 
-### Basic Pluralization Example
+### Automatic Conversion Example
 
-**Before i18nizer:**
+**Your original code:**
 ```tsx
 function ShoppingCart({ count }) {
   return (
@@ -36,22 +36,7 @@ function ShoppingCart({ count }) {
 }
 ```
 
-**After i18nizer extraction:**
-```tsx
-import { useTranslations } from 'next-intl'
-
-function ShoppingCart({ count }) {
-  const t = useTranslations('ShoppingCart')
-  
-  return (
-    <div>
-      <p>{t('itemCount', { count })} {t('itemsLabel', { count })}</p>
-    </div>
-  )
-}
-```
-
-**Manually enhance with pluralization:**
+**After i18nizer automatic conversion:**
 ```tsx
 import { useTranslations } from 'next-intl'
 
@@ -66,7 +51,7 @@ function ShoppingCart({ count }) {
 }
 ```
 
-**Translation file (`messages/en/shopping-cart.json`):**
+**Generated translation file (`messages/en/shopping-cart.json`):**
 ```json
 {
   "ShoppingCart": {
@@ -74,6 +59,12 @@ function ShoppingCart({ count }) {
   }
 }
 ```
+
+**How it works:**
+- i18nizer detects the `count === 1 ? 'item' : 'items'` pattern
+- Automatically generates ICU plural format with `one` and `other` forms
+- Replaces the ternary with a `t()` call that includes the count variable
+- Works with any variable name (not just `count`)
 
 ### ICU Plural Syntax
 
@@ -178,24 +169,24 @@ function ShoppingCart({ count }) {
 
 ---
 
-## Rich Text Formatting
+## Automatic Rich Text Formatting
 
 ### Overview
 
-Rich text formatting allows you to include JSX elements (like links, bold text, or custom components) within your translated strings. This is essential when you need to maintain the structure and styling of text while keeping it translatable.
+i18nizer automatically detects when you have mixed text with inline JSX elements (like `<a>`, `<strong>`, `<em>`) and generates the appropriate `t.rich()` calls. This ensures your translations remain atomic while maintaining JSX structure.
 
-### Why Use Rich Text?
+### Why Rich Text Detection?
 
-- **Keep translations atomic**: Don't split sentences just to add a link
-- **Translator-friendly**: Translators see the full sentence with placeholders
-- **Flexibility**: Different languages might place links in different positions
-- **Type safety**: Components passed to rich text are type-checked
+- **Automatic**: No manual refactoring needed
+- **Translator-friendly**: Full sentences with placeholders
+- **Flexible**: Different languages can reorder elements
+- **Type-safe**: Generated code is type-checked
 
-### Rich Text with next-intl
+### Automatic Conversion with next-intl
 
 #### Basic Link Example
 
-**Before i18nizer:**
+**Your original code:**
 ```tsx
 function TermsNotice() {
   return (
@@ -206,22 +197,7 @@ function TermsNotice() {
 }
 ```
 
-**After i18nizer extraction:**
-```tsx
-import { useTranslations } from 'next-intl'
-
-function TermsNotice() {
-  const t = useTranslations('TermsNotice')
-  
-  return (
-    <p>
-      {t('byClickingSignUp')} <a href="/terms">{t('termsOfService')}</a>
-    </p>
-  )
-}
-```
-
-**Manually enhance with rich text:**
+**After i18nizer automatic conversion:**
 ```tsx
 import { useTranslations } from 'next-intl'
 
@@ -231,21 +207,27 @@ function TermsNotice() {
   return (
     <p>
       {t.rich('signUpAgreement', {
-        terms: (chunks) => <a href="/terms">{chunks}</a>
+        a: (chunks) => <a>{chunks}</a>
       })}
     </p>
   )
 }
 ```
 
-**Translation file:**
+**Generated translation file:**
 ```json
 {
   "TermsNotice": {
-    "signUpAgreement": "By clicking Sign Up, you agree to our <terms>Terms of Service</terms>"
+    "signUpAgreement": "By clicking Sign Up, you agree to our <a>Terms of Service</a>"
   }
 }
 ```
+
+**How it works:**
+- i18nizer detects mixed text with an inline `<a>` element
+- Automatically generates a `t.rich()` call with element mapping
+- Creates the placeholder using the tag name: `a: (chunks) => <a>{chunks}</a>`
+- Preserves the text structure in ICU MessageFormat with XML-style tags
 
 #### Multiple Rich Elements
 
@@ -433,16 +415,16 @@ You can combine both features for powerful, flexible translations:
 
 ### ✅ Do's
 
-1. **Keep sentences together**: Use rich text instead of splitting sentences
+1. **Let i18nizer handle common patterns**: Use standard ternary operators for plurals and inline JSX for rich text
    ```tsx
-   // Good
-   {t.rich('terms', { link: (c) => <a>{c}</a> })}
+   // i18nizer will automatically convert this
+   {count === 1 ? 'item' : 'items'}
    
-   // Bad
-   {t('before')} <a>{t('link')}</a> {t('after')}
+   // and this
+   <p>Read our <a href="/terms">Terms</a></p>
    ```
 
-2. **Use descriptive placeholder names**:
+2. **Use descriptive placeholder names** in manually enhanced translations:
    ```json
    {
      "message": "Contact <supportLink>our support team</supportLink>"
@@ -468,25 +450,25 @@ You can combine both features for powerful, flexible translations:
 
 ### ❌ Don'ts
 
-1. **Don't hardcode counts in text**:
+1. **Don't use complex non-standard patterns** that i18nizer can't detect:
    ```tsx
-   // Bad
-   {count === 1 ? t('oneItem') : t('manyItems')}
+   // i18nizer may not detect this complex pattern
+   {count > 10 ? 'many' : count > 1 ? 'some' : 'one'}
    
-   // Good
-   {t('items', { count })}
+   // Instead use: count === 1 ? 'item' : 'items'
+   // Then manually add more categories if needed
    ```
 
-2. **Don't split rich text unnecessarily**:
+2. **Don't manually split sentences** before running i18nizer:
    ```tsx
-   // Bad
+   // Bad - don't do this before i18nizer
    {t('text1')} <a>{t('link')}</a> {t('text2')}
    
-   // Good
-   {t.rich('message', { link: (c) => <a>{c}</a> })}
+   // Good - let i18nizer detect and convert
+   <p>Text before <a>link</a> text after</p>
    ```
 
-3. **Don't forget the `other` category** in plurals (it's required)
+3. **Don't forget the `other` category** in manually enhanced plurals (it's required)
 
 4. **Don't use `#` outside plural expressions** (it's specific to plurals)
 
@@ -494,20 +476,25 @@ You can combine both features for powerful, flexible translations:
 
 ## Workflow with i18nizer
 
-1. **Run i18nizer** to extract base translations:
+1. **Run i18nizer** on your components:
    ```bash
    i18nizer translate src/components/Cart.tsx --locales en,es,fr
    ```
 
-2. **Identify patterns** that need pluralization or rich text
+2. **i18nizer automatically**:
+   - Detects pluralization patterns like `count === 1 ? 'item' : 'items'`
+   - Converts them to ICU message format
+   - Detects rich text patterns with inline JSX elements
+   - Generates `t.rich()` calls with element mappings
 
-3. **Manually enhance** the extracted translations:
-   - Replace ternary count logic with ICU plurals
-   - Replace split sentences with rich text
+3. **Review generated translations** in your `messages/` directory
 
-4. **Update your component** to use the enhanced translation keys
+4. **Test** with different locales and count values to ensure translations work correctly
 
-5. **Test** with different locales and count values
+5. **(Optional) Customize** generated translations:
+   - Add more plural categories for specific languages
+   - Add attributes back to rich text elements if needed
+   - Adjust wording for better context
 
 ---
 

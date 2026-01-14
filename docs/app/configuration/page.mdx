@@ -9,7 +9,7 @@ Learn how to configure i18nizer for your project using `i18nizer.config.yml`.
 
 ## What's New in 0.7.0 🎉
 
-Version 0.7.0 introduces powerful new configuration options:
+Version 0.7.0 introduces powerful new configuration options and comprehensive documentation for advanced i18n patterns:
 
 ### AI Provider Configuration
 
@@ -46,6 +46,17 @@ paths:
 - Custom source directory structure
 - Different i18n aggregator locations
 - Monorepo setups with nested paths
+
+### Pluralization and Rich Text Support
+
+i18nizer **automatically detects and handles** advanced i18n patterns:
+
+- **Automatic Pluralization**: Detects `count === 1 ? 'item' : 'items'` patterns and automatically converts them to ICU message format with `t("key", { count })` calls
+- **Automatic Rich Text**: Detects mixed text with inline JSX elements (like `<a>`, `<strong>`) and automatically generates `t.rich()` calls with proper element mappings
+- **Zero Configuration**: Both features work automatically during extraction—no manual setup required
+- **Compatible Output**: Generated code works seamlessly with i18next and next-intl built-in features
+
+See the [Examples page](/examples) for automatic transformation examples showing before/after code.
 
 ---
 

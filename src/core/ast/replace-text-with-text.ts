@@ -6,6 +6,7 @@ interface MappedText {
     node: Node;
     placeholders?: string[];
     tempKey: string;
+    isPlural?: boolean;
 }
 
 export interface ReplaceOptions {
@@ -54,13 +55,28 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
     const allowedFunctions = new Set(options.allowedFunctions ?? [...defaultAllowedFunctions]);
     const allowedMemberFunctions = new Set(options.allowedMemberFunctions ?? [...defaultAllowedMemberFunctions]);
     
-    for (const { key, node, placeholders = [] } of mapped) {
+    for (const { key, node, placeholders = [], isPlural = false } of mapped) {
         // Build placeholders string if any
         const placeholdersText = placeholders.length > 0
             ? `{ ${placeholders.map(p => `${p}: ${p}`).join(", ")} }`
             : "";
 
         const tCall = `t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`;
+
+        // For plural patterns (ternary expressions), replace the entire ternary
+        if (isPlural && Node.isConditionalExpression(node)) {
+            const parent = node.getParent();
+            
+            // In JSX expression
+            if (Node.isJsxExpression(parent)) {
+                node.replaceWithText(tCall);
+                return;
+            }
+            
+            // In other contexts, replace with t() call
+            node.replaceWithText(tCall);
+            continue;
+        }
 
         // Replace JSXText nodes → {t("key")}
         if (Node.isJsxText(node)) {

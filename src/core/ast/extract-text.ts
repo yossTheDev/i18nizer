@@ -68,6 +68,60 @@ function processTemplateLiteral(node: Node): null | { placeholders: string[]; te
 }
 
 /**
+ * Extract rich text content from JSX element with child elements
+ * Converts: <p>Click <a>here</a> to continue</p>
+ * To: "Click <a>here</a> to continue"
+ */
+function extractRichTextContent(jsxElement: Node): null | {
+    text: string;
+    elements: Array<{ tag: string; placeholder: string }>;
+} {
+    if (!Node.isJsxElement(jsxElement)) {
+        return null;
+    }
+
+    const pattern = detectRichTextPattern(jsxElement);
+    if (!pattern) {
+        return null;
+    }
+
+    const children = jsxElement.getJsxChildren();
+    let richText = '';
+    const elements: Array<{ tag: string; placeholder: string }> = [];
+    const seenPlaceholders = new Set<string>();
+
+    for (const child of children) {
+        if (Node.isJsxText(child)) {
+            richText += child.getText();
+        } else if (Node.isJsxElement(child)) {
+            const opening = child.getOpeningElement();
+            const tagName = opening.getTagNameNode().getText();
+            const placeholder = tagName.toLowerCase();
+            
+            // Get inner text of the element
+            const innerText = child.getJsxChildren()
+                .filter(c => Node.isJsxText(c))
+                .map(c => c.getText())
+                .join('');
+            
+            // Add to rich text with placeholder
+            richText += `<${placeholder}>${innerText}</${placeholder}>`;
+            
+            // Track unique elements
+            if (!seenPlaceholders.has(placeholder)) {
+                elements.push({ tag: tagName, placeholder });
+                seenPlaceholders.add(placeholder);
+            }
+        }
+    }
+
+    return {
+        elements,
+        text: richText.trim(),
+    };
+}
+
+/**
  * Detect rich text pattern - JSX element containing both text and child JSX elements
  * Example: <p>Click <a>here</a> to continue</p>
  */
@@ -282,6 +336,27 @@ export function extractTexts(sourceFile: Node, options: ExtractOptions = {}): Ex
 
     sourceFile.forEachDescendant((node: Node) => {
         if (seenNodes.has(node)) return;
+
+        // Check for rich text pattern in JSX elements
+        if (Node.isJsxElement(node)) {
+            const richContent = extractRichTextContent(node);
+            if (richContent) {
+                const tempKey = `i$fdw_${tempIdCounter++}`;
+                results.push({
+                    isRichText: true,
+                    node,
+                    placeholders: richContent.elements.map(e => e.placeholder),
+                    richTextElements: richContent.elements,
+                    tempKey,
+                    text: richContent.text,
+                });
+                seenNodes.add(node);
+                
+                // Mark all children as seen to avoid duplicate extraction
+                node.getJsxChildren().forEach(child => seenNodes.add(child));
+                return;
+            }
+        }
 
         let text: null | string = null;
         let placeholders: string[] = [];

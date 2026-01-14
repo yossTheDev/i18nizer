@@ -195,11 +195,13 @@ export default class Translate extends Command {
           return {
             isCached: result.isCached,
             isPlural: t.isPlural,
+            isRichText: t.isRichText,
             key: result.key,
             node: t.node,
             placeholders: t.placeholders,
             pluralForms: t.pluralForms,
             pluralVariable: t.pluralVariable,
+            richTextElements: t.richTextElements,
             tempKey: t.tempKey,
             text: t.text,
           };
@@ -306,9 +308,11 @@ export default class Translate extends Command {
           replaceTempKeysWithT(
             mappedTexts.map((m) => ({
               isPlural: m.isPlural,
+              isRichText: m.isRichText,
               key: m.key,
               node: m.node,
               placeholders: m.placeholders,
+              richTextElements: m.richTextElements,
               tempKey: m.tempKey,
             })),
             {

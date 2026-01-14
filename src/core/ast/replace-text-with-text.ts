@@ -7,6 +7,11 @@ interface MappedText {
     placeholders?: string[];
     tempKey: string;
     isPlural?: boolean;
+    isRichText?: boolean;
+    richTextElements?: Array<{
+        tag: string;
+        placeholder: string;
+    }>;
 }
 
 export interface ReplaceOptions {
@@ -55,7 +60,21 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
     const allowedFunctions = new Set(options.allowedFunctions ?? [...defaultAllowedFunctions]);
     const allowedMemberFunctions = new Set(options.allowedMemberFunctions ?? [...defaultAllowedMemberFunctions]);
     
-    for (const { key, node, placeholders = [], isPlural = false } of mapped) {
+    for (const { key, node, placeholders = [], isPlural = false, isRichText = false, richTextElements = [] } of mapped) {
+        // For rich text patterns, generate t.rich() call
+        if (isRichText && Node.isJsxElement(node)) {
+            // Build formatter functions for each element
+            const formatters = richTextElements.map(elem => {
+                return `${elem.placeholder}: (chunks) => <${elem.tag}>{chunks}</${elem.tag}>`;
+            }).join(', ');
+            
+            const richCall = `t.rich("${key}", { ${formatters} })`;
+            
+            // Replace the entire JSX element with {t.rich(...)}
+            node.replaceWithText(`{${richCall}}`);
+            continue;
+        }
+
         // Build placeholders string if any
         const placeholdersText = placeholders.length > 0
             ? `{ ${placeholders.map(p => `${p}: ${p}`).join(", ")} }`

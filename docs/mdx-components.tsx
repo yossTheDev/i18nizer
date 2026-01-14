@@ -16,8 +16,8 @@ function createHeading(level: number, usedIds: Map<string, number>) {
     const text = typeof children === 'string' ? children : String(children)
     const baseId = generateId(text)
     const count = usedIds.get(baseId) || 0
-    usedIds.set(baseId, count + 1)
     const id = count === 0 ? baseId : `${baseId}-${count}`
+    usedIds.set(baseId, count + 1)
     const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
     return (

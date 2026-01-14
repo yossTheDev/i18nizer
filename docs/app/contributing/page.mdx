@@ -1,0 +1,296 @@
+export const metadata = {
+  title: 'Contributing',
+  description: 'Learn how to contribute to i18nizer - setup, development workflow, and contribution guidelines',
+}
+
+# Contributing
+
+Welcome! This guide will help you contribute to i18nizer.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- Yarn (v4.12.0)
+- Git
+- Code editor (VS Code recommended)
+
+### Clone & Setup
+
+```bash
+git clone https://github.com/yossTheDev/i18nizer.git
+cd i18nizer
+yarn install
+yarn build
+yarn test
+```
+
+### Run Locally
+
+```bash
+# Unix/Linux/macOS
+./bin/dev.js translate src/component.tsx
+
+# Windows
+.\bin\dev.cmd translate src\component.tsx
+```
+
+## Project Structure
+
+```
+i18nizer/
+├── src/
+│   ├── commands/           # CLI commands
+│   │   ├── start.ts
+│   │   ├── translate.ts
+│   │   ├── extract.ts
+│   │   ├── keys.ts
+│   │   └── regenerate.ts
+│   ├── core/
+│   │   ├── ast/           # AST parsing
+│   │   ├── ai/            # AI providers
+│   │   └── i18n/          # JSON generation
+│   ├── types/             # TypeScript types
+│   └── index.ts
+├── test/                  # Tests (mirrors src/)
+├── bin/                   # Executables
+│   ├── dev.js
+│   ├── dev.cmd
+│   └── run.js
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+## Development Workflow
+
+### 1. Create a Branch
+
+```bash
+git checkout -b feature/my-feature
+# or
+git checkout -b fix/bug-description
+```
+
+### 2. Make Changes
+
+Edit files in `src/`. Follow existing patterns.
+
+### 3. Add Tests
+
+Tests are in `test/` and mirror `src/` structure:
+
+```bash
+yarn test
+yarn test --watch
+```
+
+### 4. Lint
+
+```bash
+yarn lint
+```
+
+### 5. Build & Test
+
+```bash
+yarn build
+./bin/dev.js translate path/to/test-file.tsx --dry-run
+```
+
+### 6. Commit
+
+Use conventional commits:
+
+```bash
+git add .
+git commit -m "feat: add Vue support"
+# or
+git commit -m "fix: handle empty strings"
+```
+
+**Commit Types:**
+- `feat:` - New features
+- `fix:` - Bug fixes
+- `docs:` - Documentation
+- `test:` - Tests
+- `refactor:` - Code refactoring
+- `chore:` - Build/tooling
+
+### 7. Push & PR
+
+```bash
+git push origin feature/my-feature
+```
+
+Create a PR on GitHub with:
+- Clear description
+- Related issue numbers
+- Examples/screenshots
+- Test results
+
+## Code Style
+
+### TypeScript
+
+- Always use TypeScript
+- Follow ESLint rules
+- Type annotations for functions
+- Prefer `interface` over `type`
+
+### Naming
+
+- Files: camelCase (`extractStrings.ts`)
+- Classes: PascalCase (`ASTParser`)
+- Functions: camelCase (`generateKey`)
+- Constants: UPPER_SNAKE_CASE (`DEFAULT_LOCALE`)
+
+### Comments
+
+- JSDoc for public APIs
+- Inline comments sparingly
+- Document complex logic
+
+## Testing
+
+### Unit Tests
+
+```typescript
+import { expect } from 'chai'
+import { generateKey } from '../src/core/i18n/key-generator'
+
+describe('generateKey', () => {
+  it('should generate camelCase key', () => {
+    const result = generateKey('Hello World')
+    expect(result).to.equal('helloWorld')
+  })
+})
+```
+
+### Integration Tests
+
+Test complete workflows:
+
+```typescript
+describe('translate command', () => {
+  it('should translate component', async () => {
+    // Setup test file
+    // Run translation
+    // Verify output
+  })
+})
+```
+
+## Adding Features
+
+### New AI Provider
+
+1. Create provider client in `src/core/ai/`
+2. Implement provider interface
+3. Add configuration options
+4. Update documentation
+5. Add tests
+
+### New Command
+
+1. Create command in `src/commands/`
+2. Extend `Command` from `@oclif/core`
+3. Implement `run()` method
+4. Add flags and arguments
+5. Update help text
+6. Add tests
+
+### New Extraction Pattern
+
+1. Update AST visitor in `src/core/ast/`
+2. Add extraction logic
+3. Handle edge cases
+4. Add comprehensive tests
+
+## Pull Request Guidelines
+
+### Before Submitting
+
+- ✅ Tests pass (`yarn test`)
+- ✅ Linting passes (`yarn lint`)
+- ✅ Build succeeds (`yarn build`)
+- ✅ Documentation updated
+- ✅ Conventional commits
+
+### PR Template
+
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation
+
+## Testing
+How was this tested?
+
+## Checklist
+- [ ] Tests pass
+- [ ] Linting passes
+- [ ] Documentation updated
+- [ ] No breaking changes
+```
+
+## Common Tasks
+
+### Debugging
+
+```typescript
+import { log } from '@oclif/core'
+log('Debug info:', data)
+```
+
+### Testing with Real Projects
+
+```bash
+# Build
+yarn build
+
+# Link globally
+npm link
+
+# Test in another project
+i18nizer translate ...
+
+# Unlink
+npm unlink -g i18nizer
+```
+
+### Updating Dependencies
+
+```bash
+yarn outdated
+yarn upgrade-interactive
+```
+
+## Getting Help
+
+- 📖 [Architecture docs](/architecture)
+- 💬 [GitHub Discussions](https://github.com/yossTheDev/i18nizer/discussions)
+- 🐛 [Issues](https://github.com/yossTheDev/i18nizer/issues)
+- 📧 Contact maintainer
+
+## Code of Conduct
+
+Be respectful and constructive in all interactions.
+
+## License
+
+By contributing, you agree your contributions will be licensed under the MIT License.
+
+## Thank You! 🎉
+
+Every contribution helps make i18nizer better!
+
+---
+
+**Need help getting started?** Open a [discussion](https://github.com/yossTheDev/i18nizer/discussions) and we'll guide you!

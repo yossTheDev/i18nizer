@@ -19,5 +19,8 @@ pnpm-lock.yaml
 !.yarn/sdks
 !.yarn/versions
 
-
-
+# Documentation site
+/docs/node_modules
+/docs/.next
+/docs/out
+/docs/package-lock.json

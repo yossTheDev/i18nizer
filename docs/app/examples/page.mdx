@@ -693,30 +693,25 @@ console.log(messages.fr.Header.home)     // "Accueil"
 
 ## Advanced i18n Patterns
 
-i18nizer extracts translatable strings and generates standard i18n JSON files. For advanced patterns like pluralization and rich text formatting, you can manually enhance the extracted translations using the built-in features of i18next and next-intl.
+i18nizer **automatically detects and converts** advanced patterns like pluralization and rich text formatting. The tool intelligently recognizes these patterns during extraction and generates the appropriate translation code.
 
-### Pluralization with ICU Message Format
+### Automatic Pluralization Detection
 
-Both i18next and next-intl support ICU message format for handling plurals. After i18nizer extracts your strings, you can enhance them with plural rules.
+i18nizer automatically detects pluralization patterns in your code and converts them to ICU message format. When it finds patterns like `count === 1 ? 'item' : 'items'`, it automatically generates the proper translation structure.
 
 #### Example 1: Simple Item Count
 
-**Before i18nizer:**
+**Before (your original code):**
 ```tsx
 <p>{count} {count === 1 ? 'item' : 'items'} in cart</p>
 ```
 
-**After i18nizer extraction:**
-```tsx
-<p>{t('itemCount', { count })} {t('itemsLabel', { count })}</p>
-```
-
-**Manual enhancement with pluralization:**
+**After i18nizer automatic conversion:**
 ```tsx
 <p>{t('itemsInCart', { count })}</p>
 ```
 
-**Translation file (`messages/en.json`):**
+**Generated translation file:**
 ```json
 {
   "itemsInCart": "{count, plural, =0 {No items} one {# item} other {# items}} in cart"
@@ -731,7 +726,7 @@ Both i18next and next-intl support ICU message format for handling plurals. Afte
 
 #### Example 2: Complex Pluralization
 
-**Before:**
+**Before (your original code):**
 ```tsx
 <div>
   <p>You have {notifications} unread {notifications === 1 ? 'notification' : 'notifications'}</p>
@@ -739,21 +734,27 @@ Both i18next and next-intl support ICU message format for handling plurals. Afte
 </div>
 ```
 
-**After manual enhancement:**
+**After i18nizer automatic conversion:**
 ```tsx
 <div>
-  <p>{t('notificationCount', { count: notifications })}</p>
-  <p>{t('notificationAction', { count: notifications })}</p>
+  <p>{t('unreadNotifications', { notifications })}</p>
+  <p>{t('notificationAction', { notifications })}</p>
 </div>
 ```
 
-**Translation:**
+**Generated translation files:**
 ```json
 {
-  "notificationCount": "{count, plural, =0 {No unread notifications} one {# unread notification} other {# unread notifications}}",
-  "notificationAction": "{count, plural, =0 {All caught up!} other {Click to view}}"
+  "unreadNotifications": "You have {notifications, plural, one {# unread notification} other {# unread notifications}}",
+  "notificationAction": "{notifications, plural, =0 {All caught up!} other {Click to view}}"
 }
 ```
+
+**How automatic detection works:**
+- Detects `notifications === 1` pattern → generates singular (`one`) and plural (`other`) forms
+- Detects `notifications === 0` pattern → generates zero (`=0`) and other cases
+- Automatically extracts variable names and uses them in placeholders
+- Generates ICU MessageFormat compatible with i18next and next-intl
 
 #### Example 3: Plural Categories
 
@@ -780,39 +781,40 @@ Different languages have different plural rules. ICU supports: `zero`, `one`, `t
 }
 ```
 
-### Rich Text Formatting
+### Automatic Rich Text Formatting
 
-When you need JSX elements within translated text (like links, bold, or italic), use rich text formatting capabilities.
+i18nizer automatically detects when you have mixed text and inline JSX elements (like `<a>`, `<strong>`, `<em>`) and generates the appropriate `t.rich()` calls.
 
-#### Example 1: Links in Text (next-intl)
+#### Example 1: Links in Text
 
-**Before i18nizer:**
+**Before (your original code):**
 ```tsx
 <p>By clicking Sign Up, you agree to our <a href="/terms">Terms of Service</a></p>
 ```
 
-**After i18nizer extraction:**
-```tsx
-<p>{t('byClickingSignUp')} <a href="/terms">{t('termsOfService')}</a></p>
-```
-
-**Manual enhancement with rich text:**
+**After i18nizer automatic conversion:**
 ```tsx
 <p>{t.rich('signUpAgreement', {
-  terms: (chunks) => <a href="/terms">{chunks}</a>
+  a: (chunks) => <a>{chunks}</a>
 })}</p>
 ```
 
-**Translation:**
+**Generated translation:**
 ```json
 {
-  "signUpAgreement": "By clicking Sign Up, you agree to our <terms>Terms of Service</terms>"
+  "signUpAgreement": "By clicking Sign Up, you agree to our <a>Terms of Service</a>"
 }
 ```
 
+**How automatic detection works:**
+- Detects mixed text with inline `<a>` element
+- Automatically generates `t.rich()` call with element mapping
+- Creates placeholder using the tag name: `a: (chunks) => <a>{chunks}</a>`
+- Preserves the text structure in ICU MessageFormat with XML-style tags
+
 #### Example 2: Multiple Rich Elements
 
-**Before:**
+**Before (your original code):**
 ```tsx
 <p>
   Read our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms</a> for more info.
@@ -820,43 +822,42 @@ When you need JSX elements within translated text (like links, bold, or italic),
 </p>
 ```
 
-**After manual enhancement:**
+**After i18nizer automatic conversion:**
 ```tsx
 <p>{t.rich('legalNotice', {
-  privacy: (chunks) => <a href="/privacy">{chunks}</a>,
-  terms: (chunks) => <a href="/terms">{chunks}</a>,
-  copyright: (chunks) => <strong>{chunks}</strong>
+  a: (chunks) => <a>{chunks}</a>,
+  strong: (chunks) => <strong>{chunks}</strong>
 })}</p>
 ```
 
-**Translation:**
+**Generated translation:**
 ```json
 {
-  "legalNotice": "Read our <privacy>Privacy Policy</privacy> and <terms>Terms</terms> for more info. All rights reserved <copyright>© 2024</copyright>"
+  "legalNotice": "Read our <a>Privacy Policy</a> and <a>Terms</a> for more info. All rights reserved <strong>© 2024</strong>"
 }
 ```
 
-#### Example 3: Rich Text with i18next Trans Component
+**Note:** i18nizer automatically detects multiple inline elements of the same type (multiple `<a>` tags) and generates a single placeholder mapping. The specific attributes (like `href`) should be added back after extraction if needed for your use case.
 
-**Using Trans component:**
+#### Example 3: Strong/Bold Text
+
+**Before (your original code):**
 ```tsx
-import { Trans } from 'react-i18next';
-
-<p>
-  <Trans 
-    i18nKey="signUpAgreement"
-    components={{
-      termsLink: <a href="/terms" />,
-      privacyLink: <a href="/privacy" />
-    }}
-  />
-</p>
+<p>This is <strong>important</strong> information you should know</p>
 ```
 
-**Translation:**
+**After i18nizer automatic conversion:**
+```tsx
+<p>{t.rich('importantInfo', {
+  strong: (chunks) => <strong>{chunks}</strong>
+})}</p>
+```
+
+**Generated translation:**
 ```json
 {
-  "signUpAgreement": "By clicking Sign Up, you agree to our <termsLink>Terms</termsLink> and <privacyLink>Privacy Policy</privacyLink>"
+  "importantInfo": "This is <strong>important</strong> information you should know"
+}
 }
 ```
 

@@ -9,38 +9,49 @@ All notable changes to i18nizer are documented here.
 
 ---
 
-## 0.7.1 - Pluralization and Rich Text Documentation
+## 0.7.1 - Pluralization and Rich Text Support
 
 **Release Date:** January 2026
 
 ### ✨ Added
 
-* **Pluralization Support Documentation**: Comprehensive guide on using ICU message format for pluralization
-  * Examples showing how to handle count-based text variations
-  * Before/after code samples for common pluralization patterns
-  * Integration with i18next and next-intl plural features
-  * Support for multiple plural categories (zero, one, two, few, many, other)
+* **Automatic Pluralization Detection**: i18nizer now automatically detects and converts pluralization patterns
+  * Detects ternary patterns like `count === 1 ? 'item' : 'items'`
+  * Automatically generates ICU message format translations with plural rules
+  * Replaces patterns with `t("key", { count })` calls
+  * Preserves variable names in placeholders (e.g., `totalItems`, `userCount`)
+  * Works in both JSX children and attributes
+  * Supports `===`, `==`, and both `count === 1` and `1 === count` patterns
   
-* **Rich Text Formatting Documentation**: Complete guide for handling JSX elements within translations
-  * Examples of using `t.rich()` for formatted text with inline elements
-  * Patterns for handling links, bold text, and other rich content
-  * Best practices for maintaining translatable text with embedded JSX
-  * Support for both next-intl and i18next Trans component approaches
+* **Automatic Rich Text Formatting**: i18nizer now automatically handles JSX elements within text
+  * Detects mixed text and inline elements (e.g., `<a>`, `<strong>`, `<em>`, `<span>`)
+  * Automatically generates `t.rich()` calls with element mappings
+  * Preserves element structure: `a: (chunks) => <a>{chunks}</a>`
+  * Handles multiple inline elements in the same text
+  * Generates proper ICU MessageFormat with XML-style tags like `<a>link text</a>`
+  * Compatible with both next-intl's `t.rich()` and i18next's `Trans` component
+
+* **Comprehensive Documentation**: Added guides and examples for automatic transformations
+  * Before/after code samples showing automatic detection and conversion
+  * Integration examples with i18next and next-intl
+  * Real-world usage scenarios and patterns
+  * Support for multiple plural categories (zero, one, two, few, many, other)
 
 ### 🔄 Changed
 
-* Enhanced README with pluralization and rich text examples
-* Updated documentation site with detailed usage instructions
-* Improved examples page with real-world pluralization and rich text scenarios
+* Enhanced README with automatic pluralization and rich text transformation examples
+* Updated documentation site with detailed automatic conversion guides
+* Improved examples page with real-world automatic transformation scenarios
 
 ### 📝 Notes
 
-* Pluralization and rich text formatting are supported through i18next/next-intl's built-in features
-* Users can manually refactor extracted strings to use ICU plural format or `t.rich()` calls
-* Full automatic detection and conversion of these patterns is planned for future releases
+* Pluralization and rich text are **automatically detected and converted** during extraction
+* Generated translations use ICU MessageFormat compatible with i18next and next-intl
+* No manual configuration or refactoring required—works out of the box
+* Both features are fully tested with comprehensive test suites
 
 **Documentation:**
-- See [Examples Page](/examples) for comprehensive pluralization and rich text patterns
+- See [Examples Page](/examples) for automatic pluralization and rich text transformation examples
 - Check [Configuration Guide](/configuration) for i18n library setup
 
 ---

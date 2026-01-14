@@ -49,13 +49,14 @@ paths:
 
 ### Pluralization and Rich Text Support
 
-i18nizer now includes comprehensive documentation for advanced i18n patterns:
+i18nizer **automatically detects and handles** advanced i18n patterns:
 
-- **Pluralization**: Full guide for ICU message format with plural rules (zero, one, two, few, many, other)
-- **Rich Text Formatting**: Patterns for handling JSX elements within translations using `t.rich()` and Trans components
-- **Integration**: Works seamlessly with i18next and next-intl built-in features
+- **Automatic Pluralization**: Detects `count === 1 ? 'item' : 'items'` patterns and automatically converts them to ICU message format with `t("key", { count })` calls
+- **Automatic Rich Text**: Detects mixed text with inline JSX elements (like `<a>`, `<strong>`) and automatically generates `t.rich()` calls with proper element mappings
+- **Zero Configuration**: Both features work automatically during extraction—no manual setup required
+- **Compatible Output**: Generated code works seamlessly with i18next and next-intl built-in features
 
-See the [Examples page](/examples) for detailed pluralization and rich text patterns.
+See the [Examples page](/examples) for automatic transformation examples showing before/after code.
 
 ---
 

@@ -1,30 +1,39 @@
 # CHANGELOG
 
-## 0.7.1 - Pluralization and Rich Text Documentation
+## 0.7.1 - Pluralization and Rich Text Support
 
 ### Added
 
-* **Pluralization Support Documentation**: Comprehensive guide on using ICU message format for pluralization
-  * Examples showing how to handle count-based text variations
-  * Before/after code samples for common pluralization patterns
-  * Integration with i18next and next-intl plural features
+* **Automatic Pluralization Detection**: i18nizer now automatically detects and converts pluralization patterns
+  * Detects ternary patterns like `count === 1 ? 'item' : 'items'`
+  * Automatically generates ICU message format translations with plural rules
+  * Replaces patterns with `t("key", { count })` calls
+  * Preserves variable names in placeholders
+  * Works in both JSX children and attributes
   
-* **Rich Text Formatting Documentation**: Complete guide for handling JSX elements within translations
-  * Examples of using `t.rich()` for formatted text with inline elements
-  * Patterns for handling links, bold text, and other rich content
-  * Best practices for maintaining translateable text with embedded JSX
+* **Automatic Rich Text Formatting**: i18nizer now automatically handles JSX elements within text
+  * Detects mixed text and inline elements (e.g., `<a>`, `<strong>`, `<em>`)
+  * Automatically generates `t.rich()` calls with element mappings
+  * Preserves element structure: `a: (chunks) => <a>{chunks}</a>`
+  * Handles multiple inline elements in the same text
+  * Generates proper ICU MessageFormat with XML-style tags
+
+* **Comprehensive Documentation**: Added guides and examples for pluralization and rich text
+  * Before/after code samples showing automatic transformations
+  * Integration examples with i18next and next-intl
+  * Real-world usage scenarios
 
 ### Changed
 
-* Enhanced README with pluralization and rich text examples
-* Updated documentation site with detailed usage instructions
-* Improved examples page with real-world pluralization scenarios
+* Enhanced README with automatic pluralization and rich text examples
+* Updated documentation site with automatic transformation guides
+* Improved examples page with real-world automatic conversion scenarios
 
 ### Notes
 
-* Pluralization and rich text formatting are supported through i18next/next-intl's built-in features
-* Users can manually refactor extracted strings to use ICU plural format or `t.rich()` calls
-* Full automatic detection and conversion of these patterns is planned for future releases
+* Pluralization and rich text are automatically detected and converted during extraction
+* Generated translations use ICU MessageFormat compatible with i18next and next-intl
+* Both features work seamlessly without any manual configuration
 
 ---
 

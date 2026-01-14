@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 interface Heading {
   id: string
@@ -8,9 +8,18 @@ interface Heading {
   level: number
 }
 
+// Helper function to generate heading IDs (matches mdx-components.tsx)
+function generateId(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]/g, '')
+}
+
 export function TableOfContents() {
   const [headings, setHeadings] = useState<Heading[]>([])
   const [activeId, setActiveId] = useState<string>('')
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
     // Extract headings from the page
@@ -18,16 +27,12 @@ export function TableOfContents() {
     const elements = document.querySelectorAll('h2, h3, h4')
     
     elements.forEach((element) => {
-      const id = element.id || element.textContent?.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || ''
-      
-      // Set id if it doesn't exist
-      if (!element.id && id) {
-        element.id = id
-      }
+      // Use the existing ID if available (set by mdx-components.tsx)
+      const id = element.id
       
       if (id) {
         extractedHeadings.push({
-          id: element.id,
+          id,
           text: element.textContent || '',
           level: parseInt(element.tagName.substring(1)),
         })
@@ -38,8 +43,13 @@ export function TableOfContents() {
   }, [])
 
   useEffect(() => {
-    // Intersection Observer for active section tracking
-    const observer = new IntersectionObserver(
+    // Clean up previous observer
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+    }
+
+    // Create Intersection Observer for active section tracking
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -53,15 +63,18 @@ export function TableOfContents() {
       }
     )
 
+    // Observe all heading elements
     headings.forEach((heading) => {
       const element = document.getElementById(heading.id)
-      if (element) {
-        observer.observe(element)
+      if (element && observerRef.current) {
+        observerRef.current.observe(element)
       }
     })
 
     return () => {
-      observer.disconnect()
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
     }
   }, [headings])
 

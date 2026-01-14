@@ -837,7 +837,18 @@ i18nizer automatically detects when you have mixed text and inline JSX elements 
 }
 ```
 
-**Note:** i18nizer automatically detects multiple inline elements of the same type (multiple `<a>` tags) and generates a single placeholder mapping. The specific attributes (like `href`) should be added back after extraction if needed for your use case.
+**Note:** i18nizer automatically detects multiple inline elements of the same type (multiple `<a>` tags) and generates a single placeholder mapping. If you need specific attributes (like different `href` values), you can manually adjust the generated code:
+
+```tsx
+// Manually customize the element mapping after extraction
+{t.rich('legalNotice', {
+  a: (chunks) => {
+    // Determine which link based on content
+    const href = chunks.includes('Privacy') ? '/privacy' : '/terms';
+    return <a href={href}>{chunks}</a>;
+  },
+  strong: (chunks) => <strong>{chunks}</strong>
+})}
 
 #### Example 3: Strong/Bold Text
 
@@ -857,7 +868,6 @@ i18nizer automatically detects when you have mixed text and inline JSX elements 
 ```json
 {
   "importantInfo": "This is <strong>important</strong> information you should know"
-}
 }
 ```
 

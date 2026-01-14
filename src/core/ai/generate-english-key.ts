@@ -36,7 +36,7 @@ EXAMPLES:
 OUTPUT (JSON only):`.trim();
 
   try {
-    const response = await generateTranslations(prompt, provider, undefined);
+    const response = await generateTranslations(prompt, provider);
     if (!response) return new Map();
 
     // Extract JSON from response (handle cases where AI adds markdown or extra text)
@@ -108,7 +108,7 @@ TEXT: "Seleccionar ciudad" -> selectCity
 OUTPUT (key only):`.trim();
 
   try {
-    const response = await generateTranslations(prompt, provider, undefined);
+    const response = await generateTranslations(prompt, provider);
     if (!response) return undefined;
 
     // Clean the response - remove quotes, whitespace, and any extra text

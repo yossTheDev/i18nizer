@@ -1,8 +1,8 @@
 import { expect } from 'chai';
+import yaml from 'js-yaml';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import yaml from 'js-yaml';
 
 import {
   detectFramework,
@@ -13,7 +13,7 @@ import {
   loadConfig,
   writeConfig,
 } from '../../../src/core/config/config-manager.js';
-import { Framework } from '../../../src/types/config.js';
+import { AiProvider, Framework } from '../../../src/types/config.js';
 
 describe('Config Manager', () => {
   let testDir: string;
@@ -27,7 +27,7 @@ describe('Config Manager', () => {
   afterEach(() => {
     // Clean up test directory
     if (fs.existsSync(testDir)) {
-      fs.rmSync(testDir, { recursive: true, force: true });
+      fs.rmSync(testDir, { force: true, recursive: true });
     }
   });
 
@@ -181,7 +181,7 @@ describe('Config Manager', () => {
 
     it('should write and load AI configuration correctly', () => {
       const config = generateConfig('react');
-      config.ai = { provider: 'gemini', model: 'gemini-pro' };
+      config.ai = { model: 'gemini-pro', provider: 'gemini' };
       writeConfig(testDir, config);
 
       const loadedConfig = loadConfig(testDir);
@@ -193,18 +193,18 @@ describe('Config Manager', () => {
 
     it('should validate AI provider and throw error for invalid provider', () => {
       const config = generateConfig('react');
-      config.ai = { provider: 'invalid' as any, model: 'some-model' };
+      config.ai = { model: 'some-model', provider: 'invalid' as unknown as AiProvider };
       writeConfig(testDir, config);
 
       expect(() => loadConfig(testDir)).to.throw(/Invalid AI provider/);
     });
 
     it('should accept valid AI providers', () => {
-      const validProviders = ['openai', 'gemini', 'huggingface'];
+      const validProviders: AiProvider[] = ['openai', 'gemini', 'huggingface'];
       
       for (const provider of validProviders) {
         const config = generateConfig('react');
-        config.ai = { provider: provider as any, model: 'test-model' };
+        config.ai = { model: 'test-model', provider };
         writeConfig(testDir, config);
 
         const loadedConfig = loadConfig(testDir);
@@ -224,7 +224,7 @@ describe('Config Manager', () => {
 
     it('should write and load paths configuration correctly', () => {
       const config = generateConfig('react');
-      config.paths = { src: 'source', i18n: 'locales' };
+      config.paths = { i18n: 'locales', src: 'source' };
       writeConfig(testDir, config);
 
       const loadedConfig = loadConfig(testDir);
@@ -236,7 +236,7 @@ describe('Config Manager', () => {
 
     it('should merge paths configuration with defaults', () => {
       const config = generateConfig('react');
-      config.paths = { src: 'custom-src', i18n: 'i18n' };
+      config.paths = { i18n: 'i18n', src: 'custom-src' };
       writeConfig(testDir, config);
 
       const loadedConfig = loadConfig(testDir);
@@ -249,25 +249,25 @@ describe('Config Manager', () => {
   describe('Backward compatibility', () => {
     it('should load old config without AI settings', () => {
       const oldConfig = {
+        behavior: {
+          allowedFunctions: ['alert'],
+          allowedMemberFunctions: [],
+          allowedProps: ['placeholder'],
+          autoInjectT: true,
+          detectDuplicates: true,
+          opinionatedStructure: true,
+          useAiForKeys: true
+        },
         framework: 'react' as Framework,
         i18n: {
           function: 't',
-          import: { source: 'react-i18next', named: 'useTranslation' }
+          import: { named: 'useTranslation', source: 'react-i18next' }
         },
         messages: {
-          path: 'messages',
           defaultLocale: 'en',
+          format: 'json' as const,
           locales: ['en', 'es'],
-          format: 'json' as const
-        },
-        behavior: {
-          detectDuplicates: true,
-          opinionatedStructure: true,
-          autoInjectT: true,
-          useAiForKeys: true,
-          allowedFunctions: ['alert'],
-          allowedMemberFunctions: [],
-          allowedProps: ['placeholder']
+          path: 'messages'
         }
       };
 
@@ -284,26 +284,26 @@ describe('Config Manager', () => {
 
     it('should load old config without paths settings', () => {
       const oldConfig = {
-        framework: 'react' as Framework,
-        ai: { provider: 'gemini', model: 'gemini-pro' },
-        i18n: {
-          function: 't',
-          import: { source: 'react-i18next', named: 'useTranslation' }
-        },
-        messages: {
-          path: 'messages',
-          defaultLocale: 'en',
-          locales: ['en', 'es'],
-          format: 'json' as const
-        },
+        ai: { model: 'gemini-pro', provider: 'gemini' },
         behavior: {
-          detectDuplicates: true,
-          opinionatedStructure: true,
-          autoInjectT: true,
-          useAiForKeys: true,
           allowedFunctions: ['alert'],
           allowedMemberFunctions: [],
-          allowedProps: ['placeholder']
+          allowedProps: ['placeholder'],
+          autoInjectT: true,
+          detectDuplicates: true,
+          opinionatedStructure: true,
+          useAiForKeys: true
+        },
+        framework: 'react' as Framework,
+        i18n: {
+          function: 't',
+          import: { named: 'useTranslation', source: 'react-i18next' }
+        },
+        messages: {
+          defaultLocale: 'en',
+          format: 'json' as const,
+          locales: ['en', 'es'],
+          path: 'messages'
         }
       };
 

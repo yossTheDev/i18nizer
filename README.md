@@ -282,6 +282,68 @@ Legacy standalone mode (without `i18nizer start`):
 
 ## ⚙️ Configuration
 
+The `i18nizer.config.yml` file controls all aspects of how i18nizer processes your project. Here's a complete reference:
+
+### Complete Configuration Reference
+
+```yaml
+# Framework and i18n library settings
+framework: react                    # nextjs | react | custom
+i18nLibrary: react-i18next          # next-intl | react-i18next | i18next | custom
+
+# AI provider configuration
+ai:
+  provider: openai                  # openai | gemini | huggingface
+  model: gpt-4                      # AI model to use for translations
+
+# Directory paths
+paths:
+  src: src                          # Source code directory
+  i18n: i18n                        # i18n output directory
+
+# i18n function configuration
+i18n:
+  function: t                       # Translation function name
+  import:
+    source: react-i18next           # Package to import from
+    named: useTranslation           # Named import
+
+# Translation file settings
+messages:
+  path: messages                    # Where to store translation JSON files
+  defaultLocale: en                 # Default locale
+  locales:                          # List of supported locales
+    - en
+    - es
+  format: json                      # Output format (currently only json)
+
+# Behavior settings
+behavior:
+  detectDuplicates: true            # Reuse keys for duplicate strings across components
+  opinionatedStructure: true        # Use opinionated file structure
+  autoInjectT: true                 # Auto-inject translation hooks (disable for Next.js Server Components)
+  useAiForKeys: true                # Use AI to generate English keys
+  allowedFunctions:                 # Functions whose string arguments should be translated
+    - alert
+    - confirm
+    - prompt
+  allowedMemberFunctions:           # Member functions whose string arguments should be translated
+    - toast.error
+    - toast.info
+    - toast.success
+    - toast.warn
+  allowedProps:                     # JSX props that should be translated
+    - alt
+    - aria-label
+    - aria-placeholder
+    - helperText
+    - label
+    - placeholder
+    - text
+    - title
+    - tooltip
+```
+
 ### Translation Function Injection (`autoInjectT`)
 
 i18nizer can automatically inject translation hooks into your components:
@@ -372,6 +434,86 @@ behavior:
 ```
 
 Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish text).
+
+### AI Provider and Model Configuration
+
+i18nizer supports multiple AI providers for translations. You can configure the provider and model in `i18nizer.config.yml`:
+
+```yaml
+ai:
+  provider: openai        # openai | gemini | huggingface
+  model: gpt-4           # AI model name
+```
+
+**Supported Providers:**
+
+- **OpenAI** (default): Uses OpenAI API with models like `gpt-4`, `gpt-4o-mini`, etc.
+- **Google Gemini**: Uses Google's Gemini API with models like `gemini-2.5-flash`, `gemini-pro`
+- **Hugging Face**: Uses Hugging Face Inference API with models like `deepseek-ai/DeepSeek-V3.2`
+
+**Default Configuration:**
+
+```yaml
+ai:
+  provider: openai
+  model: gpt-4
+```
+
+**Example Configurations:**
+
+For Google Gemini:
+```yaml
+ai:
+  provider: gemini
+  model: gemini-2.5-flash
+```
+
+For Hugging Face:
+```yaml
+ai:
+  provider: huggingface
+  model: deepseek-ai/DeepSeek-V3.2
+```
+
+**Note:** You still need to set up API keys using:
+```bash
+i18nizer keys --setOpenAI <YOUR_OPENAI_API_KEY>
+i18nizer keys --setGemini <YOUR_GEMINI_API_KEY>
+i18nizer keys --setHF <YOUR_HUGGING_FACE_API_KEY>
+```
+
+The provider setting in config file will be used by default, but you can override it on a per-command basis using the `--provider` flag:
+```bash
+i18nizer translate <file> --provider gemini
+```
+
+### Paths Configuration
+
+Configure default paths for your source code and i18n files in `i18nizer.config.yml`:
+
+```yaml
+paths:
+  src: src               # Source directory
+  i18n: i18n             # i18n output directory
+```
+
+**Default Configuration:**
+
+```yaml
+paths:
+  src: src
+  i18n: i18n
+```
+
+**Custom Example:**
+
+```yaml
+paths:
+  src: source
+  i18n: locales
+```
+
+These paths serve as defaults and can help organize your project structure. The `messages.path` setting (which specifies where translation JSON files are stored) is separate from `paths.i18n`.
 
 ---
 

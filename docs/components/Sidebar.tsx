@@ -10,6 +10,7 @@ const navigation = [
   { name: 'CLI Commands', href: '/cli-commands' },
   { name: 'Configuration', href: '/configuration' },
   { name: 'Examples', href: '/examples' },
+  { name: 'Advanced Features', href: '/advanced-features' },
   { name: 'Architecture', href: '/architecture' },
   { name: 'Changelog', href: '/changelog' },
   { name: 'Contributing', href: '/contributing' },

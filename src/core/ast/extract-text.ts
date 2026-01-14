@@ -25,6 +25,17 @@ export interface ExtractedText {
     placeholders: string[];
     tempKey: string;
     text: string;
+    isPlural?: boolean;
+    pluralVariable?: string;
+    pluralForms?: {
+        one: string;
+        other: string;
+    };
+    isRichText?: boolean;
+    richTextElements?: Array<{
+        tag: string;
+        placeholder: string;
+    }>;
 }
 
 export interface ExtractOptions {
@@ -54,6 +65,169 @@ function processTemplateLiteral(node: Node): null | { placeholders: string[]; te
     }
 
     return null;
+}
+
+/**
+ * Extract rich text content from JSX element with child elements
+ * Converts: <p>Click <a>here</a> to continue</p>
+ * To: "Click <a>here</a> to continue"
+ */
+function extractRichTextContent(jsxElement: Node): null | {
+    text: string;
+    elements: Array<{ tag: string; placeholder: string }>;
+} {
+    if (!Node.isJsxElement(jsxElement)) {
+        return null;
+    }
+
+    const pattern = detectRichTextPattern(jsxElement);
+    if (!pattern) {
+        return null;
+    }
+
+    const children = jsxElement.getJsxChildren();
+    let richText = '';
+    const elements: Array<{ tag: string; placeholder: string }> = [];
+    const seenPlaceholders = new Set<string>();
+
+    for (const child of children) {
+        if (Node.isJsxText(child)) {
+            richText += child.getText();
+        } else if (Node.isJsxElement(child)) {
+            const opening = child.getOpeningElement();
+            const tagName = opening.getTagNameNode().getText();
+            const placeholder = tagName.toLowerCase();
+            
+            // Get inner text of the element
+            const innerText = child.getJsxChildren()
+                .filter(c => Node.isJsxText(c))
+                .map(c => c.getText())
+                .join('');
+            
+            // Add to rich text with placeholder
+            richText += `<${placeholder}>${innerText}</${placeholder}>`;
+            
+            // Track unique elements
+            if (!seenPlaceholders.has(placeholder)) {
+                elements.push({ tag: tagName, placeholder });
+                seenPlaceholders.add(placeholder);
+            }
+        }
+    }
+
+    return {
+        elements,
+        text: richText.trim(),
+    };
+}
+
+/**
+ * Detect rich text pattern - JSX element containing both text and child JSX elements
+ * Example: <p>Click <a>here</a> to continue</p>
+ */
+function detectRichTextPattern(jsxElement: Node): null | {
+    elements: Array<{ tag: string; placeholder: string }>;
+    hasText: boolean;
+} {
+    if (!Node.isJsxElement(jsxElement) && !Node.isJsxSelfClosingElement(jsxElement)) {
+        return null;
+    }
+
+    if (Node.isJsxSelfClosingElement(jsxElement)) {
+        return null; // Self-closing elements don't have rich text
+    }
+
+    const children = jsxElement.getJsxChildren();
+    let hasText = false;
+    let hasJsxElement = false;
+    const elements: Array<{ tag: string; placeholder: string }> = [];
+
+    for (const child of children) {
+        if (Node.isJsxText(child)) {
+            const text = child.getText().trim();
+            if (text.length > 0) {
+                hasText = true;
+            }
+        } else if (Node.isJsxElement(child) || Node.isJsxSelfClosingElement(child)) {
+            hasJsxElement = true;
+            
+            // Get tag name
+            const opening = Node.isJsxElement(child) 
+                ? child.getOpeningElement() 
+                : child;
+            const tagName = opening.getTagNameNode().getText();
+            
+            // Generate placeholder name based on tag
+            const placeholder = tagName.toLowerCase();
+            elements.push({ tag: tagName, placeholder });
+        }
+    }
+
+    // Rich text pattern: has both text and JSX elements
+    if (hasText && hasJsxElement) {
+        return { elements, hasText: true };
+    }
+
+    return null;
+}
+
+/**
+ * Detect pluralization pattern in a ternary expression
+ * Pattern: variable === 1 ? 'singular' : 'plural'
+ */
+function detectPluralizationPattern(expr: Node): null | {
+    pluralVariable: string;
+    one: string;
+    other: string;
+} {
+    if (!Node.isConditionalExpression(expr)) return null;
+
+    const condition = expr.getCondition();
+    const whenTrue = expr.getWhenTrue();
+    const whenFalse = expr.getWhenFalse();
+
+    // Check if condition is a binary expression (e.g., count === 1 or count == 1)
+    if (!Node.isBinaryExpression(condition)) return null;
+
+    const operator = condition.getOperatorToken().getText();
+    if (operator !== "===" && operator !== "==") return null;
+
+    const left = condition.getLeft();
+    const right = condition.getRight();
+
+    // Check if one side is 1 and the other is a variable
+    let variable: null | string = null;
+    let isCheckingForOne = false;
+
+    if (Node.isNumericLiteral(right) && right.getLiteralValue() === 1 && Node.isIdentifier(left)) {
+        variable = left.getText();
+        isCheckingForOne = true;
+    } else if (Node.isNumericLiteral(left) && left.getLiteralValue() === 1 && Node.isIdentifier(right)) {
+        variable = right.getText();
+        isCheckingForOne = true;
+    }
+
+    if (!variable || !isCheckingForOne) return null;
+
+    // Extract singular and plural forms
+    let singular: null | string = null;
+    let plural: null | string = null;
+
+    if (Node.isStringLiteral(whenTrue)) {
+        singular = whenTrue.getLiteralText();
+    }
+
+    if (Node.isStringLiteral(whenFalse)) {
+        plural = whenFalse.getLiteralText();
+    }
+
+    if (!singular || !plural) return null;
+
+    return {
+        pluralVariable: variable,
+        one: singular,
+        other: plural,
+    };
 }
 
 function getFullCallName(node: Node): null | string {
@@ -99,6 +273,34 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
 
     // Ternary operator: condition ? whenTrue : whenFalse
     if (Node.isConditionalExpression(expr)) {
+        // Check if this is a pluralization pattern
+        const pluralPattern = detectPluralizationPattern(expr);
+        
+        if (pluralPattern) {
+            // This is a pluralization pattern, create a single entry for it
+            const tempKey = `i$fdw_${tempIdCounter++}`;
+            const text = pluralPattern.other; // Use plural form as base text
+            
+            results.push({
+                node: expr,
+                placeholders: [pluralPattern.pluralVariable],
+                tempKey,
+                text,
+                isPlural: true,
+                pluralVariable: pluralPattern.pluralVariable,
+                pluralForms: {
+                    one: pluralPattern.one,
+                    other: pluralPattern.other,
+                },
+            });
+            seenNodes.add(expr);
+            // Mark child nodes as seen to avoid duplicate extraction
+            seenNodes.add(expr.getWhenTrue());
+            seenNodes.add(expr.getWhenFalse());
+            return;
+        }
+        
+        // Not a pluralization pattern, extract strings normally
         extractStringsFromExpression(expr.getWhenTrue(), results, seenNodes);
         extractStringsFromExpression(expr.getWhenFalse(), results, seenNodes);
         return;
@@ -134,6 +336,27 @@ export function extractTexts(sourceFile: Node, options: ExtractOptions = {}): Ex
 
     sourceFile.forEachDescendant((node: Node) => {
         if (seenNodes.has(node)) return;
+
+        // Check for rich text pattern in JSX elements
+        if (Node.isJsxElement(node)) {
+            const richContent = extractRichTextContent(node);
+            if (richContent) {
+                const tempKey = `i$fdw_${tempIdCounter++}`;
+                results.push({
+                    isRichText: true,
+                    node,
+                    placeholders: richContent.elements.map(e => e.placeholder),
+                    richTextElements: richContent.elements,
+                    tempKey,
+                    text: richContent.text,
+                });
+                seenNodes.add(node);
+                
+                // Mark all children as seen to avoid duplicate extraction
+                node.getJsxChildren().forEach(child => seenNodes.add(child));
+                return;
+            }
+        }
 
         let text: null | string = null;
         let placeholders: string[] = [];

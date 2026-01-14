@@ -530,6 +530,8 @@ These paths serve as defaults and can help organize your project structure. The 
 - **Configurable behavior** (allowed functions, props, member functions)
 - **Dry-run mode** to preview changes
 - **JSON output preview** with `--show-json`
+- **Pluralization documentation** - comprehensive guide for ICU message format
+- **Rich text formatting documentation** - patterns for JSX within translations
 - Project-wide or single-file translation
 - Works with **JSX & TSX**
 - Rewrites components automatically (`t("key")`)
@@ -560,6 +562,127 @@ These paths serve as defaults and can help organize your project structure. The 
 
 ---
 
+## 🎨 Advanced i18n Patterns
+
+i18nizer extracts translatable strings and generates standard i18n JSON files. For advanced patterns like pluralization and rich text formatting, you can leverage the built-in features of i18next and next-intl.
+
+### Pluralization Support
+
+Both i18next and next-intl support ICU message format for handling plurals. After i18nizer extracts your strings, you can enhance them with plural rules.
+
+**Before i18nizer:**
+```tsx
+<p>{count} {count === 1 ? 'item' : 'items'} in cart</p>
+```
+
+**After i18nizer extraction:**
+```tsx
+<p>{t('itemCount', { count })} {t('itemsLabel', { count })}</p>
+```
+
+**Manual enhancement to use pluralization:**
+```tsx
+<p>{t('itemsInCart', { count })}</p>
+```
+
+**Translation with ICU plural format:**
+```json
+{
+  "itemsInCart": "{count, plural, =0 {No items} one {# item} other {# items}} in cart"
+}
+```
+
+**How plurals work:**
+- `=0` - Exact match for zero
+- `one` - Singular form (1 item in English)
+- `other` - Plural form (2+ items)
+- `#` - Placeholder for the count number
+
+**Additional plural categories** (language-dependent):
+- `zero`, `one`, `two`, `few`, `many`, `other`
+
+### Rich Text Formatting
+
+When you need JSX elements within translated text (like links or bold text), both i18next and next-intl provide rich text formatting capabilities.
+
+**Before i18nizer:**
+```tsx
+<p>By clicking Sign Up, you agree to our <a href="/terms">Terms of Service</a></p>
+```
+
+**After i18nizer extraction:**
+```tsx
+<p>{t('byClickingSignUpYouAgree')} <a href="/terms">{t('termsOfService')}</a></p>
+```
+
+**Manual enhancement with rich text (next-intl):**
+```tsx
+<p>{t.rich('signUpAgreement', {
+  terms: (chunks) => <a href="/terms">{chunks}</a>
+})}</p>
+```
+
+**Translation:**
+```json
+{
+  "signUpAgreement": "By clicking Sign Up, you agree to our <terms>Terms of Service</terms>"
+}
+```
+
+**Using rich text with i18next:**
+```tsx
+import { Trans } from 'react-i18next';
+
+<p>
+  <Trans i18nKey="signUpAgreement">
+    By clicking Sign Up, you agree to our <a href="/terms">Terms of Service</a>
+  </Trans>
+</p>
+```
+
+**Translation:**
+```json
+{
+  "signUpAgreement": "By clicking Sign Up, you agree to our <1>Terms of Service</1>"
+}
+```
+
+### More Examples
+
+**Date and time formatting:**
+```tsx
+// Using next-intl
+<p>{t('lastUpdated', { date: new Date() })}</p>
+
+// Translation
+{
+  "lastUpdated": "Last updated: {date, date, medium}"
+}
+```
+
+**Number formatting:**
+```tsx
+// Using next-intl
+<p>{t('price', { amount: 99.99 })}</p>
+
+// Translation
+{
+  "price": "{amount, number, currency}"
+}
+```
+
+**Nested plurals:**
+```tsx
+<p>{t('cartSummary', { itemCount: 5, totalPrice: 149.99 })}</p>
+
+// Translation
+{
+  "cartSummary": "{itemCount, plural, one {# item} other {# items}} • Total: ${totalPrice}"
+}
+```
+
+---
+
 ## 🔮 Roadmap
 
 ### ✅ Phase 0: Foundation & Reliability (Complete)
@@ -582,11 +705,12 @@ These paths serve as defaults and can help organize your project structure. The 
 
 ### 🚧 Phase 2: Advanced Features (Planned)
 
+- [ ] Automatic pluralization detection and conversion
+- [ ] Automatic rich text formatting detection
 - [ ] Watch mode for continuous translation
 - [ ] Non-AI fallback mode
 - [ ] Framework support (Vue, Svelte)
 - [ ] Additional i18n library presets
-- [ ] Pluralization support
 - [ ] Context-aware translations
 - [ ] Translation memory and glossary
 

@@ -194,9 +194,14 @@ export default class Translate extends Command {
 
           return {
             isCached: result.isCached,
+            isPlural: t.isPlural,
+            isRichText: t.isRichText,
             key: result.key,
             node: t.node,
             placeholders: t.placeholders,
+            pluralForms: t.pluralForms,
+            pluralVariable: t.pluralVariable,
+            richTextElements: t.richTextElements,
             tempKey: t.tempKey,
             text: t.text,
           };
@@ -216,9 +221,18 @@ export default class Translate extends Command {
                 cached.locales[locale] ?? mapped.text;
             }
           } else {
-            // Will need AI translation
-            for (const locale of locales) {
-              i18nJson[mapped.key][locale] = ""; // Placeholder
+            // For plural forms, generate ICU format
+            if (mapped.isPlural && mapped.pluralForms) {
+              for (const locale of locales) {
+                // Generate ICU plural format string
+                const icuFormat = `{${mapped.pluralVariable}, plural, one {${mapped.pluralForms.one}} other {${mapped.pluralForms.other}}}`;
+                i18nJson[mapped.key][locale] = icuFormat;
+              }
+            } else {
+              // Will need AI translation
+              for (const locale of locales) {
+                i18nJson[mapped.key][locale] = ""; // Placeholder
+              }
             }
           }
         }
@@ -293,9 +307,12 @@ export default class Translate extends Command {
           
           replaceTempKeysWithT(
             mappedTexts.map((m) => ({
+              isPlural: m.isPlural,
+              isRichText: m.isRichText,
               key: m.key,
               node: m.node,
               placeholders: m.placeholders,
+              richTextElements: m.richTextElements,
               tempKey: m.tempKey,
             })),
             {

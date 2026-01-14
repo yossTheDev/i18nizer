@@ -36,7 +36,7 @@ export default function Home() {
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2">What's New in v0.7.0</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Configure your AI provider and project paths directly in <code className="bg-white dark:bg-gray-900 px-2 py-1 rounded">i18nizer.config.yml</code>, plus comprehensive documentation for advanced i18n patterns
+              Configure your AI provider and project paths, plus <strong>automatic pluralization and rich text detection</strong> with zero configuration required
             </p>
             <div className="grid md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -52,15 +52,15 @@ export default function Home() {
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Pluralization Documentation</h3>
+                <h3 className="font-semibold mb-1">Automatic Pluralization</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Comprehensive guide for ICU message format and plural rules
+                  Detects and converts plural patterns to ICU message format automatically
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Rich Text Formatting</h3>
+                <h3 className="font-semibold mb-1">Automatic Rich Text</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Patterns for handling JSX elements within translations
+                  Handles JSX elements within text with automatic t.rich() generation
                 </p>
               </div>
             </div>

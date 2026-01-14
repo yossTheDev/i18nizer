@@ -68,6 +68,56 @@ function processTemplateLiteral(node: Node): null | { placeholders: string[]; te
 }
 
 /**
+ * Detect rich text pattern - JSX element containing both text and child JSX elements
+ * Example: <p>Click <a>here</a> to continue</p>
+ */
+function detectRichTextPattern(jsxElement: Node): null | {
+    elements: Array<{ tag: string; placeholder: string }>;
+    hasText: boolean;
+} {
+    if (!Node.isJsxElement(jsxElement) && !Node.isJsxSelfClosingElement(jsxElement)) {
+        return null;
+    }
+
+    if (Node.isJsxSelfClosingElement(jsxElement)) {
+        return null; // Self-closing elements don't have rich text
+    }
+
+    const children = jsxElement.getJsxChildren();
+    let hasText = false;
+    let hasJsxElement = false;
+    const elements: Array<{ tag: string; placeholder: string }> = [];
+
+    for (const child of children) {
+        if (Node.isJsxText(child)) {
+            const text = child.getText().trim();
+            if (text.length > 0) {
+                hasText = true;
+            }
+        } else if (Node.isJsxElement(child) || Node.isJsxSelfClosingElement(child)) {
+            hasJsxElement = true;
+            
+            // Get tag name
+            const opening = Node.isJsxElement(child) 
+                ? child.getOpeningElement() 
+                : child;
+            const tagName = opening.getTagNameNode().getText();
+            
+            // Generate placeholder name based on tag
+            const placeholder = tagName.toLowerCase();
+            elements.push({ tag: tagName, placeholder });
+        }
+    }
+
+    // Rich text pattern: has both text and JSX elements
+    if (hasText && hasJsxElement) {
+        return { elements, hasText: true };
+    }
+
+    return null;
+}
+
+/**
  * Detect pluralization pattern in a ternary expression
  * Pattern: variable === 1 ? 'singular' : 'plural'
  */

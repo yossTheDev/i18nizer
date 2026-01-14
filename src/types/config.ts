@@ -4,10 +4,19 @@
 
 export type Framework = "nextjs" | "react" | "custom";
 export type I18nLibrary = "next-intl" | "react-i18next" | "i18next" | "custom";
+export type AiProvider = "openai" | "gemini" | "huggingface";
 
 export interface I18nizerConfig {
   framework: Framework;
   i18nLibrary?: I18nLibrary; // Optional field to track detected library
+  ai?: {
+    provider: AiProvider;
+    model: string;
+  };
+  paths?: {
+    src: string;
+    i18n: string;
+  };
   i18n: {
     function: string;
     import: {
@@ -33,6 +42,10 @@ export interface I18nizerConfig {
 }
 
 export const DEFAULT_CONFIG: I18nizerConfig = {
+  ai: {
+    model: "gpt-4",
+    provider: "openai",
+  },
   behavior: {
     allowedFunctions: ["alert", "confirm", "prompt"],
     allowedMemberFunctions: ["toast.error", "toast.info", "toast.success", "toast.warn"],
@@ -65,6 +78,10 @@ export const DEFAULT_CONFIG: I18nizerConfig = {
     format: "json",
     locales: ["en", "es"],
     path: "messages",
+  },
+  paths: {
+    i18n: "i18n",
+    src: "src",
   },
 };
 

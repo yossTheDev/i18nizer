@@ -32,7 +32,8 @@ function loadApiKeys(): ApiKeys {
 
 export async function generateTranslations(
     prompt: string,
-    provider: Provider = "huggingface"
+    provider: Provider = "huggingface",
+    model?: string
 ): Promise<string | undefined> {
     const keys = loadApiKeys();
 
@@ -40,11 +41,12 @@ export async function generateTranslations(
         case "gemini": {
             const apiKey = keys.gemini;
             if (!apiKey) throw new Error("Gemini API key is not set.");
-            console.log("🤖 Using Google Gemini...");
+            const geminiModel = model || "gemini-2.5-flash";
+            console.log(`🤖 Using Google Gemini (${geminiModel})...`);
             const gemini = new GoogleGenAI({ apiKey });
             const result = await gemini.models.generateContent({
                 contents: prompt,
-                model: "gemini-2.5-flash",
+                model: geminiModel,
             });
             return result.text;
         }
@@ -52,12 +54,13 @@ export async function generateTranslations(
         case "huggingface": {
             const apiKey = keys.huggingface;
             if (!apiKey) throw new Error("Hugging Face API key is not set.");
-            console.log("🤖 Using Hugging Face (DeepSeek-V3.2)...");
+            const hfModel = model || "deepseek-ai/DeepSeek-V3.2";
+            console.log(`🤖 Using Hugging Face (${hfModel})...`);
             const hfClient = new HFClient(apiKey);
             try {
                 const chatCompletion = await hfClient.chatCompletion({
                     messages: [{ content: prompt, role: "user" }],
-                    model: "deepseek-ai/DeepSeek-V3.2",
+                    model: hfModel,
                 });
 
                 return chatCompletion.choices?.[0]?.message?.content || (typeof chatCompletion.output_text === "string" ? chatCompletion.output_text : undefined);
@@ -70,12 +73,13 @@ export async function generateTranslations(
         case "openai": {
             const apiKey = keys.openai;
             if (!apiKey) throw new Error("OpenAI API key is not set.");
-            console.log("🤖 Using OpenAI...");
+            const openaiModel = model || "gpt-4o-mini";
+            console.log(`🤖 Using OpenAI (${openaiModel})...`);
             const openai = new OpenAI({ apiKey });
             try {
                 const completion = await openai.chat.completions.create({
                     messages: [{ content: prompt, role: "user" }],
-                    model: "gpt-4o-mini",
+                    model: openaiModel,
                 });
                 return completion.choices?.[0]?.message?.content || "";
             } catch (error) {

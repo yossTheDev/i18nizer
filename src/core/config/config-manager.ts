@@ -3,10 +3,12 @@ import path from "node:path";
 
 import yaml from "js-yaml";
 
-import { DEFAULT_CONFIG, FRAMEWORK_PRESETS, Framework, I18N_LIBRARY_CONFIGS, I18nLibrary, I18nizerConfig } from "../../types/config.js";
+import { AiProvider, DEFAULT_CONFIG, FRAMEWORK_PRESETS, Framework, I18N_LIBRARY_CONFIGS, I18nLibrary, I18nizerConfig } from "../../types/config.js";
 
 const CONFIG_FILE_NAME = "i18nizer.config.yml";
 const PROJECT_DIR_NAME = ".i18nizer";
+
+const VALID_AI_PROVIDERS: AiProvider[] = ["openai", "gemini", "huggingface"];
 
 /**
  * Detect project type by looking for framework-specific files
@@ -66,6 +68,13 @@ export function detectI18nLibrary(cwd: string): I18nLibrary | null {
 }
 
 /**
+ * Validate AI provider value
+ */
+export function validateAiProvider(provider: string): provider is AiProvider {
+  return VALID_AI_PROVIDERS.includes(provider as AiProvider);
+}
+
+/**
  * Load configuration from the project root
  */
 export function loadConfig(cwd: string): I18nizerConfig | null {
@@ -79,6 +88,13 @@ export function loadConfig(cwd: string): I18nizerConfig | null {
     const fileContent = fs.readFileSync(configPath, "utf8");
     const parsed = yaml.load(fileContent, { schema: yaml.CORE_SCHEMA }) as Partial<I18nizerConfig>;
     
+    // Validate AI provider if specified
+    if (parsed.ai?.provider && !validateAiProvider(parsed.ai.provider)) {
+      throw new Error(
+        `Invalid AI provider: ${parsed.ai.provider}. Valid options: ${VALID_AI_PROVIDERS.join(", ")}`
+      );
+    }
+    
     // Deep merge with defaults
     return mergeConfig(DEFAULT_CONFIG, parsed);
   } catch (error) {
@@ -91,12 +107,15 @@ export function loadConfig(cwd: string): I18nizerConfig | null {
  */
 function mergeConfig(base: I18nizerConfig, override: Partial<I18nizerConfig>): I18nizerConfig {
   return {
+    ai: override.ai ? {
+      ...base.ai,
+      ...override.ai,
+    } : base.ai,
     behavior: {
       ...base.behavior,
       ...override.behavior,
     },
     framework: override.framework ?? base.framework,
-    i18nLibrary: override.i18nLibrary ?? base.i18nLibrary,
     i18n: {
       ...base.i18n,
       ...override.i18n,
@@ -105,10 +124,15 @@ function mergeConfig(base: I18nizerConfig, override: Partial<I18nizerConfig>): I
         ...(override.i18n?.import ?? {}),
       },
     },
+    i18nLibrary: override.i18nLibrary ?? base.i18nLibrary,
     messages: {
       ...base.messages,
       ...override.messages,
     },
+    paths: override.paths ? {
+      ...base.paths,
+      ...override.paths,
+    } : base.paths,
   };
 }
 

@@ -146,7 +146,7 @@ export default class Extract extends Command {
         texts: mappedTexts.map((t) => ({ tempKey: t.tempKey, text: t.text })),
       });
 
-      const raw = await generateTranslations(prompt, provider);
+      const raw = await generateTranslations(prompt, provider, undefined);
 
       if (!raw) throw new Error("AI did not return any data");
 

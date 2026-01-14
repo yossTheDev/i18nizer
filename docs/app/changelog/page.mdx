@@ -1,0 +1,315 @@
+export const metadata = {
+  title: 'Changelog',
+  description: 'Release notes and version history for i18nizer',
+}
+
+# Changelog
+
+All notable changes to i18nizer are documented here.
+
+---
+
+## 0.7.0 - AI Provider and Paths Configuration
+
+**Release Date:** January 2026
+
+### ✨ Added
+
+* **AI Provider Configuration**: Configure AI provider and model directly in `i18nizer.config.yml`
+  * `ai.provider`: Choose between `openai`, `gemini`, or `huggingface` (default: `openai`)
+  * `ai.model`: Specify the model to use (default: `gpt-4`)
+  * Provider validation ensures only supported providers are accepted
+  * CLI `--provider` flag still works and overrides config setting
+  
+* **Paths Configuration**: Define default project paths in config
+  * `paths.src`: Source directory (default: `src`)
+  * `paths.i18n`: i18n output directory (default: `i18n`)
+
+### 🔄 Changed
+
+* AI provider now defaults to `openai` instead of `huggingface` when not specified
+* `generateTranslations()` function now accepts optional `model` parameter for custom model selection
+
+### 🐛 Fixed
+
+* Config merging now properly handles optional `ai` and `paths` fields
+
+### 📝 Notes
+
+* Fully backward compatible - existing configs without `ai` or `paths` fields will use default values
+* Configuration example:
+
+```yaml
+ai:
+  provider: gemini
+  model: gemini-2.5-flash
+
+paths:
+  src: source
+  i18n: locales
+```
+
+**Documentation:**
+- See [Configuration Guide](/configuration) for detailed AI and paths setup
+- Check [Getting Started](/getting-started) for API key configuration
+
+---
+
+## 0.6.2 - Minor Fixes
+
+* Bug fixes and stability improvements
+
+---
+
+## 0.6.1 - Some Improvements
+
+### ✨ Added
+
+* `messages.generated.ts` aggregator file consolidating all JSON translations by language
+* `regenerate` CLI command to rebuild `messages.generated.ts` automatically
+* Automatic addition of `i18nizer.config.yml` to `.gitignore` if present
+* Option to use aggregator as single import point instead of multiple dynamic imports
+
+### 🔄 Changed
+
+* JSON file naming convention standardized to **lowercase with hyphens** (e.g., `notification-item.json`) for valid TypeScript imports
+* Auto-generated aggregator now sanitizes identifiers for TypeScript, converting JSON filenames into valid import identifiers
+* Namespaces inside JSON remain in PascalCase, keys remain camelCase
+
+### 🐛 Fixed
+
+* Resolved invalid import errors caused by hyphens in JSON filenames
+* Eliminated the need for multiple dynamic imports per component or page
+
+### 📝 Notes
+
+All messages for a given locale can now be accessed via `messages.generated.ts`:
+
+```ts
+import { messages } from './messages.generated';
+
+const localeMessages = messages[locale];
+```
+
+This consolidates translations, simplifies imports, and improves performance.
+
+---
+
+## 0.6.0 - Opinionated System & Generated Aggregator
+
+**This release introduces an opinionated system with automatic aggregator generation and enhanced configuration options.**
+
+### ✨ New Features
+
+* **Auto-Generated Aggregator** (`/i18n/messages.generated.ts`)
+  * Automatically scans `/messages/<locale>/` directories and generates a TypeScript aggregator file
+  * Imports all translation JSON files and exports them as a unified `messages` object
+  * Compatible with i18next and next-intl
+  * Includes warning comment to prevent manual editing
+  * Regenerates automatically after `translate` and `extract` commands
+  * Displays statistics about processed locales and namespaces
+
+* **Automatic .gitignore Management**
+  * `.i18nizer/` folder is automatically added to `.gitignore` during `i18nizer start`
+  * Keeps cache and temporary files out of version control
+  * `i18nizer.config.yml` remains tracked in git for team collaboration
+  * Prevents duplicate entries with intelligent pattern detection
+  * Handles various gitignore patterns (exact match, leading slash, wildcard)
+
+* **Configurable Locales**
+  * New `locales` field in `i18nizer.config.yml` under `messages` section
+  * Define project locales once in config instead of passing `--locales` flag every time
+  * Commands still accept `--locales` flag to override config setting
+  * Default locales: `["en", "es"]`
+
+### 🏗️ Opinionated Structure
+
+* **Messages Directory**: `/messages/<lang>/<namespace>.json`
+  * Separate folders per language for easier versioning
+  * Namespace = PascalCase (component name)
+  * Keys = camelCase
+  * No language mixing in files
+
+* **Generated Aggregator**: `/i18n/messages.generated.ts`
+  * Spread operator pattern for compatibility
+  * Sorted imports for consistency
+  * Auto-regenerated, never edited manually
+
+### 🧪 Testing
+
+* Added 15 new comprehensive tests
+  * 7 tests for aggregator generation (edge cases, sorting, multiple locales)
+  * 8 tests for .gitignore management (patterns, duplicates, empty files)
+* All 118 tests passing with no regressions
+
+---
+
+## 0.5.1 - Batch Key Generation
+
+* Implement batch key generation to minimize AI requests
+* Minor fixes
+
+---
+
+## 0.5.0 - AI Key Generation Improvements
+
+### ✨ New Features
+
+* AI-Powered Key Generation
+* Intelligent Caching
+* Graceful Fallback
+
+---
+
+## 0.4.0 - Project Integration
+
+**This release completes Phase 1 - project-level integration with configuration, caching, and intelligent string management.**
+
+### ✨ New Features
+
+* **`i18nizer start` command**: Initialize i18nizer in your project
+  * Interactive mode with framework and i18n library detection
+  * Automatic framework detection (Next.js, React)
+  * Automatic i18n library detection (next-intl, react-i18next, i18next)
+  * Manual configuration with `--framework` and `--i18n` flags
+  * Non-interactive mode with `--yes` flag for CI/automation
+  * Framework presets with optimal defaults
+  * Generates `i18nizer.config.yml` configuration file
+  * Creates `.i18nizer/` directory for caching
+  * Sets up configurable `messages/` directory
+
+* **`i18nizer translate` command**: Enhanced translation workflow
+  * Project-level mode with `--all` flag to translate all components
+  * Single-file mode for targeted translation
+  * `--dry-run` flag to preview changes
+  * `--show-json` flag to display generated translation output
+  * Integrated with project configuration system
+
+* **Configuration system**:
+  * YAML-based configuration (`i18nizer.config.yml`)
+  * Framework presets (Next.js, React, Custom)
+  * I18n library-specific configurations
+  * Combined presets (e.g., Next.js + next-intl)
+  * `autoInjectT` option to control automatic translation function injection
+  * Configurable i18n function and import source
+  * Customizable messages directory and default locale
+  * Configurable behavior (deduplication, allowed props/functions)
+
+* **Intelligent caching**:
+  * Translation cache in `.i18nizer/cache/`
+  * Avoids redundant AI translation requests
+  * String-to-key mapping for fast lookups
+  * Persistent across multiple runs
+
+* **String deduplication**:
+  * Detects duplicate strings across components
+  * Reuses deterministic keys for identical strings
+  * Reduces translation costs and ensures consistency
+
+* **Enhanced CLI feedback**:
+  * Colored output with chalk
+  * Progress spinners with ora
+  * Interactive prompts with inquirer
+  * Detailed summary statistics
+  * Clear error messages and guidance
+
+---
+
+## 0.3.0 - Foundation & Reliability
+
+**This release completes Phase 0 - stabilizing the core extraction, replacement, and reliability features.**
+
+### ✨ New Features
+
+* Expanded prop support: `aria-placeholder`, `label`, `text`, `tooltip`, `helperText`
+* Deterministic key generation with stable, human-readable camelCase keys
+* Improved JSON output quality:
+  * Alphabetically sorted keys for stable output
+  * Consistent 2-space indentation
+  * Trailing newlines added to all JSON files
+* Enhanced non-translatable filtering
+
+### 🧪 Testing
+
+* Expanded test suite from 26 to 60+ tests
+* Comprehensive tests for:
+  * All new supported props
+  * Non-translatable content filtering
+  * Deterministic key generation
+  * JSON output quality and stability
+* All tests passing on Node 18, 20, and latest
+
+---
+
+## 0.2.0 - Enhanced Text Extraction
+
+* **Enhanced text extraction for complex JSX expressions**:
+  * Support for ternary operators in JSX attributes and children
+  * Support for logical AND (`&&`) and OR (`||`) operators
+  * Support for curly-braced string literals in JSX attributes
+  * Improved filtering to skip non-translatable content
+
+* **Improved test coverage**:
+  * Comprehensive test suite for all extraction edge cases
+  * Tests verify ternary operators, logical operators, nested expressions
+
+* **CI/CD improvements**:
+  * Test status badge added to README
+  * Test workflow runs automatically on every push
+
+---
+
+## 0.1.5 - Minor Fixes
+
+* Bug fixes and stability improvements
+
+---
+
+## 0.1.4 - Member Function Support
+
+* Support for member function calls (e.g., `toast.error`, `toast.success`)
+* `getFullCallName` helper added for member expressions
+* Template literals inside member functions now processed correctly
+* Placeholders in `t("key", { ... })` now supported
+* Comments updated to English for clarity
+
+---
+
+## 0.1.3 - TSX/JSX Parsing Fixes
+
+* Fixed TSX/JSX parsing to work with any file path
+* Avoided Windows EPERM errors when scanning system folders
+* Updated parseFile to use minimal in-memory ts-morph project
+* Fixed extraction of translation keys
+* Updated buildPrompt for better AI outputs
+
+---
+
+## 0.1.2 - Minor Fixes
+
+* Bug fixes and stability improvements
+
+---
+
+## 0.1.1 - Project Structure
+
+* Added `.i18nizer` folder in project root
+  * `.i18nizer/tsconfig.json` for isolated TypeScript analysis
+  * `.i18nizer/api-keys.json` for storing API keys locally
+  * `.i18nizer/messages/` for generated locale JSON files
+* Automatically creates default configs if they don't exist
+* Ensures CLI works independently of user project tsconfig
+
+---
+
+## 0.1.0 - Initial Release
+
+* Initial release of i18nizer
+* Supported AI providers: OpenAI, Hugging Face, Gemini
+* CLI works with JSX and TSX files
+* Console logs show paths of saved locale files
+* Works independently of user project tsconfig
+
+---
+
+For the latest updates, visit the [GitHub repository](https://github.com/yossTheDev/i18nizer).

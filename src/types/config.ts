@@ -2,37 +2,50 @@
  * Configuration types for i18nizer
  */
 
-export type Framework = "nextjs" | "react" | "custom";
-export type I18nLibrary = "next-intl" | "react-i18next" | "i18next" | "custom";
+export type Framework = "custom" | "nextjs" | "react";
+export type I18nLibrary = "custom" | "i18next" | "next-intl" | "react-i18next";
+export type AiProvider = "gemini" | "huggingface" | "openai";
 
 export interface I18nizerConfig {
-  framework: Framework;
-  i18nLibrary?: I18nLibrary; // Optional field to track detected library
-  i18n: {
-    function: string;
-    import: {
-      source: string;
-      named: string;
-    };
-  };
-  messages: {
-    path: string;
-    defaultLocale: string;
-    locales: string[];
-    format: "json";
+  ai?: {
+    model: string;
+    provider: AiProvider;
   };
   behavior: {
-    detectDuplicates: boolean;
-    opinionatedStructure: boolean;
-    autoInjectT: boolean;
-    useAiForKeys: boolean;
     allowedFunctions: string[];
     allowedMemberFunctions: string[];
     allowedProps: string[];
+    autoInjectT: boolean;
+    detectDuplicates: boolean;
+    opinionatedStructure: boolean;
+    useAiForKeys: boolean;
+  };
+  framework: Framework;
+  i18n: {
+    function: string;
+    import: {
+      named: string;
+      source: string;
+    };
+  };
+  i18nLibrary?: I18nLibrary; // Optional field to track detected library
+  messages: {
+    defaultLocale: string;
+    format: "json";
+    locales: string[];
+    path: string;
+  };
+  paths?: {
+    i18n: string;
+    src: string;
   };
 }
 
 export const DEFAULT_CONFIG: I18nizerConfig = {
+  ai: {
+    model: "gpt-4",
+    provider: "openai",
+  },
   behavior: {
     allowedFunctions: ["alert", "confirm", "prompt"],
     allowedMemberFunctions: ["toast.error", "toast.info", "toast.success", "toast.warn"],
@@ -66,13 +79,16 @@ export const DEFAULT_CONFIG: I18nizerConfig = {
     locales: ["en", "es"],
     path: "messages",
   },
+  paths: {
+    i18n: "i18n",
+    src: "src",
+  },
 };
 
 export const FRAMEWORK_PRESETS: Record<Framework, Partial<I18nizerConfig>> = {
   custom: {},
   nextjs: {
     framework: "nextjs",
-    i18nLibrary: "next-intl",
     i18n: {
       function: "t",
       import: {
@@ -80,10 +96,10 @@ export const FRAMEWORK_PRESETS: Record<Framework, Partial<I18nizerConfig>> = {
         source: "next-intl",
       },
     },
+    i18nLibrary: "next-intl",
   },
   react: {
     framework: "react",
-    i18nLibrary: "react-i18next",
     i18n: {
       function: "t",
       import: {
@@ -91,6 +107,7 @@ export const FRAMEWORK_PRESETS: Record<Framework, Partial<I18nizerConfig>> = {
         source: "react-i18next",
       },
     },
+    i18nLibrary: "react-i18next",
   },
 };
 
@@ -98,8 +115,7 @@ export const FRAMEWORK_PRESETS: Record<Framework, Partial<I18nizerConfig>> = {
  * I18n library-specific configurations
  */
 export const I18N_LIBRARY_CONFIGS: Record<I18nLibrary, Partial<I18nizerConfig>> = {
-  "next-intl": {
-    i18nLibrary: "next-intl",
+  custom: {
     i18n: {
       function: "t",
       import: {
@@ -107,19 +123,9 @@ export const I18N_LIBRARY_CONFIGS: Record<I18nLibrary, Partial<I18nizerConfig>> 
         source: "next-intl",
       },
     },
-  },
-  "react-i18next": {
-    i18nLibrary: "react-i18next",
-    i18n: {
-      function: "t",
-      import: {
-        named: "useTranslation",
-        source: "react-i18next",
-      },
-    },
+    i18nLibrary: "custom",
   },
   "i18next": {
-    i18nLibrary: "i18next",
     i18n: {
       function: "t",
       import: {
@@ -127,9 +133,9 @@ export const I18N_LIBRARY_CONFIGS: Record<I18nLibrary, Partial<I18nizerConfig>> 
         source: "react-i18next", // Default to react-i18next for React apps
       },
     },
+    i18nLibrary: "i18next",
   },
-  custom: {
-    i18nLibrary: "custom",
+  "next-intl": {
     i18n: {
       function: "t",
       import: {
@@ -137,5 +143,16 @@ export const I18N_LIBRARY_CONFIGS: Record<I18nLibrary, Partial<I18nizerConfig>> 
         source: "next-intl",
       },
     },
+    i18nLibrary: "next-intl",
+  },
+  "react-i18next": {
+    i18n: {
+      function: "t",
+      import: {
+        named: "useTranslation",
+        source: "react-i18next",
+      },
+    },
+    i18nLibrary: "react-i18next",
   },
 };

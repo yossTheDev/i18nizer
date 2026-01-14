@@ -6,8 +6,8 @@ import { DocLayout } from '@/components/DocLayout'
 function generateId(text: string): string {
   return text
     .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]/g, '')
+    .replaceAll(/\s+/g, '-')
+    .replaceAll(/[^\w-]/g, '')
 }
 
 // Heading components with auto-generated IDs
@@ -33,6 +33,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   const usedIds = new Map<string, number>()
   
   return {
+    ...components,
     wrapper: ({ children }: { children: ReactNode }) => (
       <DocLayout>
         <div className="prose prose-lg dark:prose-invert max-w-none">
@@ -43,6 +44,37 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h2: createHeading(2, usedIds),
     h3: createHeading(3, usedIds),
     h4: createHeading(4, usedIds),
-    ...components,
+    table: ({ children }: { children: ReactNode }) => (
+      <div className="overflow-x-auto my-6">
+        <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+          {children}
+        </table>
+      </div>
+    ),
+    thead: ({ children }: { children: ReactNode }) => (
+      <thead className="bg-gray-50 dark:bg-gray-800">
+        {children}
+      </thead>
+    ),
+    tbody: ({ children }: { children: ReactNode }) => (
+      <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+        {children}
+      </tbody>
+    ),
+    tr: ({ children }: { children: ReactNode }) => (
+      <tr>
+        {children}
+      </tr>
+    ),
+    th: ({ children }: { children: ReactNode }) => (
+      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        {children}
+      </th>
+    ),
+    td: ({ children }: { children: ReactNode }) => (
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+        {children}
+      </td>
+    ),
   }
 }

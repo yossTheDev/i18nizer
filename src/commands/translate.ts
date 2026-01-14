@@ -104,7 +104,8 @@ export default class Translate extends Command {
       ? flags.locales.split(",")
       : config.messages.locales || [config.messages.defaultLocale, "es"]; // Use config locales or default fallback
 
-    let provider: Provider = "huggingface";
+    // Use provider from config or flag (flag takes precedence)
+    let provider: Provider = config.ai?.provider || "huggingface";
     if (flags.provider) {
       const p = flags.provider.toLowerCase();
       if (!VALID_PROVIDERS.includes(p as Provider)) {
@@ -115,6 +116,9 @@ export default class Translate extends Command {
 
       provider = p as Provider;
     }
+
+    // Use model from config (can be undefined if not specified)
+    const aiModel = config.ai?.model;
 
     // Get files to process
     const filesToProcess: string[] = flags.all
@@ -235,7 +239,7 @@ export default class Translate extends Command {
           });
 
           // eslint-disable-next-line no-await-in-loop
-          const raw = await generateTranslations(prompt, provider);
+          const raw = await generateTranslations(prompt, provider, aiModel);
           if (!raw) throw new Error("AI did not return any data");
 
           const aiJson = parseAiJson(raw);

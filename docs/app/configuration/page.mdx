@@ -7,6 +7,48 @@ export const metadata = {
 
 Learn how to configure i18nizer for your project using `i18nizer.config.yml`.
 
+## What's New in 0.7.0 🎉
+
+Version 0.7.0 introduces powerful new configuration options:
+
+### AI Provider Configuration
+
+You can now configure your AI provider and model directly in the config file:
+
+```yaml
+ai:
+  provider: openai        # openai | gemini | huggingface
+  model: gpt-4           # AI model name
+```
+
+**Benefits:**
+- Set your preferred AI provider once, use everywhere
+- No need to pass `--provider` flag on every command
+- Easy switching between providers and models
+- CLI flags still override config for one-off changes
+
+**Supported Providers:**
+- **OpenAI** (default): `gpt-4`, `gpt-4o-mini`, `gpt-3.5-turbo`
+- **Google Gemini**: `gemini-2.5-flash`, `gemini-pro`
+- **Hugging Face**: `deepseek-ai/DeepSeek-V3.2`, custom models
+
+### Paths Configuration
+
+Define your project structure once:
+
+```yaml
+paths:
+  src: src               # Source directory
+  i18n: i18n            # i18n output directory
+```
+
+**Use Cases:**
+- Custom source directory structure
+- Different i18n aggregator locations
+- Monorepo setups with nested paths
+
+---
+
 ## Configuration File
 
 The configuration file is automatically created when you run `i18nizer start`. It's located at:
@@ -180,23 +222,40 @@ behavior:
 
 ### provider
 
-Select AI provider:
+Select your preferred AI provider for translations and key generation:
 
 ```yaml
 ai:
   provider: openai  # openai | gemini | huggingface
 ```
 
+**Default:** `openai` (as of v0.7.0)
+
+**Provider Comparison:**
+
+| Provider | Best For | Cost | Speed | Quality |
+|----------|----------|------|-------|---------|
+| OpenAI | Production use | $$$ | Fast | Excellent |
+| Gemini | Cost-effective | $$ | Fast | Excellent |
+| Hugging Face | Open source, custom models | $ | Varies | Good |
+
+**Configuration Priority:**
+1. CLI `--provider` flag (highest)
+2. `ai.provider` in config
+3. Default (`openai`)
+
 ### model
 
-Specify model:
+Specify the model to use for your chosen provider:
 
 ```yaml
 ai:
   model: gpt-4  # for OpenAI
-  # model: gemini-pro  # for Gemini
-  # model: deepseek-coder  # for Hugging Face
+  # model: gemini-2.5-flash  # for Gemini
+  # model: deepseek-ai/DeepSeek-V3.2  # for Hugging Face
 ```
+
+**Default:** `gpt-4` (for OpenAI)
 
 **Recommended Models:**
 
@@ -208,13 +267,41 @@ ai:
 
 ## Path Settings
 
+### paths.src
+
+Source code directory (new in v0.7.0):
+
+```yaml
+paths:
+  src: src  # or 'app', 'components', 'lib'
+```
+
+**Default:** `src`
+
+Define where your source code lives. This helps i18nizer understand your project structure for future enhancements.
+
+### paths.i18n
+
+i18n aggregator output directory (new in v0.7.0):
+
+```yaml
+paths:
+  i18n: i18n  # or 'locales', 'translations'
+```
+
+**Default:** `i18n`
+
+Specifies where the auto-generated `messages.generated.ts` aggregator file should be created.
+
 ### outputDir
 
-Translation files directory:
+Translation JSON files directory:
 
 ```yaml
 outputDir: messages  # or 'locales', 'translations'
 ```
+
+**Deprecated:** Use `messages.path` instead (see Messages Configuration below)
 
 ### cacheDir
 
@@ -224,23 +311,7 @@ Cache directory:
 cacheDir: .i18nizer
 ```
 
-### paths.src
-
-Source code directory:
-
-```yaml
-paths:
-  src: src  # or 'app', 'components'
-```
-
-### paths.i18n
-
-Aggregator output:
-
-```yaml
-paths:
-  i18n: i18n
-```
+Stores translation cache and temporary files. This directory is automatically added to `.gitignore`.
 
 ## Example Configurations
 

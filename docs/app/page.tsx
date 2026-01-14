@@ -29,6 +29,39 @@ export default function Home() {
         </div>
       </section>
 
+      {/* What's New in v0.7.0 */}
+      <section className="bg-gradient-to-r from-primary-50 to-green-50 dark:from-gray-800 dark:to-gray-800 rounded-lg p-8 border border-primary-200 dark:border-gray-700">
+        <div className="flex items-start gap-4">
+          <span className="text-3xl">🎉</span>
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold mb-2">What's New in v0.7.0</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Configure your AI provider and project paths directly in <code className="bg-white dark:bg-gray-900 px-2 py-1 rounded">i18nizer.config.yml</code>
+            </p>
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <h3 className="font-semibold mb-1">AI Provider Configuration</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Choose between OpenAI, Gemini, or Hugging Face with custom models
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">Paths Configuration</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Define your source and i18n output directories once
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/changelog"
+              className="text-primary-600 hover:text-primary-700 font-medium inline-flex items-center gap-1"
+            >
+              View full changelog →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* What is i18nizer */}
       <section>
         <h2 className="text-3xl font-bold mb-4">What is i18nizer?</h2>

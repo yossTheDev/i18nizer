@@ -11,6 +11,7 @@ const navigation = [
   { name: 'Configuration', href: '/configuration' },
   { name: 'Examples', href: '/examples' },
   { name: 'Architecture', href: '/architecture' },
+  { name: 'Changelog', href: '/changelog' },
   { name: 'Contributing', href: '/contributing' },
 ]
 

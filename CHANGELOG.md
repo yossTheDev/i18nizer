@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## 0.7.0 - AI Provider and Paths Configuration
+
+### Added
+
+* **AI Provider Configuration**: Configure AI provider and model directly in `i18nizer.config.yml`
+  * `ai.provider`: Choose between `openai`, `gemini`, or `huggingface` (default: `openai`)
+  * `ai.model`: Specify the model to use (default: `gpt-4`)
+  * Provider validation ensures only supported providers are accepted
+  * CLI `--provider` flag still works and overrides config setting
+  
+* **Paths Configuration**: Define default project paths in config
+  * `paths.src`: Source directory (default: `src`)
+  * `paths.i18n`: i18n output directory (default: `i18n`)
+
+### Changed
+
+* AI provider now defaults to `openai` instead of `huggingface` when not specified
+* `generateTranslations()` function now accepts optional `model` parameter for custom model selection
+
+### Fixed
+
+* Config merging now properly handles optional `ai` and `paths` fields
+
+### Notes
+
+* Fully backward compatible - existing configs without `ai` or `paths` fields will use default values
+* Configuration example:
+
+```yaml
+ai:
+  provider: gemini
+  model: gemini-2.5-flash
+
+paths:
+  src: source
+  i18n: locales
+```
+
+---
+
 ## 0.6.2
 
 * Minor Fixes

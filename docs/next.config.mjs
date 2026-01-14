@@ -10,8 +10,10 @@ const nextConfig = {
 }
 
 const withMDX = createMDX({
-  // No rehype plugins due to Turbopack serialization issues
-  // Syntax highlighting will be added client-side
+  options: {
+    remarkPlugins: ['remark-gfm'],
+    rehypePlugins: [],
+  },
 })
 
 export default withMDX(nextConfig)

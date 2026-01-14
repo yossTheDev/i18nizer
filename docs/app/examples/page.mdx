@@ -691,41 +691,230 @@ console.log(messages.fr.Header.home)     // "Accueil"
 
 ---
 
-## Advanced Examples
+## Advanced i18n Patterns
 
-### Pluralization
+i18nizer extracts translatable strings and generates standard i18n JSON files. For advanced patterns like pluralization and rich text formatting, you can manually enhance the extracted translations using the built-in features of i18next and next-intl.
 
-i18nizer supports ICU message format for pluralization:
+### Pluralization with ICU Message Format
 
-**Before:**
+Both i18next and next-intl support ICU message format for handling plurals. After i18nizer extracts your strings, you can enhance them with plural rules.
+
+#### Example 1: Simple Item Count
+
+**Before i18nizer:**
 ```tsx
 <p>{count} {count === 1 ? 'item' : 'items'} in cart</p>
 ```
 
-**After:**
+**After i18nizer extraction:**
+```tsx
+<p>{t('itemCount', { count })} {t('itemsLabel', { count })}</p>
+```
+
+**Manual enhancement with pluralization:**
 ```tsx
 <p>{t('itemsInCart', { count })}</p>
 ```
 
-**Translation:**
+**Translation file (`messages/en.json`):**
 ```json
 {
   "itemsInCart": "{count, plural, =0 {No items} one {# item} other {# items}} in cart"
 }
 ```
 
-### Rich Text Formatting
+**How it works:**
+- `=0` - Exact match for zero items
+- `one` - Singular form (used for count = 1)
+- `other` - Plural form (used for count > 1)
+- `#` - Placeholder that shows the actual count number
+
+#### Example 2: Complex Pluralization
 
 **Before:**
+```tsx
+<div>
+  <p>You have {notifications} unread {notifications === 1 ? 'notification' : 'notifications'}</p>
+  <p>{notifications === 0 ? 'All caught up!' : 'Click to view'}</p>
+</div>
+```
+
+**After manual enhancement:**
+```tsx
+<div>
+  <p>{t('notificationCount', { count: notifications })}</p>
+  <p>{t('notificationAction', { count: notifications })}</p>
+</div>
+```
+
+**Translation:**
+```json
+{
+  "notificationCount": "{count, plural, =0 {No unread notifications} one {# unread notification} other {# unread notifications}}",
+  "notificationAction": "{count, plural, =0 {All caught up!} other {Click to view}}"
+}
+```
+
+#### Example 3: Plural Categories
+
+Different languages have different plural rules. ICU supports: `zero`, `one`, `two`, `few`, `many`, `other`.
+
+**English (2 forms):**
+```json
+{
+  "items": "{count, plural, one {# item} other {# items}}"
+}
+```
+
+**Polish (3 forms):**
+```json
+{
+  "items": "{count, plural, one {# przedmiot} few {# przedmioty} other {# przedmiotów}}"
+}
+```
+
+**Arabic (6 forms):**
+```json
+{
+  "items": "{count, plural, zero {لا توجد عناصر} one {عنصر واحد} two {عنصران} few {# عناصر} many {# عنصرًا} other {# عنصر}}"
+}
+```
+
+### Rich Text Formatting
+
+When you need JSX elements within translated text (like links, bold, or italic), use rich text formatting capabilities.
+
+#### Example 1: Links in Text (next-intl)
+
+**Before i18nizer:**
 ```tsx
 <p>By clicking Sign Up, you agree to our <a href="/terms">Terms of Service</a></p>
 ```
 
-**After:**
+**After i18nizer extraction:**
+```tsx
+<p>{t('byClickingSignUp')} <a href="/terms">{t('termsOfService')}</a></p>
+```
+
+**Manual enhancement with rich text:**
 ```tsx
 <p>{t.rich('signUpAgreement', {
   terms: (chunks) => <a href="/terms">{chunks}</a>
 })}</p>
+```
+
+**Translation:**
+```json
+{
+  "signUpAgreement": "By clicking Sign Up, you agree to our <terms>Terms of Service</terms>"
+}
+```
+
+#### Example 2: Multiple Rich Elements
+
+**Before:**
+```tsx
+<p>
+  Read our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms</a> for more info.
+  All rights reserved <strong>© 2024</strong>
+</p>
+```
+
+**After manual enhancement:**
+```tsx
+<p>{t.rich('legalNotice', {
+  privacy: (chunks) => <a href="/privacy">{chunks}</a>,
+  terms: (chunks) => <a href="/terms">{chunks}</a>,
+  copyright: (chunks) => <strong>{chunks}</strong>
+})}</p>
+```
+
+**Translation:**
+```json
+{
+  "legalNotice": "Read our <privacy>Privacy Policy</privacy> and <terms>Terms</terms> for more info. All rights reserved <copyright>© 2024</copyright>"
+}
+```
+
+#### Example 3: Rich Text with i18next Trans Component
+
+**Using Trans component:**
+```tsx
+import { Trans } from 'react-i18next';
+
+<p>
+  <Trans 
+    i18nKey="signUpAgreement"
+    components={{
+      termsLink: <a href="/terms" />,
+      privacyLink: <a href="/privacy" />
+    }}
+  />
+</p>
+```
+
+**Translation:**
+```json
+{
+  "signUpAgreement": "By clicking Sign Up, you agree to our <termsLink>Terms</termsLink> and <privacyLink>Privacy Policy</privacyLink>"
+}
+```
+
+### Date and Time Formatting
+
+**Example:**
+```tsx
+<p>{t('lastUpdated', { date: new Date() })}</p>
+```
+
+**Translation:**
+```json
+{
+  "lastUpdated": "Last updated: {date, date, medium}"
+}
+```
+
+**Format options:**
+- `short`: 1/1/24
+- `medium`: Jan 1, 2024
+- `long`: January 1, 2024
+- `full`: Monday, January 1, 2024
+
+### Number and Currency Formatting
+
+**Example:**
+```tsx
+<p>{t('price', { amount: 99.99, currency: 'USD' })}</p>
+```
+
+**Translation:**
+```json
+{
+  "price": "{amount, number, ::currency/{currency}}"
+}
+```
+
+**Output:**
+- English: $99.99
+- German: 99,99 €
+- Japanese: ¥100
+
+### Combining Plurals with Rich Text
+
+**Example:**
+```tsx
+<p>{t.rich('cartSummary', {
+  count: items.length,
+  price: totalPrice,
+  link: (chunks) => <a href="/cart">{chunks}</a>
+})}</p>
+```
+
+**Translation:**
+```json
+{
+  "cartSummary": "{count, plural, =0 {Your cart is empty} one {# item in <link>your cart</link> • ${price}} other {# items in <link>your cart</link> • ${price}}}"
+}
 ```
 
 ---

@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## 0.7.1 - Pluralization and Rich Text Documentation
+
+### Added
+
+* **Pluralization Support Documentation**: Comprehensive guide on using ICU message format for pluralization
+  * Examples showing how to handle count-based text variations
+  * Before/after code samples for common pluralization patterns
+  * Integration with i18next and next-intl plural features
+  
+* **Rich Text Formatting Documentation**: Complete guide for handling JSX elements within translations
+  * Examples of using `t.rich()` for formatted text with inline elements
+  * Patterns for handling links, bold text, and other rich content
+  * Best practices for maintaining translateable text with embedded JSX
+
+### Changed
+
+* Enhanced README with pluralization and rich text examples
+* Updated documentation site with detailed usage instructions
+* Improved examples page with real-world pluralization scenarios
+
+### Notes
+
+* Pluralization and rich text formatting are supported through i18next/next-intl's built-in features
+* Users can manually refactor extracted strings to use ICU plural format or `t.rich()` calls
+* Full automatic detection and conversion of these patterns is planned for future releases
+
+---
+
 ## 0.7.0 - AI Provider and Paths Configuration
 
 ### Added

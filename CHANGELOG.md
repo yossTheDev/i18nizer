@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.7.2 Some Fixes
+
+### Fixed
+
+* Prevented text extraction from disallowed JSX props such as className, key, id, and data-*, including when wrapped in JSX expressions.
+* Restored correct extraction of visible JSX text containing symbols, currency characters, and mixed content.
+* Ensured JSX child text is only extracted when it belongs to visible JSX elements.
+* Improved filtering logic for JSX expressions to respect the configured allowedProps.
+
 ## 0.7.1 - Pluralization and Rich Text Support
 
 ### Added

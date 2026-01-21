@@ -97,16 +97,16 @@ function extractRichTextContent(jsxElement: Node): null | {
             const opening = child.getOpeningElement();
             const tagName = opening.getTagNameNode().getText();
             const placeholder = tagName.toLowerCase();
-            
+
             // Get inner text of the element
             const innerText = child.getJsxChildren()
                 .filter(c => Node.isJsxText(c))
                 .map(c => c.getText())
                 .join('');
-            
+
             // Add to rich text with placeholder
             richText += `<${placeholder}>${innerText}</${placeholder}>`;
-            
+
             // Track unique elements
             if (!seenPlaceholders.has(placeholder)) {
                 elements.push({ tag: tagName, placeholder });
@@ -150,13 +150,13 @@ function detectRichTextPattern(jsxElement: Node): null | {
             }
         } else if (Node.isJsxElement(child) || Node.isJsxSelfClosingElement(child)) {
             hasJsxElement = true;
-            
+
             // Get tag name
-            const opening = Node.isJsxElement(child) 
-                ? child.getOpeningElement() 
+            const opening = Node.isJsxElement(child)
+                ? child.getOpeningElement()
                 : child;
             const tagName = opening.getTagNameNode().getText();
-            
+
             // Generate placeholder name based on tag
             const placeholder = tagName.toLowerCase();
             elements.push({ tag: tagName, placeholder });
@@ -275,12 +275,12 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
     if (Node.isConditionalExpression(expr)) {
         // Check if this is a pluralization pattern
         const pluralPattern = detectPluralizationPattern(expr);
-        
+
         if (pluralPattern) {
             // This is a pluralization pattern, create a single entry for it
             const tempKey = `i$fdw_${tempIdCounter++}`;
             const text = pluralPattern.other; // Use plural form as base text
-            
+
             results.push({
                 node: expr,
                 placeholders: [pluralPattern.pluralVariable],
@@ -299,7 +299,7 @@ function extractStringsFromExpression(expr: Node, results: ExtractedText[], seen
             seenNodes.add(expr.getWhenFalse());
             return;
         }
-        
+
         // Not a pluralization pattern, extract strings normally
         extractStringsFromExpression(expr.getWhenTrue(), results, seenNodes);
         extractStringsFromExpression(expr.getWhenFalse(), results, seenNodes);
@@ -330,7 +330,7 @@ export function extractTexts(sourceFile: Node, options: ExtractOptions = {}): Ex
     const allowedFunctions = new Set(options.allowedFunctions ?? [...defaultAllowedFunctions]);
     const allowedMemberFunctions = new Set(options.allowedMemberFunctions ?? [...defaultAllowedMemberFunctions]);
     const allowedProps = new Set(options.allowedProps ?? [...defaultAllowedProps]);
-    
+
     const results: ExtractedText[] = [];
     const seenNodes = new Set<Node>();
 
@@ -351,7 +351,7 @@ export function extractTexts(sourceFile: Node, options: ExtractOptions = {}): Ex
                     text: richContent.text,
                 });
                 seenNodes.add(node);
-                
+
                 // Mark all children as seen to avoid duplicate extraction
                 node.getJsxChildren().forEach(child => seenNodes.add(child));
                 return;
@@ -363,23 +363,44 @@ export function extractTexts(sourceFile: Node, options: ExtractOptions = {}): Ex
 
         // JSXText
         if (Node.isJsxText(node)) {
-            text = node.getText().trim();
-            if (text && isTranslatableString(node, text)) {
-                const tempKey = `i$fdw_${tempIdCounter++}`;
-                results.push({ node, placeholders, tempKey, text });
-                seenNodes.add(node);
-            }
+            const parent = node.getParent();
 
+            // Solo permitir texto visible dentro de un elemento JSX
+            if (!Node.isJsxElement(parent)) return;
+
+            text = node.getText().trim();
+            if (!text) return;
+            if (!isTranslatableString(node, text)) return;
+
+            const tempKey = `i$fdw_${tempIdCounter++}`;
+            results.push({ node, placeholders, tempKey, text });
+            seenNodes.add(node);
             return;
         }
 
         // JSXExpression - handle complex expressions
         if (Node.isJsxExpression(node)) {
             const expr = node.getExpression();
-            if (expr) {
-                extractStringsFromExpression(expr, results, seenNodes);
+            if (!expr) return;
+
+            const parent = node.getParent();
+
+            let shouldExtract = false;
+
+            if (Node.isJsxAttribute(parent)) {
+                const propName = parent.getNameNode().getText();
+                if (allowedProps.has(propName)) {
+                    shouldExtract = true;
+                }
             }
 
+            if (Node.isJsxElement(parent)) {
+                shouldExtract = true;
+            }
+
+            if (!shouldExtract) return;
+
+            extractStringsFromExpression(expr, results, seenNodes);
             return;
         }
 

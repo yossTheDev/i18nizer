@@ -444,4 +444,77 @@ describe('extractTexts', () => {
       }
     });
   });
+
+  describe('disallowed JSX props should NOT be extracted', () => {
+    it('should NOT extract from className prop', () => {
+      const code = `<div className="container main-layout" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should NOT extract from key prop', () => {
+      const code = `<Item key="user-123" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should NOT extract from id prop', () => {
+      const code = `<div id="main-wrapper" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should NOT extract from data-* attributes', () => {
+      const code = `<div data-testid="login-form" />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should NOT extract from className even if wrapped in JSX expression', () => {
+      const code = `<div className={"container dark"} />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should NOT extract from key even if wrapped in JSX expression', () => {
+      const code = `<Item key={"item-1"} />`;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(0);
+    });
+
+    it('should still extract allowed props when mixed with disallowed ones', () => {
+      const code = `
+      <input
+        className="input-primary"
+        placeholder="Enter your email"
+        data-testid="email-input"
+      />
+    `;
+      const sourceFile = createTestFile(code);
+      const results = extractTexts(sourceFile);
+
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].text).to.equal('Enter your email');
+    });
+  });
+
+  it('should NOT extract Tailwind-like class strings', () => {
+    const code = `<div className="flex items-center justify-between p-4" />`;
+    const sourceFile = createTestFile(code);
+    const results = extractTexts(sourceFile);
+
+    expect(results).to.have.lengthOf(0);
+  });
 });

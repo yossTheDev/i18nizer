@@ -19,7 +19,7 @@
                 if (diff < 86400)
                   return `Hace ${Math.floor(diff / 3600)} horas`;
                 if (diff < 604800)
-                  return `Hace ${Math.floor(diff / 86400)} días`;
+                  return `Hace ${Math.floor(diff / 86400)} días`;git
                 return createdAt.toLocaleString();
               })()
             : "Justo ahora"}
@@ -50,3 +50,7 @@ No processing strings in className and key
             </button>
 
 ```
+
+## code 4
+
+Are processing text under ClassNames and Key

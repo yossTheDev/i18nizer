@@ -1,5 +1,82 @@
 # CHANGELOG
 
+## 0.7.1 - Pluralization and Rich Text Support
+
+### Added
+
+* **Automatic Pluralization Detection**: i18nizer now automatically detects and converts pluralization patterns
+  * Detects ternary patterns like `count === 1 ? 'item' : 'items'`
+  * Automatically generates ICU message format translations with plural rules
+  * Replaces patterns with `t("key", { count })` calls
+  * Preserves variable names in placeholders
+  * Works in both JSX children and attributes
+  
+* **Automatic Rich Text Formatting**: i18nizer now automatically handles JSX elements within text
+  * Detects mixed text and inline elements (e.g., `<a>`, `<strong>`, `<em>`)
+  * Automatically generates `t.rich()` calls with element mappings
+  * Preserves element structure: `a: (chunks) => <a>{chunks}</a>`
+  * Handles multiple inline elements in the same text
+  * Generates proper ICU MessageFormat with XML-style tags
+
+* **Comprehensive Documentation**: Added guides and examples for pluralization and rich text
+  * Before/after code samples showing automatic transformations
+  * Integration examples with i18next and next-intl
+  * Real-world usage scenarios
+
+### Changed
+
+* Enhanced README with automatic pluralization and rich text examples
+* Updated documentation site with automatic transformation guides
+* Improved examples page with real-world automatic conversion scenarios
+
+### Notes
+
+* Pluralization and rich text are automatically detected and converted during extraction
+* Generated translations use ICU MessageFormat compatible with i18next and next-intl
+* Both features work seamlessly without any manual configuration
+
+---
+
+## 0.7.0 - AI Provider and Paths Configuration
+
+### Added
+
+* **AI Provider Configuration**: Configure AI provider and model directly in `i18nizer.config.yml`
+  * `ai.provider`: Choose between `openai`, `gemini`, or `huggingface` (default: `openai`)
+  * `ai.model`: Specify the model to use (default: `gpt-4`)
+  * Provider validation ensures only supported providers are accepted
+  * CLI `--provider` flag still works and overrides config setting
+  
+* **Paths Configuration**: Define default project paths in config
+  * `paths.src`: Source directory (default: `src`)
+  * `paths.i18n`: i18n output directory (default: `i18n`)
+
+### Changed
+
+* AI provider now defaults to `openai` instead of `huggingface` when not specified
+* `generateTranslations()` function now accepts optional `model` parameter for custom model selection
+
+### Fixed
+
+* Config merging now properly handles optional `ai` and `paths` fields
+
+### Notes
+
+* Fully backward compatible - existing configs without `ai` or `paths` fields will use default values
+* Configuration example:
+
+```yaml
+ai:
+  provider: gemini
+  model: gemini-2.5-flash
+
+paths:
+  src: source
+  i18n: locales
+```
+
+---
+
 ## 0.6.2
 
 * Minor Fixes

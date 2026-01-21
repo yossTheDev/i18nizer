@@ -282,6 +282,68 @@ Legacy standalone mode (without `i18nizer start`):
 
 ## ⚙️ Configuration
 
+The `i18nizer.config.yml` file controls all aspects of how i18nizer processes your project. Here's a complete reference:
+
+### Complete Configuration Reference
+
+```yaml
+# Framework and i18n library settings
+framework: react                    # nextjs | react | custom
+i18nLibrary: react-i18next          # next-intl | react-i18next | i18next | custom
+
+# AI provider configuration
+ai:
+  provider: openai                  # openai | gemini | huggingface
+  model: gpt-4                      # AI model to use for translations
+
+# Directory paths
+paths:
+  src: src                          # Source code directory
+  i18n: i18n                        # i18n output directory
+
+# i18n function configuration
+i18n:
+  function: t                       # Translation function name
+  import:
+    source: react-i18next           # Package to import from
+    named: useTranslation           # Named import
+
+# Translation file settings
+messages:
+  path: messages                    # Where to store translation JSON files
+  defaultLocale: en                 # Default locale
+  locales:                          # List of supported locales
+    - en
+    - es
+  format: json                      # Output format (currently only json)
+
+# Behavior settings
+behavior:
+  detectDuplicates: true            # Reuse keys for duplicate strings across components
+  opinionatedStructure: true        # Use opinionated file structure
+  autoInjectT: true                 # Auto-inject translation hooks (disable for Next.js Server Components)
+  useAiForKeys: true                # Use AI to generate English keys
+  allowedFunctions:                 # Functions whose string arguments should be translated
+    - alert
+    - confirm
+    - prompt
+  allowedMemberFunctions:           # Member functions whose string arguments should be translated
+    - toast.error
+    - toast.info
+    - toast.success
+    - toast.warn
+  allowedProps:                     # JSX props that should be translated
+    - alt
+    - aria-label
+    - aria-placeholder
+    - helperText
+    - label
+    - placeholder
+    - text
+    - title
+    - tooltip
+```
+
 ### Translation Function Injection (`autoInjectT`)
 
 i18nizer can automatically inject translation hooks into your components:
@@ -373,6 +435,86 @@ behavior:
 
 Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish text).
 
+### AI Provider and Model Configuration
+
+i18nizer supports multiple AI providers for translations. You can configure the provider and model in `i18nizer.config.yml`:
+
+```yaml
+ai:
+  provider: openai        # openai | gemini | huggingface
+  model: gpt-4           # AI model name
+```
+
+**Supported Providers:**
+
+- **OpenAI** (default): Uses OpenAI API with models like `gpt-4`, `gpt-4o-mini`, etc.
+- **Google Gemini**: Uses Google's Gemini API with models like `gemini-2.5-flash`, `gemini-pro`
+- **Hugging Face**: Uses Hugging Face Inference API with models like `deepseek-ai/DeepSeek-V3.2`
+
+**Default Configuration:**
+
+```yaml
+ai:
+  provider: openai
+  model: gpt-4
+```
+
+**Example Configurations:**
+
+For Google Gemini:
+```yaml
+ai:
+  provider: gemini
+  model: gemini-2.5-flash
+```
+
+For Hugging Face:
+```yaml
+ai:
+  provider: huggingface
+  model: deepseek-ai/DeepSeek-V3.2
+```
+
+**Note:** You still need to set up API keys using:
+```bash
+i18nizer keys --setOpenAI <YOUR_OPENAI_API_KEY>
+i18nizer keys --setGemini <YOUR_GEMINI_API_KEY>
+i18nizer keys --setHF <YOUR_HUGGING_FACE_API_KEY>
+```
+
+The provider setting in config file will be used by default, but you can override it on a per-command basis using the `--provider` flag:
+```bash
+i18nizer translate <file> --provider gemini
+```
+
+### Paths Configuration
+
+Configure default paths for your source code and i18n files in `i18nizer.config.yml`:
+
+```yaml
+paths:
+  src: src               # Source directory
+  i18n: i18n             # i18n output directory
+```
+
+**Default Configuration:**
+
+```yaml
+paths:
+  src: src
+  i18n: i18n
+```
+
+**Custom Example:**
+
+```yaml
+paths:
+  src: source
+  i18n: locales
+```
+
+These paths serve as defaults and can help organize your project structure. The `messages.path` setting (which specifies where translation JSON files are stored) is separate from `paths.i18n`.
+
 ---
 
 ## ✨ Features
@@ -388,6 +530,8 @@ Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish
 - **Configurable behavior** (allowed functions, props, member functions)
 - **Dry-run mode** to preview changes
 - **JSON output preview** with `--show-json`
+- **Pluralization documentation** - comprehensive guide for ICU message format
+- **Rich text formatting documentation** - patterns for JSX within translations
 - Project-wide or single-file translation
 - Works with **JSX & TSX**
 - Rewrites components automatically (`t("key")`)
@@ -418,6 +562,127 @@ Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish
 
 ---
 
+## 🎨 Advanced i18n Patterns
+
+i18nizer extracts translatable strings and generates standard i18n JSON files. For advanced patterns like pluralization and rich text formatting, you can leverage the built-in features of i18next and next-intl.
+
+### Pluralization Support
+
+Both i18next and next-intl support ICU message format for handling plurals. After i18nizer extracts your strings, you can enhance them with plural rules.
+
+**Before i18nizer:**
+```tsx
+<p>{count} {count === 1 ? 'item' : 'items'} in cart</p>
+```
+
+**After i18nizer extraction:**
+```tsx
+<p>{t('itemCount', { count })} {t('itemsLabel', { count })}</p>
+```
+
+**Manual enhancement to use pluralization:**
+```tsx
+<p>{t('itemsInCart', { count })}</p>
+```
+
+**Translation with ICU plural format:**
+```json
+{
+  "itemsInCart": "{count, plural, =0 {No items} one {# item} other {# items}} in cart"
+}
+```
+
+**How plurals work:**
+- `=0` - Exact match for zero
+- `one` - Singular form (1 item in English)
+- `other` - Plural form (2+ items)
+- `#` - Placeholder for the count number
+
+**Additional plural categories** (language-dependent):
+- `zero`, `one`, `two`, `few`, `many`, `other`
+
+### Rich Text Formatting
+
+When you need JSX elements within translated text (like links or bold text), both i18next and next-intl provide rich text formatting capabilities.
+
+**Before i18nizer:**
+```tsx
+<p>By clicking Sign Up, you agree to our <a href="/terms">Terms of Service</a></p>
+```
+
+**After i18nizer extraction:**
+```tsx
+<p>{t('byClickingSignUpYouAgree')} <a href="/terms">{t('termsOfService')}</a></p>
+```
+
+**Manual enhancement with rich text (next-intl):**
+```tsx
+<p>{t.rich('signUpAgreement', {
+  terms: (chunks) => <a href="/terms">{chunks}</a>
+})}</p>
+```
+
+**Translation:**
+```json
+{
+  "signUpAgreement": "By clicking Sign Up, you agree to our <terms>Terms of Service</terms>"
+}
+```
+
+**Using rich text with i18next:**
+```tsx
+import { Trans } from 'react-i18next';
+
+<p>
+  <Trans i18nKey="signUpAgreement">
+    By clicking Sign Up, you agree to our <a href="/terms">Terms of Service</a>
+  </Trans>
+</p>
+```
+
+**Translation:**
+```json
+{
+  "signUpAgreement": "By clicking Sign Up, you agree to our <1>Terms of Service</1>"
+}
+```
+
+### More Examples
+
+**Date and time formatting:**
+```tsx
+// Using next-intl
+<p>{t('lastUpdated', { date: new Date() })}</p>
+
+// Translation
+{
+  "lastUpdated": "Last updated: {date, date, medium}"
+}
+```
+
+**Number formatting:**
+```tsx
+// Using next-intl
+<p>{t('price', { amount: 99.99 })}</p>
+
+// Translation
+{
+  "price": "{amount, number, currency}"
+}
+```
+
+**Nested plurals:**
+```tsx
+<p>{t('cartSummary', { itemCount: 5, totalPrice: 149.99 })}</p>
+
+// Translation
+{
+  "cartSummary": "{itemCount, plural, one {# item} other {# items}} • Total: ${totalPrice}"
+}
+```
+
+---
+
 ## 🔮 Roadmap
 
 ### ✅ Phase 0: Foundation & Reliability (Complete)
@@ -440,11 +705,12 @@ Note: Keys will be in the source language (e.g., `bienvenidoDeNuevo` for Spanish
 
 ### 🚧 Phase 2: Advanced Features (Planned)
 
+- [ ] Automatic pluralization detection and conversion
+- [ ] Automatic rich text formatting detection
 - [ ] Watch mode for continuous translation
 - [ ] Non-AI fallback mode
 - [ ] Framework support (Vue, Svelte)
 - [ ] Additional i18n library presets
-- [ ] Pluralization support
 - [ ] Context-aware translations
 - [ ] Translation memory and glossary
 

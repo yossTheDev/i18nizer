@@ -1,0 +1,945 @@
+export const metadata = {
+  title: 'Examples',
+  description: 'Real-world examples showing i18nizer in action with before/after code samples',
+}
+
+# Examples
+
+See how i18nizer transforms your components with comprehensive real-world examples.
+
+## Basic Component Translation
+
+### Before
+
+```tsx
+export function Login() {
+  return (
+    <div>
+      <h1>Welcome back</h1>
+      <p>Please sign in to continue</p>
+      <button>Sign in</button>
+    </div>
+  )
+}
+```
+
+### After
+
+```tsx
+import { useTranslations } from "next-intl"
+
+export function Login() {
+  const t = useTranslations("Login")
+
+  return (
+    <div>
+      <h1>{t("welcomeBack")}</h1>
+      <p>{t("pleaseSignInToContinue")}</p>
+      <button>{t("signIn")}</button>
+    </div>
+  )
+}
+```
+
+### Generated JSON (`messages/en/login.json`)
+
+```json
+{
+  "Login": {
+    "welcomeBack": "Welcome back",
+    "pleaseSignInToContinue": "Please sign in to continue",
+    "signIn": "Sign in"
+  }
+}
+```
+
+---
+
+## Form with Placeholders and Labels
+
+### Before
+
+```tsx
+export function ContactForm() {
+  return (
+    <form>
+      <h2>Contact Us</h2>
+      <label htmlFor="name">Your Name</label>
+      <input
+        id="name"
+        type="text"
+        placeholder="Enter your full name"
+        aria-label="Name input field"
+      />
+      
+      <label htmlFor="email">Email Address</label>
+      <input
+        id="email"
+        type="email"
+        placeholder="you@example.com"
+        aria-label="Email input field"
+      />
+      
+      <label htmlFor="message">Message</label>
+      <textarea
+        id="message"
+        placeholder="Tell us how we can help..."
+        aria-label="Message textarea"
+      />
+      
+      <button type="submit">Send Message</button>
+      <p className="text-sm">
+        We typically respond within 24 hours
+      </p>
+    </form>
+  )
+}
+```
+
+### After
+
+```tsx
+import { useTranslations } from "next-intl"
+
+export function ContactForm() {
+  const t = useTranslations("ContactForm")
+
+  return (
+    <form>
+      <h2>{t("contactUs")}</h2>
+      <label htmlFor="name">{t("yourName")}</label>
+      <input
+        id="name"
+        type="text"
+        placeholder={t("enterYourFullName")}
+        aria-label={t("nameInputField")}
+      />
+      
+      <label htmlFor="email">{t("emailAddress")}</label>
+      <input
+        id="email"
+        type="email"
+        placeholder={t("emailPlaceholder")}
+        aria-label={t("emailInputField")}
+      />
+      
+      <label htmlFor="message">{t("message")}</label>
+      <textarea
+        id="message"
+        placeholder={t("tellUsHowWeCanHelp")}
+        aria-label={t("messageTextarea")}
+      />
+      
+      <button type="submit">{t("sendMessage")}</button>
+      <p className="text-sm">
+        {t("weTypicallyRespondWithin24Hours")}
+      </p>
+    </form>
+  )
+}
+```
+
+### Generated JSON (`messages/en/contact-form.json`)
+
+```json
+{
+  "ContactForm": {
+    "contactUs": "Contact Us",
+    "yourName": "Your Name",
+    "enterYourFullName": "Enter your full name",
+    "nameInputField": "Name input field",
+    "emailAddress": "Email Address",
+    "emailPlaceholder": "you@example.com",
+    "emailInputField": "Email input field",
+    "message": "Message",
+    "tellUsHowWeCanHelp": "Tell us how we can help...",
+    "messageTextarea": "Message textarea",
+    "sendMessage": "Send Message",
+    "weTypicallyRespondWithin24Hours": "We typically respond within 24 hours"
+  }
+}
+```
+
+---
+
+## Conditional Rendering & Dynamic Content
+
+### Before
+
+```tsx
+export function UserGreeting({ user, isLoggedIn }) {
+  return (
+    <div>
+      {isLoggedIn ? (
+        <>
+          <h1>Welcome back, {user.name}!</h1>
+          <p>You have {user.notifications} new notifications</p>
+        </>
+      ) : (
+        <>
+          <h1>Welcome, Guest!</h1>
+          <p>Please log in to access your account</p>
+        </>
+      )}
+      
+      {user.isPremium && <span>Premium Member</span>}
+      {user.hasNewMessages && <span>You have new messages</span>}
+      
+      <button>
+        {isLoggedIn ? "Log out" : "Log in"}
+      </button>
+    </div>
+  )
+}
+```
+
+### After
+
+```tsx
+import { useTranslations } from "next-intl"
+
+export function UserGreeting({ user, isLoggedIn }) {
+  const t = useTranslations("UserGreeting")
+
+  return (
+    <div>
+      {isLoggedIn ? (
+        <>
+          <h1>{t("welcomeBackName", { name: user.name })}</h1>
+          <p>{t("youHaveNotifications", { count: user.notifications })}</p>
+        </>
+      ) : (
+        <>
+          <h1>{t("welcomeGuest")}</h1>
+          <p>{t("pleaseLogInToAccessYourAccount")}</p>
+        </>
+      )}
+      
+      {user.isPremium && <span>{t("premiumMember")}</span>}
+      {user.hasNewMessages && <span>{t("youHaveNewMessages")}</span>}
+      
+      <button>
+        {isLoggedIn ? t("logOut") : t("logIn")}
+      </button>
+    </div>
+  )
+}
+```
+
+### Generated JSON (`messages/en/user-greeting.json`)
+
+```json
+{
+  "UserGreeting": {
+    "welcomeBackName": "Welcome back, {name}!",
+    "youHaveNotifications": "You have {count} new notifications",
+    "welcomeGuest": "Welcome, Guest!",
+    "pleaseLogInToAccessYourAccount": "Please log in to access your account",
+    "premiumMember": "Premium Member",
+    "youHaveNewMessages": "You have new messages",
+    "logOut": "Log out",
+    "logIn": "Log in"
+  }
+}
+```
+
+---
+
+## E-commerce Product Card
+
+### Before
+
+```tsx
+export function ProductCard({ product }) {
+  const isOnSale = product.salePrice < product.price
+  const discount = Math.round((1 - product.salePrice / product.price) * 100)
+  
+  return (
+    <div className="product-card">
+      <img src={product.image} alt="Product image" />
+      
+      {isOnSale && (
+        <div className="badge">{discount}% OFF</div>
+      )}
+      
+      <h3>{product.name}</h3>
+      
+      <div className="price">
+        {isOnSale ? (
+          <>
+            <span className="original">${product.price}</span>
+            <span className="sale">${product.salePrice}</span>
+          </>
+        ) : (
+          <span>${product.price}</span>
+        )}
+      </div>
+      
+      <p className="stock">
+        {product.inStock ? (
+          `In stock - Ships in ${product.shippingDays} days`
+        ) : (
+          "Out of stock - Notify me when available"
+        )}
+      </p>
+      
+      <div className="rating">
+        <span>★★★★☆</span>
+        <span>({product.reviews} reviews)</span>
+      </div>
+      
+      <button 
+        disabled={!product.inStock}
+        title="Add item to shopping cart"
+        aria-label="Add to cart button"
+      >
+        {product.inStock ? "Add to Cart" : "Notify Me"}
+      </button>
+      
+      <a href="#" className="details">
+        View full details →
+      </a>
+    </div>
+  )
+}
+```
+
+### After
+
+```tsx
+import { useTranslations } from "next-intl"
+
+export function ProductCard({ product }) {
+  const t = useTranslations("ProductCard")
+  const isOnSale = product.salePrice < product.price
+  const discount = Math.round((1 - product.salePrice / product.price) * 100)
+  
+  return (
+    <div className="product-card">
+      <img src={product.image} alt={t("productImage")} />
+      
+      {isOnSale && (
+        <div className="badge">{t("discountOff", { percent: discount })}</div>
+      )}
+      
+      <h3>{product.name}</h3>
+      
+      <div className="price">
+        {isOnSale ? (
+          <>
+            <span className="original">${product.price}</span>
+            <span className="sale">${product.salePrice}</span>
+          </>
+        ) : (
+          <span>${product.price}</span>
+        )}
+      </div>
+      
+      <p className="stock">
+        {product.inStock ? (
+          t("inStockShipsInDays", { days: product.shippingDays })
+        ) : (
+          t("outOfStockNotifyMe")
+        )}
+      </p>
+      
+      <div className="rating">
+        <span>★★★★☆</span>
+        <span>{t("reviewsCount", { count: product.reviews })}</span>
+      </div>
+      
+      <button 
+        disabled={!product.inStock}
+        title={t("addItemToShoppingCart")}
+        aria-label={t("addToCartButton")}
+      >
+        {product.inStock ? t("addToCart") : t("notifyMe")}
+      </button>
+      
+      <a href="#" className="details">
+        {t("viewFullDetails")} →
+      </a>
+    </div>
+  )
+}
+```
+
+### Generated JSON (`messages/en/product-card.json`)
+
+```json
+{
+  "ProductCard": {
+    "productImage": "Product image",
+    "discountOff": "{percent}% OFF",
+    "inStockShipsInDays": "In stock - Ships in {days} days",
+    "outOfStockNotifyMe": "Out of stock - Notify me when available",
+    "reviewsCount": "({count} reviews)",
+    "addItemToShoppingCart": "Add item to shopping cart",
+    "addToCartButton": "Add to cart button",
+    "addToCart": "Add to Cart",
+    "notifyMe": "Notify Me",
+    "viewFullDetails": "View full details"
+  }
+}
+```
+
+---
+
+## Dashboard with Complex UI
+
+### Before
+
+```tsx
+export function Dashboard({ stats, user }) {
+  return (
+    <div className="dashboard">
+      <header>
+        <h1>Dashboard</h1>
+        <p>Welcome back, {user.name}</p>
+      </header>
+      
+      <div className="stats-grid">
+        <div className="stat-card">
+          <h3>Total Revenue</h3>
+          <p className="value">${stats.revenue.toLocaleString()}</p>
+          <span className="change positive">
+            +{stats.revenueGrowth}% from last month
+          </span>
+        </div>
+        
+        <div className="stat-card">
+          <h3>Active Users</h3>
+          <p className="value">{stats.users.toLocaleString()}</p>
+          <span className="change negative">
+            -{stats.userChurn}% churn rate
+          </span>
+        </div>
+        
+        <div className="stat-card">
+          <h3>Conversion Rate</h3>
+          <p className="value">{stats.conversion}%</p>
+          <span className="info">
+            Based on {stats.totalVisitors} visitors
+          </span>
+        </div>
+      </div>
+      
+      <section className="recent-activity">
+        <h2>Recent Activity</h2>
+        <p className="subtitle">
+          Last updated {stats.lastUpdate}
+        </p>
+        
+        {stats.activities.length > 0 ? (
+          <ul>
+            {stats.activities.map(activity => (
+              <li key={activity.id}>{activity.text}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="empty">
+            No recent activity to display
+          </p>
+        )}
+        
+        <button>View all activity →</button>
+      </section>
+      
+      <aside className="quick-actions">
+        <h3>Quick Actions</h3>
+        <button>Create new project</button>
+        <button>Invite team member</button>
+        <button>Generate report</button>
+        <button>Export data</button>
+      </aside>
+    </div>
+  )
+}
+```
+
+### After
+
+```tsx
+import { useTranslations } from "next-intl"
+
+export function Dashboard({ stats, user }) {
+  const t = useTranslations("Dashboard")
+  
+  return (
+    <div className="dashboard">
+      <header>
+        <h1>{t("dashboard")}</h1>
+        <p>{t("welcomeBackName", { name: user.name })}</p>
+      </header>
+      
+      <div className="stats-grid">
+        <div className="stat-card">
+          <h3>{t("totalRevenue")}</h3>
+          <p className="value">${stats.revenue.toLocaleString()}</p>
+          <span className="change positive">
+            {t("growthFromLastMonth", { percent: stats.revenueGrowth })}
+          </span>
+        </div>
+        
+        <div className="stat-card">
+          <h3>{t("activeUsers")}</h3>
+          <p className="value">{stats.users.toLocaleString()}</p>
+          <span className="change negative">
+            {t("churnRate", { percent: stats.userChurn })}
+          </span>
+        </div>
+        
+        <div className="stat-card">
+          <h3>{t("conversionRate")}</h3>
+          <p className="value">{stats.conversion}%</p>
+          <span className="info">
+            {t("basedOnVisitors", { count: stats.totalVisitors })}
+          </span>
+        </div>
+      </div>
+      
+      <section className="recent-activity">
+        <h2>{t("recentActivity")}</h2>
+        <p className="subtitle">
+          {t("lastUpdated", { time: stats.lastUpdate })}
+        </p>
+        
+        {stats.activities.length > 0 ? (
+          <ul>
+            {stats.activities.map(activity => (
+              <li key={activity.id}>{activity.text}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="empty">
+            {t("noRecentActivityToDisplay")}
+          </p>
+        )}
+        
+        <button>{t("viewAllActivity")} →</button>
+      </section>
+      
+      <aside className="quick-actions">
+        <h3>{t("quickActions")}</h3>
+        <button>{t("createNewProject")}</button>
+        <button>{t("inviteTeamMember")}</button>
+        <button>{t("generateReport")}</button>
+        <button>{t("exportData")}</button>
+      </aside>
+    </div>
+  )
+}
+```
+
+---
+
+## Multi-Language Output Example
+
+When you run:
+
+```bash
+i18nizer translate src/components/Welcome.tsx --locales en,es,fr,de,ja,zh
+```
+
+### messages/en/welcome.json
+
+```json
+{
+  "Welcome": {
+    "welcomeToOurApp": "Welcome to our app",
+    "getStarted": "Get started",
+    "learnMore": "Learn more",
+    "exploreFeatures": "Explore features",
+    "signUpForFree": "Sign up for free"
+  }
+}
+```
+
+### messages/es/welcome.json
+
+```json
+{
+  "Welcome": {
+    "welcomeToOurApp": "Bienvenido a nuestra aplicación",
+    "getStarted": "Comenzar",
+    "learnMore": "Aprende más",
+    "exploreFeatures": "Explorar características",
+    "signUpForFree": "Regístrate gratis"
+  }
+}
+```
+
+### messages/fr/welcome.json
+
+```json
+{
+  "Welcome": {
+    "welcomeToOurApp": "Bienvenue dans notre application",
+    "getStarted": "Commencer",
+    "learnMore": "En savoir plus",
+    "exploreFeatures": "Explorer les fonctionnalités",
+    "signUpForFree": "Inscrivez-vous gratuitement"
+  }
+}
+```
+
+### messages/de/welcome.json
+
+```json
+{
+  "Welcome": {
+    "welcomeToOurApp": "Willkommen in unserer App",
+    "getStarted": "Loslegen",
+    "learnMore": "Mehr erfahren",
+    "exploreFeatures": "Funktionen erkunden",
+    "signUpForFree": "Kostenlos registrieren"
+  }
+}
+```
+
+### messages/ja/welcome.json
+
+```json
+{
+  "Welcome": {
+    "welcomeToOurApp": "アプリへようこそ",
+    "getStarted": "はじめる",
+    "learnMore": "もっと詳しく",
+    "exploreFeatures": "機能を探索",
+    "signUpForFree": "無料で登録"
+  }
+}
+```
+
+### messages/zh/welcome.json
+
+```json
+{
+  "Welcome": {
+    "welcomeToOurApp": "欢迎使用我们的应用",
+    "getStarted": "开始使用",
+    "learnMore": "了解更多",
+    "exploreFeatures": "探索功能",
+    "signUpForFree": "免费注册"
+  }
+}
+```
+
+---
+
+## Complete Workflow Example
+
+### Step 1: Initialize Project
+
+```bash
+cd my-app
+i18nizer start
+```
+
+### Step 2: Configure API Key
+
+```bash
+i18nizer keys --setOpenAI sk-your-key-here
+```
+
+### Step 3: Preview Changes
+
+```bash
+i18nizer translate src/components/Header.tsx --dry-run
+```
+
+Output:
+```
+[DRY RUN] Would extract 5 strings:
+  - "Home" → home
+  - "Products" → products
+  - "About Us" → aboutUs
+  - "Contact" → contact
+  - "Get Started" → getStarted
+```
+
+### Step 4: Translate Component
+
+```bash
+i18nizer translate src/components/Header.tsx --locales en,es,fr
+```
+
+### Step 5: Review Generated Files
+
+```bash
+cat messages/en/header.json
+cat messages/es/header.json
+git diff src/components/Header.tsx
+```
+
+### Step 6: Translate Entire Project
+
+```bash
+i18nizer translate --all --locales en,es,fr,de,ja
+```
+
+### Step 7: Test in Application
+
+```javascript
+// In your app
+import { messages } from './i18n/messages.generated'
+
+console.log(messages.en.Header.home)     // "Home"
+console.log(messages.es.Header.home)     // "Inicio"
+console.log(messages.fr.Header.home)     // "Accueil"
+```
+
+---
+
+## Advanced i18n Patterns
+
+i18nizer **automatically detects and converts** advanced patterns like pluralization and rich text formatting. The tool intelligently recognizes these patterns during extraction and generates the appropriate translation code.
+
+### Automatic Pluralization Detection
+
+i18nizer automatically detects pluralization patterns in your code and converts them to ICU message format. When it finds patterns like `count === 1 ? 'item' : 'items'`, it automatically generates the proper translation structure.
+
+#### Example 1: Simple Item Count
+
+**Before (your original code):**
+```tsx
+<p>{count} {count === 1 ? 'item' : 'items'} in cart</p>
+```
+
+**After i18nizer automatic conversion:**
+```tsx
+<p>{t('itemsInCart', { count })}</p>
+```
+
+**Generated translation file:**
+```json
+{
+  "itemsInCart": "{count, plural, =0 {No items} one {# item} other {# items}} in cart"
+}
+```
+
+**How it works:**
+- `=0` - Exact match for zero items
+- `one` - Singular form (used for count = 1)
+- `other` - Plural form (used for count > 1)
+- `#` - Placeholder that shows the actual count number
+
+#### Example 2: Complex Pluralization
+
+**Before (your original code):**
+```tsx
+<div>
+  <p>You have {notifications} unread {notifications === 1 ? 'notification' : 'notifications'}</p>
+  <p>{notifications === 0 ? 'All caught up!' : 'Click to view'}</p>
+</div>
+```
+
+**After i18nizer automatic conversion:**
+```tsx
+<div>
+  <p>{t('unreadNotifications', { notifications })}</p>
+  <p>{t('notificationAction', { notifications })}</p>
+</div>
+```
+
+**Generated translation files:**
+```json
+{
+  "unreadNotifications": "You have {notifications, plural, one {# unread notification} other {# unread notifications}}",
+  "notificationAction": "{notifications, plural, =0 {All caught up!} other {Click to view}}"
+}
+```
+
+**How automatic detection works:**
+- Detects `notifications === 1` pattern → generates singular (`one`) and plural (`other`) forms
+- Detects `notifications === 0` pattern → generates zero (`=0`) and other cases
+- Automatically extracts variable names and uses them in placeholders
+- Generates ICU MessageFormat compatible with i18next and next-intl
+
+#### Example 3: Plural Categories
+
+Different languages have different plural rules. ICU supports: `zero`, `one`, `two`, `few`, `many`, `other`.
+
+**English (2 forms):**
+```json
+{
+  "items": "{count, plural, one {# item} other {# items}}"
+}
+```
+
+**Polish (3 forms):**
+```json
+{
+  "items": "{count, plural, one {# przedmiot} few {# przedmioty} other {# przedmiotów}}"
+}
+```
+
+**Arabic (6 forms):**
+```json
+{
+  "items": "{count, plural, zero {لا توجد عناصر} one {عنصر واحد} two {عنصران} few {# عناصر} many {# عنصرًا} other {# عنصر}}"
+}
+```
+
+### Automatic Rich Text Formatting
+
+i18nizer automatically detects when you have mixed text and inline JSX elements (like `<a>`, `<strong>`, `<em>`) and generates the appropriate `t.rich()` calls.
+
+#### Example 1: Links in Text
+
+**Before (your original code):**
+```tsx
+<p>By clicking Sign Up, you agree to our <a href="/terms">Terms of Service</a></p>
+```
+
+**After i18nizer automatic conversion:**
+```tsx
+<p>{t.rich('signUpAgreement', {
+  a: (chunks) => <a>{chunks}</a>
+})}</p>
+```
+
+**Generated translation:**
+```json
+{
+  "signUpAgreement": "By clicking Sign Up, you agree to our <a>Terms of Service</a>"
+}
+```
+
+**How automatic detection works:**
+- Detects mixed text with inline `<a>` element
+- Automatically generates `t.rich()` call with element mapping
+- Creates placeholder using the tag name: `a: (chunks) => <a>{chunks}</a>`
+- Preserves the text structure in ICU MessageFormat with XML-style tags
+
+#### Example 2: Multiple Rich Elements
+
+**Before (your original code):**
+```tsx
+<p>
+  Read our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms</a> for more info.
+  All rights reserved <strong>© 2024</strong>
+</p>
+```
+
+**After i18nizer automatic conversion:**
+```tsx
+<p>{t.rich('legalNotice', {
+  a: (chunks) => <a>{chunks}</a>,
+  strong: (chunks) => <strong>{chunks}</strong>
+})}</p>
+```
+
+**Generated translation:**
+```json
+{
+  "legalNotice": "Read our <a>Privacy Policy</a> and <a>Terms</a> for more info. All rights reserved <strong>© 2024</strong>"
+}
+```
+
+**Note:** i18nizer automatically detects multiple inline elements of the same type (multiple `<a>` tags) and generates a single placeholder mapping. If you need specific attributes (like different `href` values), you can manually adjust the generated code:
+
+```tsx
+// Manually customize the element mapping after extraction
+{t.rich('legalNotice', {
+  a: (chunks) => {
+    // Determine which link based on content
+    const href = chunks.includes('Privacy') ? '/privacy' : '/terms';
+    return <a href={href}>{chunks}</a>;
+  },
+  strong: (chunks) => <strong>{chunks}</strong>
+})}
+
+#### Example 3: Strong/Bold Text
+
+**Before (your original code):**
+```tsx
+<p>This is <strong>important</strong> information you should know</p>
+```
+
+**After i18nizer automatic conversion:**
+```tsx
+<p>{t.rich('importantInfo', {
+  strong: (chunks) => <strong>{chunks}</strong>
+})}</p>
+```
+
+**Generated translation:**
+```json
+{
+  "importantInfo": "This is <strong>important</strong> information you should know"
+}
+```
+
+### Date and Time Formatting
+
+**Example:**
+```tsx
+<p>{t('lastUpdated', { date: new Date() })}</p>
+```
+
+**Translation:**
+```json
+{
+  "lastUpdated": "Last updated: {date, date, medium}"
+}
+```
+
+**Format options:**
+- `short`: 1/1/24
+- `medium`: Jan 1, 2024
+- `long`: January 1, 2024
+- `full`: Monday, January 1, 2024
+
+### Number and Currency Formatting
+
+**Example:**
+```tsx
+<p>{t('price', { amount: 99.99, currency: 'USD' })}</p>
+```
+
+**Translation:**
+```json
+{
+  "price": "{amount, number, ::currency/{currency}}"
+}
+```
+
+**Output:**
+- English: $99.99
+- German: 99,99 €
+- Japanese: ¥100
+
+### Combining Plurals with Rich Text
+
+**Example:**
+```tsx
+<p>{t.rich('cartSummary', {
+  count: items.length,
+  price: totalPrice,
+  link: (chunks) => <a href="/cart">{chunks}</a>
+})}</p>
+```
+
+**Translation:**
+```json
+{
+  "cartSummary": "{count, plural, =0 {Your cart is empty} one {# item in <link>your cart</link> • ${price}} other {# items in <link>your cart</link> • ${price}}}"
+}
+```
+
+---
+
+## Tips & Best Practices
+
+1. **Use descriptive variable names** in templates for better translations
+2. **Keep strings together** - don't break sentences into multiple keys
+3. **Use context** when the same English word has different meanings
+4. **Review AI translations** - they're good but not always perfect
+5. **Maintain consistency** - use the same keys across similar components
+6. **Test all locales** - especially RTL languages like Arabic
+7. **Cache is your friend** - reusing translations is faster and cheaper
+
+---
+
+Need more examples? Check out our [GitHub repository](https://github.com/yossTheDev/i18nizer/tree/main/examples) for complete sample projects!

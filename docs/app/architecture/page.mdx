@@ -1,0 +1,302 @@
+export const metadata = {
+  title: 'Architecture',
+  description: 'Understanding how i18nizer works under the hood - AST parsing, AI integration, and caching',
+}
+
+# Architecture
+
+Understanding how i18nizer works under the hood.
+
+## High-Level Overview
+
+i18nizer operates in three main phases:
+
+1. **Extraction** - Parse JSX/TSX and extract translatable strings
+2. **Translation** - Generate translations and keys using AI
+3. **Transformation** - Rewrite components with translation functions
+
+## Core Components
+
+### 1. Command Layer (`src/commands/`)
+
+CLI commands built with [oclif](https://oclif.io/):
+
+- `start.ts` - Project initialization
+- `translate.ts` - Main translation workflow
+- `extract.ts` - Legacy extraction
+- `keys.ts` - API key management
+- `regenerate.ts` - Aggregator regeneration
+
+### 2. Core Logic (`src/core/`)
+
+**AST Utilities** (`src/core/ast/`):
+
+Uses [ts-morph](https://ts-morph.com/) for TypeScript/JSX manipulation:
+
+- **Parser** - Converts code to Abstract Syntax Tree
+- **Extractor** - Walks AST to find translatable strings
+- **Transformer** - Modifies AST to inject translation calls
+
+**AI Integration** (`src/core/ai/`):
+
+- OpenAI Client - GPT models
+- Gemini Client - Google's models
+- Hugging Face Client - Open models
+- Prompt Engineering - Optimized prompts
+
+**i18n Utilities** (`src/core/i18n/`):
+
+- JSON Writer - Creates/updates files
+- Aggregator Generator - Builds `messages.generated.ts`
+- Key Generator - Deterministic key creation
+
+### 3. Types (`src/types/`)
+
+Shared TypeScript definitions for type safety.
+
+## AST Parsing
+
+i18nizer uses Abstract Syntax Tree parsing to understand and modify code programmatically.
+
+### The Process
+
+```
+Source Code
+   ↓
+Tokenization (Lexer)
+   ↓
+AST Generation (Parser)
+   ↓
+AST Traversal (Visitor Pattern)
+   ↓
+String Extraction
+   ↓
+AST Modification
+   ↓
+Code Generation (Printer)
+```
+
+### Example Transformation
+
+**Input:**
+```tsx
+<button>Click me</button>
+```
+
+**AST:**
+```json
+{
+  "kind": "JsxElement",
+  "openingElement": {
+    "tagName": "button"
+  },
+  "children": [
+    {
+      "kind": "JsxText",
+      "text": "Click me"
+    }
+  ]
+}
+```
+
+**Output:**
+```tsx
+<button>{t("clickMe")}</button>
+```
+
+**Modified AST:**
+```json
+{
+  "kind": "JsxElement",
+  "openingElement": {
+    "tagName": "button"
+  },
+  "children": [
+    {
+      "kind": "JsxExpression",
+      "expression": {
+        "kind": "CallExpression",
+        "expression": { "name": "t" },
+        "arguments": [
+          { "kind": "StringLiteral", "text": "clickMe" }
+        ]
+      }
+    }
+  ]
+}
+```
+
+## AI Provider Integration
+
+### Translation Flow
+
+```
+Extract Strings
+   ↓
+Check Cache
+   ↓
+For New Strings:
+  - Generate English Key (AI or deterministic)
+  - Request Translations for All Locales
+  - Cache Results
+   ↓
+Build JSON Objects
+   ↓
+Write Files
+```
+
+### Key Generation
+
+**Two-tier approach:**
+
+1. **AI-Powered (Primary)**
+   - Sends text to AI
+   - Requests English camelCase key
+   - Caches with text hash
+   - Consistent across languages
+
+2. **Deterministic Fallback**
+   - Normalizes text
+   - Converts to camelCase
+   - Truncates if long
+   - Handles edge cases
+
+### Prompt Engineering
+
+Example prompt:
+
+```typescript
+const prompt = `
+Translate to ${targetLocale}.
+Preserve placeholders like {username} or {count}.
+Return ONLY the translation.
+
+Source: "${sourceText}"
+`
+```
+
+## Caching Strategy
+
+### Cache Structure
+
+```json
+{
+  "translations": {
+    "text-hash": {
+      "en": "English translation",
+      "es": "Spanish translation"
+    }
+  },
+  "keys": {
+    "text-hash": "generatedKey"
+  },
+  "metadata": {
+    "lastUpdated": "2024-01-14T...",
+    "provider": "openai"
+  }
+}
+```
+
+### Benefits
+
+- **Cost Reduction** - No duplicate API calls
+- **Consistency** - Same text → same translation
+- **Speed** - Instant cached lookups
+- **Offline Support** - Work without API
+
+## Data Flow
+
+```
+┌─────────────┐
+│  User Input │
+│ (CLI Args)  │
+└──────┬──────┘
+       │
+       ↓
+┌─────────────────┐
+│ Command Handler │
+└────────┬────────┘
+         │
+         ↓
+┌──────────────────┐
+│   AST Parser     │ ← File Content
+└────────┬─────────┘
+         │
+         ↓
+┌──────────────────┐
+│ String Extractor │
+└────────┬─────────┘
+         │
+         ↓
+┌──────────────────┐      ┌──────────┐
+│  Cache Lookup    │ ←──→ │  Cache   │
+└────────┬─────────┘      └──────────┘
+         │
+         ↓
+┌──────────────────┐      ┌──────────┐
+│  AI Translation  │ ←──→ │ AI APIs  │
+└────────┬─────────┘      └──────────┘
+         │
+         ↓
+┌──────────────────┐
+│  JSON Generator  │
+└────────┬─────────┘
+         │
+         ↓
+┌──────────────────┐
+│   AST Transform  │
+└────────┬─────────┘
+         │
+         ↓
+┌──────────────────┐
+│  File Output     │
+│  (JSON + TSX)    │
+└──────────────────┘
+```
+
+## Framework Independence
+
+i18nizer works without project-specific `tsconfig.json`:
+
+- Creates isolated TypeScript projects
+- Uses minimal compiler config
+- No type checking (only parsing)
+- Operates on files independently
+
+## Performance
+
+**Optimizations:**
+
+- Parallel file processing
+- Lazy loading
+- Incremental updates
+- Smart caching (O(1) lookups)
+- Batch API requests
+
+**Typical Performance:**
+
+| Files | Time | API Calls |
+|-------|------|-----------|
+| 1 | ~2s | 3-5 |
+| 10 | ~15s | 30-50 |
+| 100 | ~2m | 300-500 |
+
+*With caching, subsequent runs are ~90% faster*
+
+## Error Handling
+
+- **Parse Errors** - Skip with warnings
+- **API Failures** - Retry with backoff
+- **File System** - Clear error messages
+- **Validation** - Early input validation
+
+## Security
+
+- API keys stored locally only
+- No data sent to external services (except AI APIs)
+- No telemetry or tracking
+- All processing done locally
+
+---
+
+For implementation details, see the [source code on GitHub](https://github.com/yossTheDev/i18nizer).

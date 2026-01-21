@@ -1,12 +1,13 @@
+import yaml from "js-yaml";
 import fs from "node:fs";
 import path from "node:path";
 
-import yaml from "js-yaml";
-
-import { DEFAULT_CONFIG, FRAMEWORK_PRESETS, Framework, I18N_LIBRARY_CONFIGS, I18nLibrary, I18nizerConfig } from "../../types/config.js";
+import { AiProvider, DEFAULT_CONFIG, Framework, FRAMEWORK_PRESETS, I18N_LIBRARY_CONFIGS, I18nizerConfig, I18nLibrary } from "../../types/config.js";
 
 const CONFIG_FILE_NAME = "i18nizer.config.yml";
 const PROJECT_DIR_NAME = ".i18nizer";
+
+const VALID_AI_PROVIDERS: AiProvider[] = ["openai", "gemini", "huggingface"];
 
 /**
  * Detect project type by looking for framework-specific files
@@ -19,11 +20,11 @@ export function detectFramework(cwd: string): Framework {
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
       const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
       
-      if (deps["next"]) {
+      if (deps.next) {
         return "nextjs";
       }
       
-      if (deps["react"]) {
+      if (deps.react) {
         return "react";
       }
     } catch {
@@ -54,7 +55,7 @@ export function detectI18nLibrary(cwd: string): I18nLibrary | null {
         return "react-i18next";
       }
       
-      if (deps["i18next"]) {
+      if (deps.i18next) {
         return "i18next";
       }
     } catch {
@@ -63,6 +64,13 @@ export function detectI18nLibrary(cwd: string): I18nLibrary | null {
   }
   
   return null; // No i18n library detected
+}
+
+/**
+ * Validate AI provider value
+ */
+export function validateAiProvider(provider: string): provider is AiProvider {
+  return VALID_AI_PROVIDERS.includes(provider as AiProvider);
 }
 
 /**
@@ -79,6 +87,13 @@ export function loadConfig(cwd: string): I18nizerConfig | null {
     const fileContent = fs.readFileSync(configPath, "utf8");
     const parsed = yaml.load(fileContent, { schema: yaml.CORE_SCHEMA }) as Partial<I18nizerConfig>;
     
+    // Validate AI provider if specified
+    if (parsed.ai?.provider && !validateAiProvider(parsed.ai.provider)) {
+      throw new Error(
+        `Invalid AI provider: ${parsed.ai.provider}. Valid options: ${VALID_AI_PROVIDERS.join(", ")}`
+      );
+    }
+    
     // Deep merge with defaults
     return mergeConfig(DEFAULT_CONFIG, parsed);
   } catch (error) {
@@ -91,24 +106,32 @@ export function loadConfig(cwd: string): I18nizerConfig | null {
  */
 function mergeConfig(base: I18nizerConfig, override: Partial<I18nizerConfig>): I18nizerConfig {
   return {
+    ai: override.ai ? {
+      ...base.ai,
+      ...override.ai,
+    } : base.ai,
     behavior: {
       ...base.behavior,
       ...override.behavior,
     },
     framework: override.framework ?? base.framework,
-    i18nLibrary: override.i18nLibrary ?? base.i18nLibrary,
     i18n: {
       ...base.i18n,
       ...override.i18n,
       import: {
         ...base.i18n.import,
-        ...(override.i18n?.import ?? {}),
+        ...override.i18n?.import,
       },
     },
+    i18nLibrary: override.i18nLibrary ?? base.i18nLibrary,
     messages: {
       ...base.messages,
       ...override.messages,
     },
+    paths: override.paths ? {
+      ...base.paths,
+      ...override.paths,
+    } : base.paths,
   };
 }
 
@@ -132,8 +155,8 @@ export function generateConfig(framework: Framework, i18nLibrary?: I18nLibrary):
     const i18nConfig = I18N_LIBRARY_CONFIGS[i18nLibrary];
     return {
       ...baseConfig,
-      i18nLibrary: i18nConfig.i18nLibrary,
       i18n: i18nConfig.i18n ?? baseConfig.i18n,
+      i18nLibrary: i18nConfig.i18nLibrary,
     };
   }
   
@@ -194,5 +217,6 @@ export function normalizeI18nLibrary(library: I18nLibrary | string | undefined):
   if (library === "custom" || !library) {
     return undefined;
   }
+
   return library as I18nLibrary;
 }

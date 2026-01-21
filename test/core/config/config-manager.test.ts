@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import yaml from 'js-yaml';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -12,7 +13,7 @@ import {
   loadConfig,
   writeConfig,
 } from '../../../src/core/config/config-manager.js';
-import { Framework } from '../../../src/types/config.js';
+import { AiProvider, Framework } from '../../../src/types/config.js';
 
 describe('Config Manager', () => {
   let testDir: string;
@@ -26,7 +27,7 @@ describe('Config Manager', () => {
   afterEach(() => {
     // Clean up test directory
     if (fs.existsSync(testDir)) {
-      fs.rmSync(testDir, { recursive: true, force: true });
+      fs.rmSync(testDir, { force: true, recursive: true });
     }
   });
 
@@ -167,6 +168,153 @@ describe('Config Manager', () => {
       const messagesDir = getMessagesDir(testDir, config);
       expect(fs.existsSync(messagesDir)).to.be.true;
       expect(path.basename(messagesDir)).to.equal('locales');
+    });
+  });
+
+  describe('AI provider configuration', () => {
+    it('should include default AI provider and model in config', () => {
+      const config = generateConfig('react');
+      expect(config.ai).to.not.be.undefined;
+      expect(config.ai!.provider).to.equal('openai');
+      expect(config.ai!.model).to.equal('gpt-4');
+    });
+
+    it('should write and load AI configuration correctly', () => {
+      const config = generateConfig('react');
+      config.ai = { model: 'gemini-pro', provider: 'gemini' };
+      writeConfig(testDir, config);
+
+      const loadedConfig = loadConfig(testDir);
+      expect(loadedConfig).to.not.be.null;
+      expect(loadedConfig!.ai).to.not.be.undefined;
+      expect(loadedConfig!.ai!.provider).to.equal('gemini');
+      expect(loadedConfig!.ai!.model).to.equal('gemini-pro');
+    });
+
+    it('should validate AI provider and throw error for invalid provider', () => {
+      const config = generateConfig('react');
+      config.ai = { model: 'some-model', provider: 'invalid' as unknown as AiProvider };
+      writeConfig(testDir, config);
+
+      expect(() => loadConfig(testDir)).to.throw(/Invalid AI provider/);
+    });
+
+    it('should accept valid AI providers', () => {
+      const validProviders: AiProvider[] = ['openai', 'gemini', 'huggingface'];
+      
+      for (const provider of validProviders) {
+        const config = generateConfig('react');
+        config.ai = { model: 'test-model', provider };
+        writeConfig(testDir, config);
+
+        const loadedConfig = loadConfig(testDir);
+        expect(loadedConfig).to.not.be.null;
+        expect(loadedConfig!.ai!.provider).to.equal(provider);
+      }
+    });
+  });
+
+  describe('Paths configuration', () => {
+    it('should include default paths in config', () => {
+      const config = generateConfig('react');
+      expect(config.paths).to.not.be.undefined;
+      expect(config.paths!.src).to.equal('src');
+      expect(config.paths!.i18n).to.equal('i18n');
+    });
+
+    it('should write and load paths configuration correctly', () => {
+      const config = generateConfig('react');
+      config.paths = { i18n: 'locales', src: 'source' };
+      writeConfig(testDir, config);
+
+      const loadedConfig = loadConfig(testDir);
+      expect(loadedConfig).to.not.be.null;
+      expect(loadedConfig!.paths).to.not.be.undefined;
+      expect(loadedConfig!.paths!.src).to.equal('source');
+      expect(loadedConfig!.paths!.i18n).to.equal('locales');
+    });
+
+    it('should merge paths configuration with defaults', () => {
+      const config = generateConfig('react');
+      config.paths = { i18n: 'i18n', src: 'custom-src' };
+      writeConfig(testDir, config);
+
+      const loadedConfig = loadConfig(testDir);
+      expect(loadedConfig).to.not.be.null;
+      expect(loadedConfig!.paths!.src).to.equal('custom-src');
+      expect(loadedConfig!.paths!.i18n).to.equal('i18n');
+    });
+  });
+
+  describe('Backward compatibility', () => {
+    it('should load old config without AI settings', () => {
+      const oldConfig = {
+        behavior: {
+          allowedFunctions: ['alert'],
+          allowedMemberFunctions: [],
+          allowedProps: ['placeholder'],
+          autoInjectT: true,
+          detectDuplicates: true,
+          opinionatedStructure: true,
+          useAiForKeys: true
+        },
+        framework: 'react' as Framework,
+        i18n: {
+          function: 't',
+          import: { named: 'useTranslation', source: 'react-i18next' }
+        },
+        messages: {
+          defaultLocale: 'en',
+          format: 'json' as const,
+          locales: ['en', 'es'],
+          path: 'messages'
+        }
+      };
+
+      const configPath = path.join(testDir, 'i18nizer.config.yml');
+      fs.writeFileSync(configPath, yaml.dump(oldConfig), 'utf8');
+
+      const loadedConfig = loadConfig(testDir);
+      expect(loadedConfig).to.not.be.null;
+      expect(loadedConfig!.ai).to.not.be.undefined;
+      expect(loadedConfig!.ai!.provider).to.equal('openai'); // Default from merge
+      expect(loadedConfig!.paths).to.not.be.undefined;
+      expect(loadedConfig!.paths!.src).to.equal('src'); // Default from merge
+    });
+
+    it('should load old config without paths settings', () => {
+      const oldConfig = {
+        ai: { model: 'gemini-pro', provider: 'gemini' },
+        behavior: {
+          allowedFunctions: ['alert'],
+          allowedMemberFunctions: [],
+          allowedProps: ['placeholder'],
+          autoInjectT: true,
+          detectDuplicates: true,
+          opinionatedStructure: true,
+          useAiForKeys: true
+        },
+        framework: 'react' as Framework,
+        i18n: {
+          function: 't',
+          import: { named: 'useTranslation', source: 'react-i18next' }
+        },
+        messages: {
+          defaultLocale: 'en',
+          format: 'json' as const,
+          locales: ['en', 'es'],
+          path: 'messages'
+        }
+      };
+
+      const configPath = path.join(testDir, 'i18nizer.config.yml');
+      fs.writeFileSync(configPath, yaml.dump(oldConfig), 'utf8');
+
+      const loadedConfig = loadConfig(testDir);
+      expect(loadedConfig).to.not.be.null;
+      expect(loadedConfig!.paths).to.not.be.undefined;
+      expect(loadedConfig!.paths!.src).to.equal('src'); // Default from merge
+      expect(loadedConfig!.paths!.i18n).to.equal('i18n'); // Default from merge
     });
   });
 });

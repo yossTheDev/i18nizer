@@ -127,9 +127,14 @@ export default class Extract extends Command {
       const result = deduplicationResults.get(t.text)!;
       return {
         isCached: result.isCached,
+        isPlural: t.isPlural,
+        isRichText: t.isRichText,
         key: result.key,
         node: t.node,
         placeholders: t.placeholders,
+        pluralForms: t.pluralForms,
+        pluralVariable: t.pluralVariable,
+        richTextElements: t.richTextElements,
         tempKey: t.tempKey,
         text: t.text,
       };
@@ -159,14 +164,23 @@ export default class Extract extends Command {
 
       // Use our generated keys, not the AI's keys
       for (const mapped of mappedTexts) {
-        const translations = jsonNamespace[mapped.tempKey];
-        if (!translations) {
-          throw new Error(`No translations found for tempKey: ${mapped.tempKey}`);
-        }
-
         i18nJson[mapped.key] = {};
-        for (const locale of locales) {
-          i18nJson[mapped.key][locale] = translations[locale];
+        
+        // For plural forms, generate ICU format directly
+        if (mapped.isPlural && mapped.pluralForms) {
+          for (const locale of locales) {
+            const icuFormat = `{${mapped.pluralVariable}, plural, one {${mapped.pluralForms.one}} other {${mapped.pluralForms.other}}}`;
+            i18nJson[mapped.key][locale] = icuFormat;
+          }
+        } else {
+          const translations = jsonNamespace[mapped.tempKey];
+          if (!translations) {
+            throw new Error(`No translations found for tempKey: ${mapped.tempKey}`);
+          }
+
+          for (const locale of locales) {
+            i18nJson[mapped.key][locale] = translations[locale];
+          }
         }
 
         // Update cache
@@ -187,9 +201,12 @@ export default class Extract extends Command {
       insertUseTranslations(sourceFile, componentName);
       replaceTempKeysWithT(
         mappedTexts.map((m) => ({
+          isPlural: m.isPlural,
+          isRichText: m.isRichText,
           key: m.key,
           node: m.node,
           placeholders: m.placeholders,
+          richTextElements: m.richTextElements,
           tempKey: m.tempKey,
         }))
       );

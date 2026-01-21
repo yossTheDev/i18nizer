@@ -1,0 +1,44 @@
+{
+  "name": "i18nizer-docs",
+  "version": "1.0.0",
+  "description": "Documentation website for i18nizer",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": [
+    "i18nizer",
+    "documentation",
+    "i18n"
+  ],
+  "author": "Yoannis Sanchez Soto",
+  "license": "MIT",
+  "dependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.1.1",
+    "@types/node": "^25.0.8",
+    "@types/react": "^19.2.8",
+    "@types/react-dom": "^19.2.3",
+    "gray-matter": "^4.0.3",
+    "next": "^16.1.1",
+    "next-mdx-remote": "^5.0.0",
+    "next-themes": "^0.4.6",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.0",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19"
+  }
+}

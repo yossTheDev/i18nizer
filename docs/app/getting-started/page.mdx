@@ -1,0 +1,459 @@
+export const metadata = {
+  title: 'Getting Started',
+  description: 'Get started with i18nizer - installation, setup, and your first translation',
+}
+
+# Getting Started
+
+This comprehensive guide will walk you through installing i18nizer, setting up your project, and running your first translation.
+
+## Requirements
+
+Before you begin, make sure you have:
+
+- **Node.js 18+** - i18nizer requires Node.js version 18 or higher
+- **Existing i18n setup** - Currently works with i18next, next-intl, or react-i18next
+- **AI API key** - Optional but recommended for automatic translations (OpenAI, Google Gemini, or Hugging Face)
+
+## Installation
+
+### Global Installation (Recommended)
+
+Install i18nizer globally using npm:
+
+```bash
+npm install -g i18nizer
+```
+
+Or using yarn:
+
+```bash
+yarn global add i18nizer
+```
+
+### Verify Installation
+
+Confirm that i18nizer is installed correctly:
+
+```bash
+i18nizer --version
+```
+
+You should see the version number displayed.
+
+## API Key Configuration
+
+To enable AI-powered translations, configure at least one AI provider. API keys are stored locally in `[HOME]/.i18nizer/api-keys.json` and are **never** committed to your repository.
+
+### OpenAI
+
+Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys):
+
+```bash
+i18nizer keys --setOpenAI YOUR_OPENAI_API_KEY
+```
+
+**Recommended models:** `gpt-4`, `gpt-3.5-turbo`
+
+### Google Gemini
+
+Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey):
+
+```bash
+i18nizer keys --setGemini YOUR_GEMINI_API_KEY
+```
+
+**Recommended models:** `gemini-pro`, `gemini-1.5-pro`
+
+### Hugging Face
+
+Get your API key from [Hugging Face Settings](https://huggingface.co/settings/tokens):
+
+```bash
+i18nizer keys --setHF YOUR_HUGGING_FACE_API_KEY
+```
+
+**Recommended models:** DeepSeek, Llama, Mistral
+
+### Verifying API Keys
+
+Check which API keys are configured:
+
+```bash
+i18nizer keys
+```
+
+## Initialize Your Project
+
+i18nizer offers multiple ways to initialize your project based on your workflow.
+
+### Interactive Mode (Recommended)
+
+Run the interactive setup which will auto-detect your framework and i18n library:
+
+```bash
+i18nizer start
+```
+
+This command will:
+
+- 🔍 Auto-detect your framework (Next.js or React)
+- 🔍 Auto-detect your i18n library (next-intl, react-i18next, i18next)
+- ❓ Ask you to confirm or change the detected settings
+- ✅ Create `i18nizer.config.yml` with optimal defaults
+- 📁 Set up `.i18nizer/` directory for caching
+- 📂 Create `messages/` directory for translation files
+
+**Example interactive session:**
+
+```
+? Framework detected: nextjs. Is this correct? (Y/n)
+? i18n library detected: next-intl. Is this correct? (Y/n)
+? Which locales do you want to support? en,es,fr
+✓ Configuration created: i18nizer.config.yml
+✓ Created .i18nizer directory
+✓ Created messages directory
+```
+
+### Non-Interactive Mode
+
+For CI/CD pipelines or automated setups:
+
+```bash
+i18nizer start --yes
+```
+
+This will use auto-detected values without prompting.
+
+### Manual Configuration
+
+Specify framework and i18n library explicitly:
+
+```bash
+# Next.js with next-intl
+i18nizer start --framework nextjs --i18n next-intl
+
+# React with react-i18next
+i18nizer start --framework react --i18n react-i18next
+
+# Custom setup
+i18nizer start --framework custom --i18n custom
+```
+
+**Available options:**
+
+| Flag | Values | Description |
+|------|--------|-------------|
+| `--framework` | `nextjs`, `react`, `custom` | Your project framework |
+| `--i18n` | `next-intl`, `react-i18next`, `i18next`, `custom` | i18n library |
+| `--yes`, `-y` | Boolean | Skip interactive prompts |
+| `--force`, `-f` | Boolean | Re-initialize existing project |
+
+## Your First Translation
+
+Now that your project is initialized, let's translate your first component!
+
+### Translate a Single File
+
+Let's translate a simple React component:
+
+```bash
+i18nizer translate src/components/Login.tsx --locales en,es,fr
+```
+
+**What happens:**
+
+1. ✅ Extracts all translatable strings from the component
+2. ✅ Generates translation keys using AI
+3. ✅ Creates translation JSON files for English, Spanish, and French
+4. ✅ Rewrites the component to use `t()` function
+
+**Example output:**
+
+```
+🔍 Analyzing src/components/Login.tsx...
+📝 Found 3 translatable strings
+🔑 Generating keys...
+🌍 Translating to: en, es, fr
+💾 Writing JSON files...
+✓ messages/en/login.json
+✓ messages/es/login.json
+✓ messages/fr/login.json
+✅ Component updated: src/components/Login.tsx
+```
+
+### Preview Changes First
+
+Use dry-run mode to see what would change without modifying files:
+
+```bash
+i18nizer translate src/components/Login.tsx --dry-run
+```
+
+This shows you:
+- Which strings will be extracted
+- What keys will be generated
+- How the component will be rewritten
+
+**Example dry-run output:**
+
+```
+[DRY RUN] Would extract:
+  - "Welcome back" → welcomeBack
+  - "Please sign in to continue" → pleaseSignInToContinue
+  - "Sign in" → signIn
+
+[DRY RUN] Would create:
+  - messages/en/login.json
+  - messages/es/login.json
+
+[DRY RUN] Would update:
+  - src/components/Login.tsx
+```
+
+### Show Generated JSON
+
+Preview the JSON output before writing files:
+
+```bash
+i18nizer translate src/components/Login.tsx --show-json
+```
+
+This displays the exact JSON that will be generated for each locale.
+
+### Translate Multiple Files
+
+Translate all components in your project at once:
+
+```bash
+i18nizer translate --all --locales en,es,fr,de
+```
+
+**Advanced patterns:**
+
+```bash
+# Translate specific directory
+i18nizer translate src/components --all --locales en,es,fr
+
+# Translate with specific AI provider
+i18nizer translate src/components --all --provider gemini
+
+# Dry-run for entire project
+i18nizer translate --all --dry-run
+```
+
+## Understanding the Output
+
+After running i18nizer, your project structure will look like this:
+
+```
+your-project/
+├── i18nizer.config.yml       # Configuration
+├── .i18nizer/
+│   ├── cache/
+│   │   └── translations.json # Translation cache
+│   └── ...
+├── i18n/
+│   └── messages.generated.ts # Auto-generated aggregator
+└── messages/                 # Translation files
+    ├── en/
+    │   ├── login.json
+    │   ├── dashboard.json
+    │   └── settings.json
+    ├── es/
+    │   ├── login.json
+    │   ├── dashboard.json
+    │   └── settings.json
+    └── fr/
+        ├── login.json
+        ├── dashboard.json
+        └── settings.json
+```
+
+### JSON File Format
+
+Each JSON file follows this structure:
+
+```json
+{
+  "ComponentName": {
+    "translationKey": "Translation text",
+    "anotherKey": "Another translation"
+  }
+}
+```
+
+**Example** (`messages/en/login.json`):
+
+```json
+{
+  "Login": {
+    "welcomeBack": "Welcome back",
+    "pleaseSignInToContinue": "Please sign in to continue",
+    "emailPlaceholder": "Email address",
+    "passwordPlaceholder": "Password",
+    "signIn": "Sign in",
+    "forgotPassword": "Forgot password?",
+    "dontHaveAccount": "Don't have an account?",
+    "signUp": "Sign up"
+  }
+}
+```
+
+### Aggregator File
+
+The auto-generated `i18n/messages.generated.ts` imports all your translation files:
+
+```typescript
+// Auto-generated by i18nizer
+import Login_en from '../messages/en/login.json'
+import Login_es from '../messages/es/login.json'
+import Dashboard_en from '../messages/en/dashboard.json'
+import Dashboard_es from '../messages/es/dashboard.json'
+
+export const messages = {
+  en: {
+    ...Login_en,
+    ...Dashboard_en,
+  },
+  es: {
+    ...Login_es,
+    ...Dashboard_es,
+  },
+}
+```
+
+### Regenerating the Aggregator
+
+If you manually add or remove JSON files, regenerate the aggregator:
+
+```bash
+i18nizer regenerate
+```
+
+## Real-World Workflow Example
+
+Here's a complete workflow from start to finish:
+
+### Step 1: Initialize Project
+
+```bash
+cd my-nextjs-app
+i18nizer start
+```
+
+### Step 2: Configure API Key
+
+```bash
+i18nizer keys --setOpenAI sk-your-api-key-here
+```
+
+### Step 3: Preview One Component
+
+```bash
+i18nizer translate src/components/Header.tsx --dry-run
+```
+
+### Step 4: Translate Component
+
+```bash
+i18nizer translate src/components/Header.tsx --locales en,es,fr,de
+```
+
+### Step 5: Review Changes
+
+```bash
+git diff src/components/Header.tsx
+cat messages/en/header.json
+```
+
+### Step 6: Translate Entire Project
+
+```bash
+i18nizer translate --all --locales en,es,fr,de,ja,zh
+```
+
+### Step 7: Regenerate Aggregator (if needed)
+
+```bash
+i18nizer regenerate
+```
+
+### Step 8: Test in Your App
+
+```bash
+npm run dev
+# Test switching between languages
+```
+
+## Troubleshooting
+
+### Command Not Found
+
+If you get "command not found" after installation:
+
+```bash
+# Check npm global bin path
+npm config get prefix
+
+# Add to PATH (Unix/Linux/macOS)
+export PATH=$PATH:$(npm config get prefix)/bin
+
+# Or reinstall globally
+npm install -g i18nizer
+```
+
+### API Key Not Working
+
+Verify your API key is configured:
+
+```bash
+i18nizer keys
+```
+
+Check the stored keys file:
+
+```bash
+cat ~/.i18nizer/api-keys.json
+```
+
+### Translations Not Generated
+
+Ensure you have:
+- Configured an API key
+- Internet connection
+- Valid API key with credits/quota
+
+### Component Not Updated
+
+Check the `i18nizer.config.yml` configuration:
+
+```yaml
+behavior:
+  autoInjectT: true  # Should be true for automatic injection
+```
+
+For Next.js Server Components, you may need to manually add the translation hook.
+
+## Next Steps
+
+Now that you have i18nizer set up:
+
+- Learn about [CLI commands and options](/cli-commands)
+- Configure [project settings](/configuration)
+- Explore [real-world examples](/examples)
+- Understand the [architecture](/architecture)
+- [Contribute](/contributing) to the project
+
+## Best Practices
+
+1. **Commit before translating** - Always commit your changes before running i18nizer
+2. **Use dry-run first** - Preview changes with `--dry-run` before applying
+3. **Review AI translations** - AI translations are good but not perfect
+4. **Cache is your friend** - The cache prevents duplicate API calls
+5. **Consistent keys** - Let i18nizer generate keys for consistency
+6. **Version control** - Commit both code and JSON files together
+
+---
+
+Need help? Check out our [GitHub Discussions](https://github.com/yossTheDev/i18nizer/discussions) or [open an issue](https://github.com/yossTheDev/i18nizer/issues).

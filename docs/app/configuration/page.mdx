@@ -1,0 +1,501 @@
+export const metadata = {
+  title: 'Configuration',
+  description: 'Learn how to configure i18nizer for your project with i18nizer.config.yml',
+}
+
+# Configuration
+
+Learn how to configure i18nizer for your project using `i18nizer.config.yml`.
+
+## What's New in 0.7.0 🎉
+
+Version 0.7.0 introduces powerful new configuration options and comprehensive documentation for advanced i18n patterns:
+
+### AI Provider Configuration
+
+You can now configure your AI provider and model directly in the config file:
+
+```yaml
+ai:
+  provider: openai        # openai | gemini | huggingface
+  model: gpt-4           # AI model name
+```
+
+**Benefits:**
+- Set your preferred AI provider once, use everywhere
+- No need to pass `--provider` flag on every command
+- Easy switching between providers and models
+- CLI flags still override config for one-off changes
+
+**Supported Providers:**
+- **OpenAI** (default): `gpt-4`, `gpt-4o-mini`, `gpt-3.5-turbo`
+- **Google Gemini**: `gemini-2.5-flash`, `gemini-pro`
+- **Hugging Face**: `deepseek-ai/DeepSeek-V3.2`, custom models
+
+### Paths Configuration
+
+Define your project structure once:
+
+```yaml
+paths:
+  src: src               # Source directory
+  i18n: i18n            # i18n output directory
+```
+
+**Use Cases:**
+- Custom source directory structure
+- Different i18n aggregator locations
+- Monorepo setups with nested paths
+
+### Pluralization and Rich Text Support
+
+i18nizer **automatically detects and handles** advanced i18n patterns:
+
+- **Automatic Pluralization**: Detects `count === 1 ? 'item' : 'items'` patterns and automatically converts them to ICU message format with `t("key", { count })` calls
+- **Automatic Rich Text**: Detects mixed text with inline JSX elements (like `<a>`, `<strong>`) and automatically generates `t.rich()` calls with proper element mappings
+- **Zero Configuration**: Both features work automatically during extraction—no manual setup required
+- **Compatible Output**: Generated code works seamlessly with i18next and next-intl built-in features
+
+See the [Examples page](/examples) for automatic transformation examples showing before/after code.
+
+---
+
+## Configuration File
+
+The configuration file is automatically created when you run `i18nizer start`. It's located at:
+
+```
+your-project/i18nizer.config.yml
+```
+
+## Complete Configuration Example
+
+```yaml
+framework: nextjs          # nextjs | react | custom
+i18nLibrary: next-intl    # next-intl | react-i18next | i18next | custom
+outputDir: messages       # Translation files directory
+cacheDir: .i18nizer       # Cache directory
+
+behavior:
+  autoInjectT: false      # Auto-inject translation hooks
+  useAiForKeys: true      # Use AI for English key generation
+  
+  allowedFunctions:       # Functions allowed in JSX
+    - t
+    - useTranslations
+    - format
+  
+  allowedProps:           # Props to extract
+    - placeholder
+    - title
+    - alt
+    - aria-label
+    - label
+    - text
+    - tooltip
+  
+  allowedMemberFunctions: # Member functions
+    - toString
+
+ai:
+  provider: openai        # openai | gemini | huggingface
+  model: gpt-4           # AI model
+  
+paths:
+  src: src               # Source directory
+  i18n: i18n            # i18n output directory
+```
+
+## Framework Settings
+
+### framework
+
+Specifies your project's framework:
+
+```yaml
+framework: nextjs  # or 'react' or 'custom'
+```
+
+**Options:**
+- `nextjs` - Next.js projects
+- `react` - React projects (CRA, Vite, etc.)
+- `custom` - Custom setup
+
+### i18nLibrary
+
+Specifies your i18n library:
+
+```yaml
+i18nLibrary: next-intl  # or 'react-i18next', 'i18next', 'custom'
+```
+
+**Options:**
+- `next-intl` - For Next.js
+- `react-i18next` - For React
+- `i18next` - Vanilla i18next
+- `custom` - Custom implementation
+
+## Behavior Settings
+
+### autoInjectT
+
+Controls automatic injection of translation hooks:
+
+```yaml
+behavior:
+  autoInjectT: false  # Default for Next.js
+```
+
+**Next.js (false by default):**
+- Disabled to avoid breaking Server Components
+- i18nizer replaces strings but doesn't inject hooks
+- Manually add translation functions where needed
+
+**React (true by default):**
+- Full automation with hook injection
+- Safe for all Client Components
+
+### useAiForKeys
+
+Uses AI to generate consistent English camelCase keys:
+
+```yaml
+behavior:
+  useAiForKeys: true  # Enabled by default
+```
+
+**Benefits:**
+- Keys always in English (even if source is Spanish, etc.)
+- Readable: `welcomeBack` vs `bienvenidoDeNuevo`
+- Cached for consistency
+- Minimal diffs across runs
+
+**Example:**
+
+Source (Spanish):
+```tsx
+<h1>Bienvenido de nuevo</h1>
+```
+
+Generated key (English):
+```json
+{
+  "welcomeBack": "Bienvenido de nuevo"
+}
+```
+
+### allowedFunctions
+
+Functions allowed in JSX expressions:
+
+```yaml
+behavior:
+  allowedFunctions:
+    - t
+    - useTranslations
+    - console.log
+    - handleClick
+```
+
+Prevents extracting function names as strings.
+
+### allowedProps
+
+JSX props to extract:
+
+```yaml
+behavior:
+  allowedProps:
+    - placeholder
+    - title
+    - alt
+    - aria-label
+    - aria-placeholder
+    - label
+    - text
+    - tooltip
+    - helperText
+```
+
+### allowedMemberFunctions
+
+Member functions allowed:
+
+```yaml
+behavior:
+  allowedMemberFunctions:
+    - toString
+    - valueOf
+    - trim
+```
+
+## AI Provider Settings
+
+### provider
+
+Select your preferred AI provider for translations and key generation:
+
+```yaml
+ai:
+  provider: openai  # openai | gemini | huggingface
+```
+
+**Default:** `openai` (as of v0.7.0)
+
+**Provider Comparison:**
+
+| Provider | Best For | Cost | Speed | Quality |
+|----------|----------|------|-------|---------|
+| OpenAI | Production use | $$$ | Fast | Excellent |
+| Gemini | Cost-effective | $$ | Fast | Excellent |
+| Hugging Face | Open source, custom models | $ | Varies | Good |
+
+**Configuration Priority:**
+1. CLI `--provider` flag (highest)
+2. `ai.provider` in config
+3. Default (`openai`)
+
+### model
+
+Specify the model to use for your chosen provider:
+
+```yaml
+ai:
+  model: gpt-4  # for OpenAI
+  # model: gemini-2.5-flash  # for Gemini
+  # model: deepseek-ai/DeepSeek-V3.2  # for Hugging Face
+```
+
+**Default:** `gpt-4` (for OpenAI)
+
+**Recommended Models:**
+
+| Provider | Models | Best For |
+|----------|--------|----------|
+| OpenAI | `gpt-4`, `gpt-3.5-turbo` | High quality, fast |
+| Gemini | `gemini-pro`, `gemini-1.5-pro` | Cost-effective |
+| Hugging Face | `deepseek`, `llama` | Open source |
+
+## Path Settings
+
+### paths.src
+
+Source code directory (new in v0.7.0):
+
+```yaml
+paths:
+  src: src  # or 'app', 'components', 'lib'
+```
+
+**Default:** `src`
+
+Define where your source code lives. This helps i18nizer understand your project structure for future enhancements.
+
+### paths.i18n
+
+i18n aggregator output directory (new in v0.7.0):
+
+```yaml
+paths:
+  i18n: i18n  # or 'locales', 'translations'
+```
+
+**Default:** `i18n`
+
+Specifies where the auto-generated `messages.generated.ts` aggregator file should be created.
+
+### outputDir
+
+Translation JSON files directory:
+
+```yaml
+outputDir: messages  # or 'locales', 'translations'
+```
+
+**Deprecated:** Use `messages.path` instead (see Messages Configuration below)
+
+### cacheDir
+
+Cache directory:
+
+```yaml
+cacheDir: .i18nizer
+```
+
+Stores translation cache and temporary files. This directory is automatically added to `.gitignore`.
+
+## Example Configurations
+
+### Next.js with next-intl
+
+```yaml
+framework: nextjs
+i18nLibrary: next-intl
+outputDir: messages
+cacheDir: .i18nizer
+
+behavior:
+  autoInjectT: false
+  useAiForKeys: true
+  allowedProps:
+    - placeholder
+    - title
+    - alt
+    - aria-label
+
+ai:
+  provider: openai
+  model: gpt-4
+```
+
+### React with react-i18next
+
+```yaml
+framework: react
+i18nLibrary: react-i18next
+outputDir: public/locales
+cacheDir: .i18nizer
+
+behavior:
+  autoInjectT: true
+  useAiForKeys: true
+  allowedProps:
+    - placeholder
+    - title
+    - alt
+
+ai:
+  provider: gemini
+  model: gemini-pro
+```
+
+### Custom Setup
+
+```yaml
+framework: custom
+i18nLibrary: custom
+outputDir: translations
+cacheDir: .cache/i18nizer
+
+behavior:
+  autoInjectT: false
+  useAiForKeys: false
+  allowedFunctions:
+    - translate
+    - t
+  allowedProps:
+    - label
+    - placeholder
+
+ai:
+  provider: huggingface
+  model: deepseek-coder
+```
+
+## Caching Strategy
+
+i18nizer caches translations and keys to:
+
+- **Reduce AI costs** - Same string never translated twice
+- **Ensure consistency** - Identical strings get same translation
+- **Speed up processing** - Instant lookup
+- **Support offline** - Work with cached data
+
+### Cache Structure
+
+`.i18nizer/cache/translations.json`:
+
+```json
+{
+  "translations": {
+    "hash-of-text": {
+      "en": "English translation",
+      "es": "Spanish translation"
+    }
+  },
+  "keys": {
+    "hash-of-text": "generatedKey"
+  },
+  "metadata": {
+    "lastUpdated": "2024-01-14T...",
+    "provider": "openai"
+  }
+}
+```
+
+### Cache Management
+
+```bash
+# Clear cache
+rm -rf .i18nizer/cache
+
+# View cache size
+du -sh .i18nizer/cache
+
+# Backup cache
+cp -r .i18nizer/cache .i18nizer/cache.backup
+```
+
+## Advanced Configuration
+
+### Custom Translation Function
+
+For custom setups:
+
+```yaml
+behavior:
+  translationFunction: myTranslate
+  translationImport: "import { myTranslate } from './i18n'"
+```
+
+### Multiple Output Directories
+
+```yaml
+outputDirs:
+  client: messages/client
+  server: messages/server
+  shared: messages/shared
+```
+
+### Locale Aliases
+
+```yaml
+locales:
+  en: en-US
+  es: es-ES
+  zh: zh-CN
+```
+
+## Troubleshooting
+
+### Configuration Not Found
+
+Ensure `i18nizer.config.yml` is in your project root:
+
+```bash
+ls -la i18nizer.config.yml
+```
+
+### Invalid Configuration
+
+Validate YAML syntax:
+
+```bash
+# Use a YAML validator
+cat i18nizer.config.yml | yq
+```
+
+### Behavior Not Working
+
+Check configuration priority:
+1. CLI flags (highest)
+2. `i18nizer.config.yml`
+3. Auto-detection
+4. Defaults (lowest)
+
+---
+
+For more help, see:
+- [CLI Commands](/cli-commands)
+- [Examples](/examples)
+- [Architecture](/architecture)

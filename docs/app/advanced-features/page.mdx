@@ -1,0 +1,517 @@
+export const metadata = {
+  title: 'Advanced Features - Pluralization & Rich Text',
+  description: 'i18nizer automatically detects and converts pluralization and rich text patterns using ICU message format',
+}
+
+# Advanced Features
+
+i18nizer **automatically detects and converts** advanced i18n patterns like pluralization and rich text formatting. When you run i18nizer on your components, it intelligently recognizes these patterns and generates the appropriate ICU message format translations.
+
+## Automatic Pluralization Detection
+
+### Overview
+
+i18nizer automatically detects pluralization patterns in your code (like `count === 1 ? 'item' : 'items'`) and converts them to ICU message format. This works seamlessly with both i18next and next-intl, and handles different plural rules across languages automatically.
+
+### Why ICU Message Format?
+
+Different languages have different plural rules:
+- **English**: 2 forms (one, other)
+- **Polish**: 3 forms (one, few, many)
+- **Arabic**: 6 forms (zero, one, two, few, many, other)
+- **Chinese/Japanese**: 1 form (other)
+
+ICU message format automatically selects the correct form based on the locale.
+
+### Automatic Conversion Example
+
+**Your original code:**
+```tsx
+function ShoppingCart({ count }) {
+  return (
+    <div>
+      <p>{count} {count === 1 ? 'item' : 'items'} in cart</p>
+    </div>
+  )
+}
+```
+
+**After i18nizer automatic conversion:**
+```tsx
+import { useTranslations } from 'next-intl'
+
+function ShoppingCart({ count }) {
+  const t = useTranslations('ShoppingCart')
+  
+  return (
+    <div>
+      <p>{t('itemsInCart', { count })}</p>
+    </div>
+  )
+}
+```
+
+**Generated translation file (`messages/en/shopping-cart.json`):**
+```json
+{
+  "ShoppingCart": {
+    "itemsInCart": "{count, plural, =0 {No items} one {# item} other {# items}} in cart"
+  }
+}
+```
+
+**How it works:**
+- i18nizer detects the `count === 1 ? 'item' : 'items'` pattern
+- Automatically generates ICU plural format with `one` and `other` forms
+- Replaces the ternary with a `t()` call that includes the count variable
+- Works with any variable name (not just `count`)
+
+### ICU Plural Syntax
+
+```
+{variable, plural, category {text} category {text} ...}
+```
+
+**Categories:**
+- `=0`, `=1`, `=2` - Exact matches
+- `zero` - Zero items (not all languages use this)
+- `one` - Singular (typically 1, but varies by language)
+- `two` - Dual (some languages like Arabic)
+- `few` - Few items (some languages)
+- `many` - Many items (some languages)
+- `other` - Default/fallback (required)
+
+**Placeholders:**
+- `#` - Replaced with the actual count number
+- `{variable}` - Any variable passed to the translation
+
+### More Pluralization Examples
+
+#### Example 1: Notifications Counter
+
+```tsx
+<p>{t('notificationCount', { count: unreadCount })}</p>
+```
+
+```json
+{
+  "notificationCount": "{count, plural, =0 {No new notifications} one {# new notification} other {# new notifications}}"
+}
+```
+
+#### Example 2: Days Remaining
+
+```tsx
+<span>{t('daysRemaining', { days: remainingDays })}</span>
+```
+
+```json
+{
+  "daysRemaining": "{days, plural, =0 {Expires today} =1 {# day remaining} other {# days remaining}}"
+}
+```
+
+#### Example 3: File Upload
+
+```tsx
+<p>{t('filesSelected', { count: selectedFiles.length })}</p>
+```
+
+```json
+{
+  "filesSelected": "{count, plural, =0 {No files selected} one {# file selected} other {# files selected}}"
+}
+```
+
+#### Example 4: Complex Conditional Text
+
+```tsx
+<div>
+  <p>{t('taskStatus', { completed: completedTasks, total: totalTasks })}</p>
+</div>
+```
+
+```json
+{
+  "taskStatus": "{completed, plural, =0 {No tasks completed} other {# of {total} tasks completed}}"
+}
+```
+
+### Pluralization for Different Languages
+
+**English (`messages/en.json`):**
+```json
+{
+  "items": "{count, plural, one {# item} other {# items}}"
+}
+```
+
+**Spanish (`messages/es.json`):**
+```json
+{
+  "items": "{count, plural, one {# artículo} other {# artículos}}"
+}
+```
+
+**Polish (`messages/pl.json`):**
+```json
+{
+  "items": "{count, plural, one {# przedmiot} few {# przedmioty} many {# przedmiotów} other {# przedmiotu}}"
+}
+```
+
+**Arabic (`messages/ar.json`):**
+```json
+{
+  "items": "{count, plural, zero {لا توجد عناصر} one {عنصر واحد} two {عنصران} few {# عناصر} many {# عنصرًا} other {# عنصر}}"
+}
+```
+
+---
+
+## Automatic Rich Text Formatting
+
+### Overview
+
+i18nizer automatically detects when you have mixed text with inline JSX elements (like `<a>`, `<strong>`, `<em>`) and generates the appropriate `t.rich()` calls. This ensures your translations remain atomic while maintaining JSX structure.
+
+### Why Rich Text Detection?
+
+- **Automatic**: No manual refactoring needed
+- **Translator-friendly**: Full sentences with placeholders
+- **Flexible**: Different languages can reorder elements
+- **Type-safe**: Generated code is type-checked
+
+### Automatic Conversion with next-intl
+
+#### Basic Link Example
+
+**Your original code:**
+```tsx
+function TermsNotice() {
+  return (
+    <p>
+      By clicking Sign Up, you agree to our <a href="/terms">Terms of Service</a>
+    </p>
+  )
+}
+```
+
+**After i18nizer automatic conversion:**
+```tsx
+import { useTranslations } from 'next-intl'
+
+function TermsNotice() {
+  const t = useTranslations('TermsNotice')
+  
+  return (
+    <p>
+      {t.rich('signUpAgreement', {
+        a: (chunks) => <a>{chunks}</a>
+      })}
+    </p>
+  )
+}
+```
+
+**Generated translation file:**
+```json
+{
+  "TermsNotice": {
+    "signUpAgreement": "By clicking Sign Up, you agree to our <a>Terms of Service</a>"
+  }
+}
+```
+
+**How it works:**
+- i18nizer detects mixed text with an inline `<a>` element
+- Automatically generates a `t.rich()` call with element mapping
+- Creates the placeholder using the tag name: `a: (chunks) => <a>{chunks}</a>`
+- Preserves the text structure in ICU MessageFormat with XML-style tags
+
+#### Multiple Rich Elements
+
+```tsx
+<p>
+  {t.rich('legalNotice', {
+    privacy: (chunks) => <a href="/privacy">{chunks}</a>,
+    terms: (chunks) => <a href="/terms">{chunks}</a>,
+    bold: (chunks) => <strong>{chunks}</strong>
+  })}
+</p>
+```
+
+```json
+{
+  "legalNotice": "Read our <privacy>Privacy Policy</privacy> and <terms>Terms</terms>. <bold>Important:</bold> All rights reserved."
+}
+```
+
+#### Rich Text with Dynamic Props
+
+```tsx
+<p>
+  {t.rich('downloadLink', {
+    link: (chunks) => (
+      <a href={fileUrl} download className="text-primary-600">
+        {chunks}
+      </a>
+    )
+  })}
+</p>
+```
+
+```json
+{
+  "downloadLink": "Click <link>here</link> to download the file"
+}
+```
+
+### Rich Text with i18next (Trans Component)
+
+#### Basic Trans Example
+
+```tsx
+import { Trans } from 'react-i18next'
+
+function Welcome() {
+  return (
+    <p>
+      <Trans i18nKey="welcomeMessage">
+        Welcome to our app! Check out our <a href="/guide">guide</a> to get started.
+      </Trans>
+    </p>
+  )
+}
+```
+
+**Translation:**
+```json
+{
+  "welcomeMessage": "Welcome to our app! Check out our <1>guide</1> to get started."
+}
+```
+
+#### Trans with Named Components
+
+```tsx
+<Trans 
+  i18nKey="legal"
+  components={{
+    termsLink: <a href="/terms" />,
+    privacyLink: <a href="/privacy" />,
+    bold: <strong />
+  }}
+/>
+```
+
+```json
+{
+  "legal": "By continuing, you agree to our <termsLink>Terms</termsLink> and <privacyLink>Privacy Policy</privacyLink>. <bold>Your data is protected.</bold>"
+}
+```
+
+### Combining Rich Text with Pluralization
+
+You can combine both features for powerful, flexible translations:
+
+```tsx
+<p>
+  {t.rich('cartSummary', {
+    count: items.length,
+    price: totalPrice,
+    link: (chunks) => <a href="/cart">{chunks}</a>,
+    bold: (chunks) => <strong>{chunks}</strong>
+  })}
+</p>
+```
+
+```json
+{
+  "cartSummary": "{count, plural, =0 {Your cart is empty} one {You have # item in <link>your cart</link> • <bold>${price}</bold>} other {You have # items in <link>your cart</link> • <bold>${price}</bold>}}"
+}
+```
+
+---
+
+## Number and Currency Formatting
+
+### Currency Example
+
+```tsx
+<p>{t('productPrice', { amount: 99.99, currency: 'USD' })}</p>
+```
+
+```json
+{
+  "productPrice": "Price: {amount, number, ::currency/{currency}}"
+}
+```
+
+**Output by locale:**
+- English (US): "Price: $99.99"
+- German: "Price: 99,99 €"
+- Japanese: "Price: ¥100"
+
+### Number Formatting
+
+```tsx
+<p>{t('largeNumber', { num: 1234567.89 })}</p>
+```
+
+```json
+{
+  "largeNumber": "{num, number, ::compact-short}"
+}
+```
+
+**Output by locale:**
+- English: "1.2M"
+- German: "1,2 Mio."
+
+---
+
+## Date and Time Formatting
+
+### Date Example
+
+```tsx
+<p>{t('publishDate', { date: new Date('2024-01-15') })}</p>
+```
+
+```json
+{
+  "publishDate": "Published on {date, date, long}"
+}
+```
+
+**Date format options:**
+- `short`: 1/15/24
+- `medium`: Jan 15, 2024
+- `long`: January 15, 2024
+- `full`: Monday, January 15, 2024
+
+### Time Example
+
+```tsx
+<p>{t('eventTime', { time: new Date() })}</p>
+```
+
+```json
+{
+  "eventTime": "Event starts at {time, time, short}"
+}
+```
+
+**Time format options:**
+- `short`: 3:30 PM
+- `medium`: 3:30:00 PM
+- `long`: 3:30:00 PM UTC
+- `full`: 3:30:00 PM Coordinated Universal Time
+
+---
+
+## Best Practices
+
+### ✅ Do's
+
+1. **Let i18nizer handle common patterns**: Use standard ternary operators for plurals and inline JSX for rich text
+   ```tsx
+   // i18nizer will automatically convert this
+   {count === 1 ? 'item' : 'items'}
+   
+   // and this
+   <p>Read our <a href="/terms">Terms</a></p>
+   ```
+
+2. **Use descriptive placeholder names** in manually enhanced translations:
+   ```json
+   {
+     "message": "Contact <supportLink>our support team</supportLink>"
+   }
+   ```
+
+3. **Provide context for translators**:
+   ```json
+   {
+     "itemCount": "{count, plural, one {# item} other {# items}}",
+     "_itemCount_context": "Shopping cart item counter"
+   }
+   ```
+
+4. **Test all plural forms** in your target languages
+
+5. **Use exact matches** for special cases:
+   ```json
+   {
+     "days": "{count, plural, =0 {Today} =1 {Tomorrow} other {In # days}}"
+   }
+   ```
+
+### ❌ Don'ts
+
+1. **Don't use complex non-standard patterns** that i18nizer can't detect:
+   ```tsx
+   // i18nizer may not detect this complex pattern
+   {count > 10 ? 'many' : count > 1 ? 'some' : 'one'}
+   
+   // Instead use: count === 1 ? 'item' : 'items'
+   // Then manually add more categories if needed
+   ```
+
+2. **Don't manually split sentences** before running i18nizer:
+   ```tsx
+   // Bad - don't do this before i18nizer
+   {t('text1')} <a>{t('link')}</a> {t('text2')}
+   
+   // Good - let i18nizer detect and convert
+   <p>Text before <a>link</a> text after</p>
+   ```
+
+3. **Don't forget the `other` category** in manually enhanced plurals (it's required)
+
+4. **Don't use `#` outside plural expressions** (it's specific to plurals)
+
+---
+
+## Workflow with i18nizer
+
+1. **Run i18nizer** on your components:
+   ```bash
+   i18nizer translate src/components/Cart.tsx --locales en,es,fr
+   ```
+
+2. **i18nizer automatically**:
+   - Detects pluralization patterns like `count === 1 ? 'item' : 'items'`
+   - Converts them to ICU message format
+   - Detects rich text patterns with inline JSX elements
+   - Generates `t.rich()` calls with element mappings
+
+3. **Review generated translations** in your `messages/` directory
+
+4. **Test** with different locales and count values to ensure translations work correctly
+
+5. **(Optional) Customize** generated translations:
+   - Add more plural categories for specific languages
+   - Add attributes back to rich text elements if needed
+   - Adjust wording for better context
+
+---
+
+## Resources
+
+- [ICU Message Format Documentation](https://unicode-org.github.io/icu/userguide/format_parse/messages/)
+- [next-intl Rich Text Guide](https://next-intl-docs.vercel.app/docs/usage/messages#rich-text)
+- [i18next Trans Component](https://react.i18next.com/latest/trans-component)
+- [CLDR Plural Rules](https://www.unicode.org/cldr/charts/43/supplemental/language_plural_rules.html)
+
+---
+
+## Need Help?
+
+If you have questions or run into issues with advanced i18n patterns:
+
+- Check the [examples page](/examples) for more use cases
+- Review the [i18next documentation](https://www.i18next.com/)
+- Review the [next-intl documentation](https://next-intl-docs.vercel.app/)
+- Open an issue on [GitHub](https://github.com/yossTheDev/i18nizer/issues)

@@ -6,6 +6,12 @@ interface MappedText {
     node: Node;
     placeholders?: string[];
     tempKey: string;
+    isPlural?: boolean;
+    isRichText?: boolean;
+    richTextElements?: Array<{
+        tag: string;
+        placeholder: string;
+    }>;
 }
 
 export interface ReplaceOptions {
@@ -54,13 +60,42 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
     const allowedFunctions = new Set(options.allowedFunctions ?? [...defaultAllowedFunctions]);
     const allowedMemberFunctions = new Set(options.allowedMemberFunctions ?? [...defaultAllowedMemberFunctions]);
     
-    for (const { key, node, placeholders = [] } of mapped) {
+    for (const { key, node, placeholders = [], isPlural = false, isRichText = false, richTextElements = [] } of mapped) {
+        // For rich text patterns, generate t.rich() call
+        if (isRichText && Node.isJsxElement(node)) {
+            // Build formatter functions for each element
+            const formatters = richTextElements.map(elem => {
+                return `${elem.placeholder}: (chunks) => <${elem.tag}>{chunks}</${elem.tag}>`;
+            }).join(', ');
+            
+            const richCall = `t.rich("${key}", { ${formatters} })`;
+            
+            // Replace the entire JSX element with {t.rich(...)}
+            node.replaceWithText(`{${richCall}}`);
+            continue;
+        }
+
         // Build placeholders string if any
         const placeholdersText = placeholders.length > 0
             ? `{ ${placeholders.map(p => `${p}: ${p}`).join(", ")} }`
             : "";
 
         const tCall = `t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`;
+
+        // For plural patterns (ternary expressions), replace the entire ternary
+        if (isPlural && Node.isConditionalExpression(node)) {
+            const parent = node.getParent();
+            
+            // In JSX expression
+            if (Node.isJsxExpression(parent)) {
+                node.replaceWithText(tCall);
+                return;
+            }
+            
+            // In other contexts, replace with t() call
+            node.replaceWithText(tCall);
+            continue;
+        }
 
         // Replace JSXText nodes → {t("key")}
         if (Node.isJsxText(node)) {

@@ -1,0 +1,335 @@
+export const metadata = {
+  title: 'CLI Commands',
+  description: 'Complete reference for all i18nizer CLI commands, flags, and options',
+}
+
+# CLI Commands
+
+Complete reference for all i18nizer commands and their options.
+
+## i18nizer start
+
+Initialize i18nizer in your project.
+
+### Usage
+
+```bash
+i18nizer start [OPTIONS]
+```
+
+### Options
+
+| Flag | Values | Description |
+|------|--------|-------------|
+| `--framework` | `nextjs`, `react`, `custom` | Specify the framework |
+| `--i18n` | `next-intl`, `react-i18next`, `i18next`, `custom` | Specify the i18n library |
+| `--yes`, `-y` | Boolean | Skip interactive prompts |
+| `--force`, `-f` | Boolean | Re-initialize existing project |
+
+### Examples
+
+```bash
+# Interactive mode (recommended)
+i18nizer start
+
+# Auto-detect with defaults
+i18nizer start --yes
+
+# Next.js with next-intl
+i18nizer start --framework nextjs --i18n next-intl
+
+# React with react-i18next
+i18nizer start --framework react --i18n react-i18next
+
+# Force re-initialization
+i18nizer start --force
+```
+
+---
+
+## i18nizer translate
+
+Extract and translate strings from components.
+
+### Usage
+
+```bash
+i18nizer translate [FILE] [OPTIONS]
+```
+
+### Options
+
+| Flag | Description | Example |
+|------|-------------|---------|
+| `--locales` | Comma-separated list of locale codes | `--locales en,es,fr` |
+| `--all` | Translate all components in the project | `--all` |
+| `--dry-run` | Preview changes without modifying files | `--dry-run` |
+| `--show-json` | Display generated JSON output | `--show-json` |
+| `--provider` | Specify AI provider | `--provider openai` |
+
+### Examples
+
+```bash
+# Translate single file
+i18nizer translate src/components/Login.tsx --locales en,es,fr
+
+# Translate all files
+i18nizer translate --all --locales en,es,fr,de
+
+# Preview without changes
+i18nizer translate src/components/Login.tsx --dry-run
+
+# Show JSON output
+i18nizer translate src/components/Login.tsx --show-json
+
+# Use specific provider
+i18nizer translate src/components/Login.tsx --provider gemini
+
+# Translate directory
+i18nizer translate src/components --all --locales en,es
+
+# Complex example with multiple options
+i18nizer translate src/pages --all --locales en,es,fr,de,ja --provider openai --show-json
+```
+
+---
+
+## i18nizer extract (Legacy)
+
+Legacy command for extracting strings. The `translate` command is recommended instead.
+
+### Usage
+
+```bash
+i18nizer extract FILE [OPTIONS]
+```
+
+### Options
+
+| Flag | Description |
+|------|-------------|
+| `--locales` | Languages to generate (default: `en,es`) |
+| `--provider` | AI provider to use |
+
+### Example
+
+```bash
+i18nizer extract src/components/Login.tsx --locales en,es,fr --provider openai
+```
+
+---
+
+## i18nizer keys
+
+Manage API keys for AI providers.
+
+### Usage
+
+```bash
+i18nizer keys [OPTIONS]
+```
+
+### Options
+
+| Flag | Description |
+|------|-------------|
+| `--setOpenAI KEY` | Set OpenAI API key |
+| `--setGemini KEY` | Set Google Gemini API key |
+| `--setHF KEY` | Set Hugging Face API key |
+
+### Examples
+
+```bash
+# Set OpenAI key
+i18nizer keys --setOpenAI sk-your-openai-key
+
+# Set Gemini key
+i18nizer keys --setGemini your-gemini-key
+
+# Set Hugging Face key
+i18nizer keys --setHF your-hf-key
+
+# View configured keys
+i18nizer keys
+```
+
+### API Key Storage
+
+Keys are stored in: `[HOME]/.i18nizer/api-keys.json`
+
+```json
+{
+  "openai": "sk-...",
+  "gemini": "...",
+  "huggingface": "..."
+}
+```
+
+---
+
+## i18nizer regenerate
+
+Rebuild the auto-generated aggregator file.
+
+### Usage
+
+```bash
+i18nizer regenerate
+```
+
+This command regenerates the `i18n/messages.generated.ts` file by scanning all JSON files in your messages directory.
+
+### When to Use
+
+- You manually add or remove translation JSON files
+- You rename JSON files
+- The aggregator becomes out of sync with your messages
+- After bulk edits to translation files
+
+### Example
+
+```bash
+# Regenerate aggregator
+i18nizer regenerate
+
+# Output
+✓ Scanning messages directory...
+✓ Found 15 translation files
+✓ Generated i18n/messages.generated.ts
+```
+
+---
+
+## Common Workflows
+
+### Initial Setup
+
+```bash
+# 1. Initialize project
+i18nizer start
+
+# 2. Set API key
+i18nizer keys --setOpenAI sk-your-key
+
+# 3. Test with one component
+i18nizer translate src/components/Header.tsx --dry-run
+
+# 4. Apply if satisfied
+i18nizer translate src/components/Header.tsx --locales en,es,fr
+```
+
+### Incremental Translation
+
+```bash
+# Translate new components as you build
+i18nizer translate src/components/NewFeature.tsx --locales en,es,fr
+
+# Review changes
+git diff src/components/NewFeature.tsx
+
+# Commit
+git add .
+git commit -m "Add i18n to NewFeature component"
+```
+
+### Project-Wide Translation
+
+```bash
+# Preview all changes
+i18nizer translate --all --dry-run
+
+# Apply to entire project
+i18nizer translate --all --locales en,es,fr,de,ja,zh
+
+# Regenerate aggregator
+i18nizer regenerate
+```
+
+### Adding New Locales
+
+```bash
+# Translate existing components to new locales
+i18nizer translate --all --locales ko,pt,it
+
+# This will create new locale directories with all translations
+```
+
+---
+
+## Advanced Usage
+
+### Custom Provider Configuration
+
+In `i18nizer.config.yml`:
+
+```yaml
+ai:
+  provider: openai
+  model: gpt-4
+```
+
+Then translate:
+
+```bash
+i18nizer translate src/components/App.tsx --locales en,es
+```
+
+### Filtering Components
+
+```bash
+# Translate only specific patterns
+i18nizer translate "src/components/Auth/**/*.tsx" --all --locales en,es
+
+# Exclude certain directories
+i18nizer translate src --all --locales en,es --exclude "**/*.test.tsx"
+```
+
+### CI/CD Integration
+
+```yaml
+# GitHub Actions example
+- name: Translate new components
+  run: |
+    i18nizer start --yes
+    i18nizer keys --setOpenAI ${{ secrets.OPENAI_API_KEY }}
+    i18nizer translate --all --locales en,es,fr
+    i18nizer regenerate
+```
+
+---
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | General error |
+| 2 | Configuration error |
+| 3 | API error |
+| 4 | File system error |
+
+---
+
+## Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `I18NIZER_API_KEY_OPENAI` | OpenAI API key | `sk-...` |
+| `I18NIZER_API_KEY_GEMINI` | Gemini API key | `...` |
+| `I18NIZER_API_KEY_HF` | Hugging Face API key | `...` |
+| `I18NIZER_CONFIG` | Custom config file path | `/path/to/config.yml` |
+
+---
+
+## Tips
+
+1. **Always use `--dry-run` first** to preview changes
+2. **Commit before translating** so you can review diffs
+3. **Use specific locale codes** following ISO 639-1 standard
+4. **Check the cache** at `.i18nizer/cache/translations.json`
+5. **Review AI output** for accuracy and context
+6. **Use `--show-json`** to verify translations before writing
+
+---
+
+For more examples, see the [Examples](/examples) page.

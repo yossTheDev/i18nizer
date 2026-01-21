@@ -104,7 +104,8 @@ export default class Translate extends Command {
       ? flags.locales.split(",")
       : config.messages.locales || [config.messages.defaultLocale, "es"]; // Use config locales or default fallback
 
-    let provider: Provider = "huggingface";
+    // Use provider from config or flag (flag takes precedence)
+    let provider: Provider = config.ai?.provider || "huggingface";
     if (flags.provider) {
       const p = flags.provider.toLowerCase();
       if (!VALID_PROVIDERS.includes(p as Provider)) {
@@ -115,6 +116,9 @@ export default class Translate extends Command {
 
       provider = p as Provider;
     }
+
+    // Use model from config (can be undefined if not specified)
+    const aiModel = config.ai?.model;
 
     // Get files to process
     const filesToProcess: string[] = flags.all
@@ -190,9 +194,14 @@ export default class Translate extends Command {
 
           return {
             isCached: result.isCached,
+            isPlural: t.isPlural,
+            isRichText: t.isRichText,
             key: result.key,
             node: t.node,
             placeholders: t.placeholders,
+            pluralForms: t.pluralForms,
+            pluralVariable: t.pluralVariable,
+            richTextElements: t.richTextElements,
             tempKey: t.tempKey,
             text: t.text,
           };
@@ -212,9 +221,18 @@ export default class Translate extends Command {
                 cached.locales[locale] ?? mapped.text;
             }
           } else {
-            // Will need AI translation
-            for (const locale of locales) {
-              i18nJson[mapped.key][locale] = ""; // Placeholder
+            // For plural forms, generate ICU format
+            if (mapped.isPlural && mapped.pluralForms) {
+              for (const locale of locales) {
+                // Generate ICU plural format string
+                const icuFormat = `{${mapped.pluralVariable}, plural, one {${mapped.pluralForms.one}} other {${mapped.pluralForms.other}}}`;
+                i18nJson[mapped.key][locale] = icuFormat;
+              }
+            } else {
+              // Will need AI translation
+              for (const locale of locales) {
+                i18nJson[mapped.key][locale] = ""; // Placeholder
+              }
             }
           }
         }
@@ -235,7 +253,7 @@ export default class Translate extends Command {
           });
 
           // eslint-disable-next-line no-await-in-loop
-          const raw = await generateTranslations(prompt, provider);
+          const raw = await generateTranslations(prompt, provider, aiModel);
           if (!raw) throw new Error("AI did not return any data");
 
           const aiJson = parseAiJson(raw);
@@ -289,9 +307,12 @@ export default class Translate extends Command {
           
           replaceTempKeysWithT(
             mappedTexts.map((m) => ({
+              isPlural: m.isPlural,
+              isRichText: m.isRichText,
               key: m.key,
               node: m.node,
               placeholders: m.placeholders,
+              richTextElements: m.richTextElements,
               tempKey: m.tempKey,
             })),
             {

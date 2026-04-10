@@ -4,13 +4,9 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 235 21% 11%;
     --foreground: 210 40% 98%;
+    --terminal-bg: 235 21% 11%;
   }
 
   html {
@@ -18,32 +14,112 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+    @apply bg-terminal-bg text-terminal-fg antialiased;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   }
 }
 
-/* Syntax highlighting theme */
-.hljs {
-  @apply rounded-lg p-4 overflow-x-auto;
+@layer components {
+  .glass {
+    @apply bg-white/70 dark:bg-terminal-bg/70 backdrop-blur-md border border-white/20 dark:border-white/10;
+  }
+
+  .terminal-border {
+    @apply border border-gray-200 dark:border-terminal-gray/30;
+  }
 }
+
+/* Syntax highlighting theme (Tokyo Night inspired) */
+.hljs {
+  @apply rounded-lg p-4 overflow-x-auto bg-terminal-black text-terminal-fg border border-terminal-gray/20;
+}
+
+.hljs-keyword, .hljs-selector-tag { @apply text-terminal-magenta; }
+.hljs-string, .hljs-doctag { @apply text-terminal-green; }
+.hljs-title, .hljs-section, .hljs-selector-id { @apply text-terminal-blue font-bold; }
+.hljs-variable, .hljs-template-variable { @apply text-terminal-cyan; }
+.hljs-type, .hljs-built_in, .hljs-builtin-name, .hljs-number, .hljs-params { @apply text-terminal-yellow; }
+.hljs-comment, .hljs-quote { @apply text-terminal-gray italic; }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded;
+  @apply bg-gray-300 dark:bg-terminal-gray/50 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+  @apply bg-gray-400 dark:bg-terminal-gray;
+}
+
+/* Typography Overrides */
+.prose {
+  @apply max-w-none dark:prose-invert;
+}
+
+.prose pre {
+  @apply bg-transparent p-0 border-none shadow-none ring-0;
+}
+
+.prose code {
+  @apply font-mono text-sm bg-primary-500/10 px-1.5 py-0.5 rounded text-primary-400 before:content-none after:content-none border border-primary-500/20;
+}
+
+.prose table {
+  @apply border-collapse w-full my-8 text-sm overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-sm;
+}
+
+.prose thead {
+  @apply bg-primary-500/10 border-b border-white/10;
+}
+
+.prose th {
+  @apply px-4 py-3 text-left font-bold text-primary-400 uppercase tracking-widest text-[10px];
+}
+
+.prose td {
+  @apply px-4 py-3 border-b border-white/5 text-terminal-white/70;
+}
+
+.prose tr:last-child td {
+  @apply border-b-0;
+}
+
+.prose tr:hover td {
+  @apply bg-white/[0.02] text-terminal-white transition-colors;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  @apply tracking-tight font-bold text-white mb-4 mt-8 flex items-center gap-2;
+}
+
+.prose h1 { @apply text-4xl mb-8; }
+.prose h2 { @apply text-2xl border-b border-white/5 pb-2; }
+.prose h3 { @apply text-xl text-primary-400; }
+
+.prose p {
+  @apply text-terminal-white/80 leading-relaxed mb-6;
+}
+
+.prose strong {
+  @apply text-primary-300 font-semibold;
+}
+
+.prose ul, .prose ol {
+  @apply mb-6 ml-4;
+}
+
+.prose li {
+  @apply text-terminal-white/80 mb-2;
+}
+
+.prose a {
+  @apply text-primary-400 no-underline border-b border-primary-400/30 hover:border-primary-400 transition-all;
 }

@@ -6,10 +6,11 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+    --terminal-bg: 235 21% 11%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 235 21% 11%;
     --foreground: 210 40% 98%;
   }
 
@@ -18,32 +19,60 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+    @apply bg-white text-gray-900 dark:bg-terminal-bg dark:text-terminal-fg antialiased;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   }
 }
 
-/* Syntax highlighting theme */
-.hljs {
-  @apply rounded-lg p-4 overflow-x-auto;
+@layer components {
+  .glass {
+    @apply bg-white/70 dark:bg-terminal-bg/70 backdrop-blur-md border border-white/20 dark:border-white/10;
+  }
+
+  .terminal-border {
+    @apply border border-gray-200 dark:border-terminal-gray/30;
+  }
 }
+
+/* Syntax highlighting theme (Tokyo Night inspired) */
+.hljs {
+  @apply rounded-lg p-4 overflow-x-auto bg-terminal-black text-terminal-fg border border-terminal-gray/20;
+}
+
+.hljs-keyword, .hljs-selector-tag { @apply text-terminal-magenta; }
+.hljs-string, .hljs-doctag { @apply text-terminal-green; }
+.hljs-title, .hljs-section, .hljs-selector-id { @apply text-terminal-blue font-bold; }
+.hljs-variable, .hljs-template-variable { @apply text-terminal-cyan; }
+.hljs-type, .hljs-built_in, .hljs-builtin-name, .hljs-number, .hljs-params { @apply text-terminal-yellow; }
+.hljs-comment, .hljs-quote { @apply text-terminal-gray italic; }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded;
+  @apply bg-gray-300 dark:bg-terminal-gray/50 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+  @apply bg-gray-400 dark:bg-terminal-gray;
+}
+
+/* Typography Overrides */
+.prose {
+  @apply max-w-none dark:prose-invert;
+}
+
+.prose pre {
+  @apply bg-transparent p-0;
+}
+
+.prose code {
+  @apply font-mono text-sm bg-gray-100 dark:bg-terminal-black px-1.5 py-0.5 rounded text-primary-600 dark:text-terminal-cyan before:content-none after:content-none;
 }

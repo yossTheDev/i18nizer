@@ -10,6 +10,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        terminal: {
+          black: '#1a1b26',
+          red: '#f7768e',
+          green: '#9ece6a',
+          yellow: '#e0af68',
+          blue: '#7aa2f7',
+          magenta: '#bb9af7',
+          cyan: '#7dcfff',
+          white: '#a9b1d6',
+          gray: '#414868',
+          bg: '#1a1b26',
+          fg: '#c0caf5',
+        },
         primary: {
           50: '#f0fdf4',
           100: '#dcfce7',
@@ -22,6 +35,9 @@ const config: Config = {
           800: '#166534',
           900: '#14532d',
         },
+      },
+      backdropBlur: {
+        xs: '2px',
       },
     },
   },

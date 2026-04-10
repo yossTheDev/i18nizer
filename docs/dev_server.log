@@ -1,0 +1,27 @@
+
+> i18nizer-docs@1.0.0 dev
+> next dev
+
+▲ Next.js 16.2.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 655ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /app/yarn.lock as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles:
+   * /app/docs/yarn.lock
+
+
+○ Compiling / ...
+ GET / 200 in 6.8s (next.js: 6.2s, application-code: 627ms)
+ GET / 200 in 182ms (next.js: 11ms, application-code: 171ms)
+ GET / 200 in 299ms (next.js: 7ms, application-code: 292ms)
+ GET /getting-started 200 in 2.1s (next.js: 1943ms, application-code: 149ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+✓ Compiled in 389ms
+ GET / 200 in 421ms (next.js: 62ms, application-code: 359ms)
+ GET / 200 in 124ms (next.js: 7ms, application-code: 117ms)
+ GET / 200 in 110ms (next.js: 3ms, application-code: 107ms)
+ GET / 200 in 112ms (next.js: 4ms, application-code: 108ms)

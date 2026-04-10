@@ -17,7 +17,7 @@ import {
 
 const navigation = [
   { name: 'Home', href: '/', icon: Terminal },
-  { name: 'Getting Started', href: '/getting-started', icon: Terminal },
+  { name: 'Introduction', href: '/getting-started', icon: Terminal },
   { name: 'CLI Commands', href: '/cli-commands', icon: List },
   { name: 'Configuration', href: '/configuration', icon: Settings },
   { name: 'Examples', href: '/examples', icon: BookOpen },
@@ -36,19 +36,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
 
   const sidebarContent = (
-    <div className="py-6 px-4">
-      <div className="flex items-center justify-between mb-4 px-3 py-2">
-        <div className="text-xs font-mono font-bold uppercase tracking-widest text-gray-500 dark:text-terminal-white/40 flex items-center gap-2">
-          <ChevronRight className="w-3 h-3" />
-          Navigation
+    <div className="py-6 px-4 flex flex-col h-full">
+      <div className="flex items-center justify-between mb-8 px-3">
+        <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-terminal-white/40 flex items-center gap-2">
+          <div className="w-1 h-1 bg-primary-500 rounded-full animate-pulse" />
+          System.Nav
         </div>
         {onClose && (
-          <button onClick={onClose} className="lg:hidden p-1 text-gray-500 hover:text-gray-700 dark:text-terminal-white/40 dark:hover:text-white">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="lg:hidden p-1 text-terminal-white/40 hover:text-white transition-colors">
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
-      <nav className="space-y-1">
+      <nav className="space-y-1 flex-1">
         {navigation.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -57,39 +57,46 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               href={item.href}
               onClick={onClose}
               className={clsx(
-                'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+                'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 relative',
                 isActive
-                  ? 'bg-primary-50 text-primary-600 dark:bg-terminal-blue/10 dark:text-terminal-blue border border-primary-100 dark:border-terminal-blue/20 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-terminal-white/70 dark:hover:text-white dark:hover:bg-white/5'
+                  ? 'text-primary-400 bg-primary-500/5 border border-primary-500/20 shadow-[0_0_15px_rgba(14,165,233,0.1)]'
+                  : 'text-terminal-white/60 hover:text-terminal-white hover:bg-white/5 border border-transparent'
               )}
             >
               <item.icon className={clsx(
-                'mr-3 h-4 w-4 transition-colors',
-                isActive ? 'text-primary-600 dark:text-terminal-blue' : 'text-gray-400 group-hover:text-gray-500 dark:text-terminal-white/40 dark:group-hover:text-terminal-white'
+                'mr-3 h-4 w-4 transition-colors duration-300',
+                isActive ? 'text-primary-400' : 'text-terminal-white/30 group-hover:text-terminal-white/60'
               )} />
-              <span className="flex-1">{item.name}</span>
+              <span className="flex-1 tracking-tight">{item.name}</span>
               {isActive && (
-                <ChevronRight className="h-4 w-4" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary-500 rounded-full shadow-[0_0_8px_rgba(14,165,233,0.8)]" />
+              )}
+              {isActive && (
+                <ChevronRight className="h-3 w-3 opacity-50" />
               )}
             </Link>
           )
         })}
       </nav>
 
-      <div className="mt-8 rounded-xl bg-gradient-to-br from-primary-600 to-primary-700 dark:from-terminal-blue dark:to-blue-600 p-4 shadow-lg overflow-hidden relative group">
-        <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 rounded-full blur-2xl transition-transform group-hover:scale-150" />
-        <h3 className="text-sm font-bold text-white mb-1 relative z-10">New version out!</h3>
-        <p className="text-xs text-primary-50 dark:text-blue-50 mb-3 relative z-10">
-          Check out the new features in v0.7.2 including AI model support.
-        </p>
-        <Link
-          href="/changelog"
-          onClick={onClose}
-          className="inline-flex items-center text-xs font-bold text-white bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-colors relative z-10"
-        >
-          Changelog
-          <ChevronRight className="ml-1 h-3 w-3" />
-        </Link>
+      <div className="mt-auto pt-8">
+        <div className="rounded-2xl bg-gradient-to-br from-primary-600/20 to-primary-900/40 border border-primary-500/20 p-5 shadow-2xl overflow-hidden relative group">
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary-500/10 rounded-full blur-2xl transition-transform group-hover:scale-150" />
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+            <h3 className="text-[11px] font-bold text-primary-100 uppercase tracking-widest relative z-10">Broadcast</h3>
+          </div>
+          <p className="text-xs text-terminal-white/60 mb-4 leading-relaxed relative z-10">
+            v0.7.2 stable release is now live with enhanced AI translation logic.
+          </p>
+          <Link
+            href="/changelog"
+            onClick={onClose}
+            className="inline-flex items-center w-full justify-center text-[10px] font-bold uppercase tracking-tighter text-white bg-primary-500/20 hover:bg-primary-500/40 border border-primary-500/30 py-2 rounded-xl transition-all duration-300 relative z-10"
+          >
+            Read Patch Notes
+          </Link>
+        </div>
       </div>
     </div>
   )
@@ -97,21 +104,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-16 z-30 hidden h-[calc(100vh-4rem)] w-64 overflow-y-auto border-r border-gray-200 dark:border-terminal-gray/20 bg-white/50 dark:bg-terminal-bg/50 backdrop-blur-xl lg:block custom-scrollbar">
+      <aside className={clsx(
+        "fixed left-0 top-16 z-30 hidden h-[calc(100vh-4rem)] overflow-y-auto border-r border-white/5 bg-terminal-bg/60 backdrop-blur-2xl lg:block custom-scrollbar transition-all duration-500 ease-in-out",
+        isOpen ? "w-64" : "w-0 border-none opacity-0 pointer-events-none"
+      )}>
         {sidebarContent}
       </aside>
 
       {/* Mobile Sidebar Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md lg:hidden transition-opacity duration-300"
           onClick={onClose}
         />
       )}
 
       {/* Mobile Sidebar */}
       <aside className={clsx(
-        'fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-terminal-bg shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden overflow-y-auto custom-scrollbar',
+        'fixed inset-y-0 left-0 z-50 w-72 bg-terminal-bg border-r border-white/5 shadow-2xl transform transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) lg:hidden overflow-y-auto custom-scrollbar',
         isOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
         {sidebarContent}

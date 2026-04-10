@@ -39,8 +39,8 @@ export function CodeHighlight() {
           pre.classList.add('group')
 
           const button = document.createElement('button')
-          button.className = 'copy-button absolute right-4 top-4 p-2 rounded-lg bg-white/5 border border-white/10 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 text-terminal-white/50 hover:text-white'
-          button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>'
+          button.className = 'copy-button absolute right-4 top-4 p-2 rounded-xl bg-primary-500/10 border border-primary-500/20 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary-500/20 text-primary-400'
+          button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>'
 
           button.onclick = () => {
             const text = block.textContent || ''

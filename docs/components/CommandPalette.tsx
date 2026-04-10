@@ -43,12 +43,12 @@ export function CommandPalette() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="relative flex h-9 w-full items-center justify-start rounded-[0.5rem] bg-gray-100 dark:bg-terminal-black/50 border border-gray-200 dark:border-terminal-gray/30 px-3 text-sm text-gray-500 dark:text-terminal-white/50 sm:pr-12 md:w-40 lg:w-64 transition-all hover:bg-gray-200 dark:hover:bg-terminal-black"
+        className="relative flex h-9 w-full items-center justify-start rounded-xl bg-primary-500/[0.03] border border-primary-500/20 px-3 text-sm text-terminal-white/40 sm:pr-12 md:w-40 lg:w-64 transition-all hover:bg-primary-500/10 hover:border-primary-500/40"
       >
-        <Search className="mr-2 h-4 w-4" />
-        <span className="hidden lg:inline-flex">Search documentation...</span>
-        <span className="inline-flex lg:hidden">Search...</span>
-        <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border border-gray-200 dark:border-terminal-gray/30 bg-gray-50 dark:bg-terminal-black px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+        <Search className="mr-2 h-3 w-3" />
+        <span className="hidden lg:inline-flex text-[11px] uppercase tracking-wider font-bold">Quick Search...</span>
+        <span className="inline-flex lg:hidden text-[11px] uppercase tracking-wider font-bold">Search...</span>
+        <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded-lg border border-primary-500/20 bg-primary-500/10 px-1.5 font-mono text-[9px] font-bold opacity-100 sm:flex text-primary-400">
           <span className="text-xs">⌘</span>K
         </kbd>
       </button>
@@ -66,27 +66,30 @@ export function CommandPalette() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-2xl overflow-hidden rounded-xl glass shadow-2xl"
+              className="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-terminal-bg/95 border border-primary-500/20 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-xl"
             >
               <Command className="flex h-full w-full flex-col overflow-hidden bg-transparent">
-                <div className="flex items-center border-b border-gray-200 dark:border-terminal-gray/20 px-3" cmdk-input-wrapper="">
-                  <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                <div className="flex items-center border-b border-white/5 px-4" cmdk-input-wrapper="">
+                  <Search className="mr-3 h-4 w-4 shrink-0 text-primary-400" />
                   <Command.Input
-                    placeholder="Search documentation..."
-                    className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="Type to search documentation..."
+                    className="flex h-14 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-terminal-white/20 disabled:cursor-not-allowed disabled:opacity-50 text-white"
                   />
-                  <kbd className="hidden sm:inline-block pointer-events-none select-none rounded border border-gray-200 dark:border-terminal-gray/30 bg-gray-50 dark:bg-terminal-black px-1.5 font-mono text-[10px] font-medium opacity-100">
+                  <kbd className="hidden sm:inline-block pointer-events-none select-none rounded-lg border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] font-bold opacity-100 text-terminal-white/40">
                     ESC
                   </kbd>
                 </div>
-                <Command.List className="max-h-[300px] overflow-y-auto overflow-x-hidden p-2">
-                  <Command.Empty className="py-6 text-center text-sm">No results found.</Command.Empty>
-                  <Command.Group heading="Documentation" className="px-2 py-1.5 text-xs font-medium text-gray-500 dark:text-terminal-white/50 uppercase tracking-wider">
+                <Command.List className="max-h-[400px] overflow-y-auto overflow-x-hidden p-3 custom-scrollbar">
+                  <Command.Empty className="py-12 text-center text-sm text-terminal-white/30">
+                    <div className="mb-2 text-xl">∅</div>
+                    No results found.
+                  </Command.Empty>
+                  <Command.Group heading="System Navigation" className="px-2 py-3 text-[10px] font-bold text-primary-400/50 uppercase tracking-[0.2em]">
                     {navigation.map((item) => (
                       <Command.Item
                         key={item.id}
                         onSelect={() => runCommand(() => router.push(item.href))}
-                        className="flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-primary-500/10 aria-selected:text-primary-600 dark:aria-selected:bg-terminal-blue/10 dark:aria-selected:text-terminal-blue"
+                        className="flex cursor-default select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary-500/10 aria-selected:text-primary-400 transition-colors duration-200 text-terminal-white/70"
                       >
                         <item.icon className="mr-2 h-4 w-4" />
                         <span>{item.title.toUpperCase()}</span>
@@ -94,16 +97,15 @@ export function CommandPalette() {
                     ))}
                   </Command.Group>
                 </Command.List>
-                <div className="flex items-center justify-between border-t border-gray-200 dark:border-terminal-gray/20 px-4 py-2 text-[10px] text-gray-500 dark:text-terminal-white/30">
-                  <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1">
-                      <kbd className="rounded border border-gray-200 dark:border-terminal-gray/30 bg-gray-50 dark:bg-terminal-black px-1">↵</kbd>
-                      to select
+                <div className="flex items-center justify-between border-t border-white/5 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-terminal-white/20">
+                  <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1.5">
+                      <kbd className="rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-primary-400/50">ENTER</kbd>
+                      SELECT
                     </span>
-                    <span className="flex items-center gap-1">
-                      <kbd className="rounded border border-gray-200 dark:border-terminal-gray/30 bg-gray-50 dark:bg-terminal-black px-1">↓</kbd>
-                      <kbd className="rounded border border-gray-200 dark:border-terminal-gray/30 bg-gray-50 dark:bg-terminal-black px-1">↑</kbd>
-                      to navigate
+                    <span className="flex items-center gap-1.5">
+                      <kbd className="rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-primary-400/50">↑↓</kbd>
+                      NAVIGATE
                     </span>
                   </div>
                   <span className="flex items-center gap-1">

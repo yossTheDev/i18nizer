@@ -5,10 +5,13 @@ import { motion } from 'framer-motion'
 import { Terminal, Zap, Globe, Cpu, RefreshCw, Layout, ArrowRight } from 'lucide-react'
 import { FaGithub } from 'react-icons/fa'
 import { useState, useEffect } from 'react'
+import { Particles } from '@/components/Particles'
+import { VisualDiff } from '@/components/VisualDiff'
 
 export default function Home() {
   return (
-    <div className="space-y-32 pb-20">
+    <div className="space-y-32 pb-20 relative">
+      <Particles />
       {/* Hero Section */}
       <section className="relative text-center py-20 overflow-hidden">
         <motion.div
@@ -17,16 +20,16 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="relative z-10"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 mb-6 text-primary-400 text-xs font-bold uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-celeste/10 border border-celeste/20 mb-6 text-celeste text-xs font-bold uppercase tracking-widest">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-celeste opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-celeste"></span>
             </span>
             v0.7.2 is now stable
           </div>
           <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tighter text-white leading-tight">
             I18N WITHOUT <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-primary-500 to-blue-600">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-celeste via-white to-celeste">
               THE FRICTION.
             </span>
           </h1>
@@ -37,7 +40,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/getting-started"
-              className="group px-8 py-4 bg-primary-500 text-white rounded-2xl hover:bg-primary-600 transition-all font-bold flex items-center gap-2 shadow-[0_0_30px_rgba(14,165,233,0.4)] hover:shadow-[0_0_40px_rgba(14,165,233,0.6)]"
+              className="group px-8 py-4 bg-celeste text-black rounded-2xl hover:bg-white transition-all font-bold flex items-center gap-2 shadow-[0_0_30px_rgba(178,255,255,0.4)] hover:shadow-[0_0_40px_rgba(178,255,255,0.6)]"
             >
               Get Started
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -57,11 +60,11 @@ export default function Home() {
 
       {/* Transformation Demo */}
       <section className="relative">
-        <div className="absolute inset-0 bg-primary-500/5 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 bg-celeste/5 blur-[120px] rounded-full" />
         <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-4xl font-bold mb-6 text-white tracking-tight">
-              Watch the <span className="text-primary-400">Magic</span> Happen
+              Watch the <span className="text-celeste">Magic</span> Happen
             </h2>
             <p className="text-lg text-terminal-white/60 mb-8 leading-relaxed">
               i18nizer analyzes your code, identifies translatable strings, generates optimized keys,
@@ -81,8 +84,8 @@ export default function Home() {
                   transition={{ delay: i * 0.1 }}
                   className="flex items-center gap-3 text-terminal-white/80 font-medium"
                 >
-                  <div className="w-5 h-5 rounded-full bg-primary-500/20 flex items-center justify-center border border-primary-500/30">
-                    <Zap className="w-3 h-3 text-primary-400" />
+                  <div className="w-5 h-5 rounded-full bg-celeste/20 flex items-center justify-center border border-celeste/30">
+                    <Zap className="w-3 h-3 text-celeste" />
                   </div>
                   {item}
                 </motion.li>
@@ -90,7 +93,7 @@ export default function Home() {
             </ul>
           </div>
           <div className="relative">
-             <TransformationDemo />
+             <VisualDiff />
           </div>
         </div>
       </section>
@@ -103,7 +106,7 @@ export default function Home() {
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           <FeatureCard
-            icon={<Cpu className="w-6 h-6 text-primary-400" />}
+            icon={<Cpu className="w-6 h-6 text-celeste" />}
             title="AI Multimodal"
             description="Seamlessly switch between OpenAI, Gemini, or Hugging Face models for high-quality translations."
           />
@@ -137,8 +140,8 @@ export default function Home() {
 
       {/* Quick Start Terminal */}
       <section className="max-w-4xl mx-auto">
-        <div className="bg-[#0d1117] rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
-          <div className="flex items-center gap-2 px-6 py-4 bg-white/5 border-b border-white/5">
+        <div className="bg-black/80 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+          <div className="flex items-center gap-2 px-6 py-4 bg-white/5 border-b border-white/10">
             <div className="flex gap-1.5">
               <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/40" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/40" />
@@ -148,20 +151,20 @@ export default function Home() {
           </div>
           <div className="p-8 font-mono text-sm space-y-4">
             <div className="flex gap-4">
-              <span className="text-primary-500">$</span>
+              <span className="text-celeste">$</span>
               <span className="text-terminal-white">npm install -g i18nizer</span>
             </div>
             <div className="flex gap-4">
-              <span className="text-primary-500">$</span>
+              <span className="text-celeste">$</span>
               <span className="text-terminal-white">i18nizer start</span>
             </div>
             <div className="flex gap-4">
-              <span className="text-primary-500 text-opacity-50">?</span>
-              <span className="text-primary-400">Select source directory:</span>
+              <span className="text-celeste text-opacity-50">?</span>
+              <span className="text-celeste">Select source directory:</span>
               <span className="text-terminal-white">src</span>
             </div>
             <div className="flex gap-4">
-              <span className="text-primary-500">$</span>
+              <span className="text-celeste">$</span>
               <span className="text-terminal-white">i18nizer translate src/app/page.tsx</span>
             </div>
             <div className="pt-4 text-green-400 font-bold">
@@ -176,62 +179,11 @@ export default function Home() {
   )
 }
 
-function TransformationDemo() {
-  const [step, setStep] = useState(0)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setStep((s) => (s + 1) % 3)
-    }, 4000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const steps = [
-    {
-      label: "SOURCE JSX",
-      code: `export function Welcome() {\n  return (\n    <div>\n      <h1>Hello World</h1>\n      <p>Welcome to our app!</p>\n    </div>\n  )\n}`,
-      color: "text-blue-400"
-    },
-    {
-      label: "AI KEY GEN",
-      code: `{\n  "helloWorld": "Hello World",\n  "welcomeToApp": "Welcome to our app!"\n}`,
-      color: "text-yellow-400"
-    },
-    {
-      label: "TRANSFORMED",
-      code: `export function Welcome() {\n  const t = useTranslations('Welcome')\n  return (\n    <div>\n      <h1>{t('helloWorld')}</h1>\n      <p>{t('welcomeToApp')}</p>\n    </div>\n  )\n}`,
-      color: "text-green-400"
-    }
-  ]
-
-  return (
-    <div className="bg-[#0d1117]/80 backdrop-blur-xl rounded-3xl border border-white/5 p-8 shadow-[0_0_50px_rgba(0,0,0,0.3)] min-h-[320px]">
-      <div className="flex items-center justify-between mb-6">
-        <div className="text-[10px] font-bold text-primary-400 uppercase tracking-widest">{steps[step].label}</div>
-        <div className="flex gap-2">
-           {[0, 1, 2].map(i => (
-             <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${step === i ? 'bg-primary-500 w-4' : 'bg-white/10'}`} />
-           ))}
-        </div>
-      </div>
-      <motion.pre
-        key={step}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        className={`text-xs md:text-sm font-mono leading-relaxed ${steps[step].color}`}
-      >
-        <code>{steps[step].code}</code>
-      </motion.pre>
-    </div>
-  )
-}
-
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="group relative bg-white/[0.02] border border-white/5 p-8 rounded-3xl hover:bg-white/[0.05] hover:border-primary-500/20 transition-all duration-300">
+    <div className="group relative bg-white/[0.02] border border-white/5 p-8 rounded-3xl hover:bg-white/[0.05] hover:border-celeste/20 transition-all duration-300 backdrop-blur-sm">
       <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className="w-1.5 h-1.5 rounded-full bg-primary-500 shadow-[0_0_8px_rgba(14,165,233,0.8)]" />
+        <div className="w-1.5 h-1.5 rounded-full bg-celeste shadow-[0_0_8px_rgba(178,255,255,0.8)]" />
       </div>
       <div className="mb-6 p-3 bg-white/5 rounded-2xl w-fit group-hover:scale-110 transition-transform duration-300">
         {icon}

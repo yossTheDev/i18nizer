@@ -3,9 +3,22 @@ export const metadata = {
   description: 'Complete reference for all i18nizer CLI commands, flags, and options',
 }
 
-# CLI Commands
+# CLI Reference
 
-Complete reference for all i18nizer commands and their options.
+The i18nizer CLI is the primary interface for automating your internationalization workflow. This reference covers every command, flag, and environment variable available.
+
+## Global Flags
+
+These flags can be applied to any command:
+
+| Flag | Description |
+|------|-------------|
+| `--help`, `-h` | Display help for the current command |
+| `--version`, `-v` | Show i18nizer version |
+| `--verbose` | Enable detailed debug logging |
+| `--config <path>` | Path to a custom `i18nizer.config.yml` |
+
+---
 
 ## i18nizer start
 
@@ -49,54 +62,62 @@ i18nizer start --force
 
 ## i18nizer translate
 
-Extract and translate strings from components.
+The core command of i18nizer. It analyzes your JSX/TSX files, extracts translatable strings, generates JSON files using AI, and rewrites your components to use i18n hooks.
 
 ### Usage
 
 ```bash
-i18nizer translate [FILE] [OPTIONS]
+i18nizer translate [FILE_PATTERN] [OPTIONS]
 ```
 
 ### Options
 
-| Flag | Description | Example |
-|------|-------------|---------|
-| `--locales` | Comma-separated list of locale codes | `--locales en,es,fr` |
-| `--all` | Translate all components in the project | `--all` |
-| `--dry-run` | Preview changes without modifying files | `--dry-run` |
-| `--show-json` | Display generated JSON output | `--show-json` |
-| `--provider` | Specify AI provider | `--provider openai` |
+| Flag | Type | Description |
+|------|------|-------------|
+| `--locales` | `string` | Comma-separated list of locale codes (e.g., `en,es,fr`) |
+| `--all` | `boolean` | Scan and translate all components in the project |
+| `--dry-run` | `boolean` | Preview extraction and translation without modifying files |
+| `--show-json` | `boolean` | Print the generated translation JSON to the terminal |
+| `--provider` | `string` | AI provider to use: `openai`, `gemini`, or `huggingface` |
+| `--model` | `string` | Specify a specific model (e.g., `gpt-4o`, `gemini-1.5-pro`) |
+| `--exclude` | `string` | Glob pattern to exclude files (e.g., `"**/*.test.tsx"`) |
 
 ### Examples
 
 ```bash
-# Translate single file
-i18nizer translate src/components/Login.tsx --locales en,es,fr
+$ i18nizer translate src/components/Login.tsx --locales en,es
+🔍 Analyzing src/components/Login.tsx...
+📝 Found 3 translatable strings
+🌍 Translating to: en, es
+✓ messages/en/login.json
+✓ messages/es/login.json
+✅ Component rewritten successfully!
+```
 
-# Translate all files
-i18nizer translate --all --locales en,es,fr,de
+```bash
+$ i18nizer translate --all --locales en,es,fr
+🔍 Scanning project...
+📁 Found 12 components
+🌍 Translating to: en, es, fr
+✅ 12 files processed successfully
+```
 
-# Preview without changes
-i18nizer translate src/components/Login.tsx --dry-run
-
-# Show JSON output
-i18nizer translate src/components/Login.tsx --show-json
-
-# Use specific provider
-i18nizer translate src/components/Login.tsx --provider gemini
-
-# Translate directory
-i18nizer translate src/components --all --locales en,es
-
-# Complex example with multiple options
-i18nizer translate src/pages --all --locales en,es,fr,de,ja --provider openai --show-json
+```bash
+$ i18nizer translate src/components/Login.tsx --dry-run
+[DRY RUN] Would extract:
+  - "Welcome back" → welcomeBack
+  - "Sign in" → signIn
+[DRY RUN] No files will be modified.
 ```
 
 ---
 
 ## i18nizer extract (Legacy)
 
-Legacy command for extracting strings. The `translate` command is recommended instead.
+> [!WARNING]
+> This command is deprecated. Use `i18nizer translate` for an end-to-end workflow.
+
+Legacy command for extracting strings without full component rewriting.
 
 ### Usage
 

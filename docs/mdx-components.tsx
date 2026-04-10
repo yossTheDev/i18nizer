@@ -1,6 +1,7 @@
 import type { MDXComponents } from 'mdx/types'
 import type { ReactNode } from 'react'
 import { DocLayout } from '@/components/DocLayout'
+import { TerminalPre } from '@/components/TerminalPre'
 
 // Helper function to generate heading IDs
 function generateId(text: string): string {
@@ -34,6 +35,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   
   return {
     ...components,
+    pre: TerminalPre,
     wrapper: ({ children }: { children: ReactNode }) => (
       <DocLayout>
         <div className="prose prose-lg dark:prose-invert max-w-none">
@@ -45,34 +47,34 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h3: createHeading(3, usedIds),
     h4: createHeading(4, usedIds),
     table: ({ children }: { children: ReactNode }) => (
-      <div className="overflow-x-auto my-6">
-        <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+      <div className="overflow-x-auto my-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-sm shadow-xl">
+        <table className="min-w-full divide-y divide-white/10">
           {children}
         </table>
       </div>
     ),
     thead: ({ children }: { children: ReactNode }) => (
-      <thead className="bg-gray-50 dark:bg-gray-800">
+      <thead className="bg-celeste/5">
         {children}
       </thead>
     ),
     tbody: ({ children }: { children: ReactNode }) => (
-      <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+      <tbody className="divide-y divide-white/5">
         {children}
       </tbody>
     ),
     tr: ({ children }: { children: ReactNode }) => (
-      <tr>
+      <tr className="hover:bg-white/[0.02] transition-colors">
         {children}
       </tr>
     ),
     th: ({ children }: { children: ReactNode }) => (
-      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <th className="px-6 py-4 text-left text-[10px] font-bold text-celeste uppercase tracking-widest">
         {children}
       </th>
     ),
     td: ({ children }: { children: ReactNode }) => (
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-terminal-white/70">
         {children}
       </td>
     ),

@@ -4,9 +4,10 @@
 
 @layer base {
   :root {
-    --background: 235 21% 11%;
+    --background: 0 0% 0%;
     --foreground: 210 40% 98%;
-    --terminal-bg: 235 21% 11%;
+    --terminal-bg: 0 0% 0%;
+    --celeste: 180 100% 85%;
   }
 
   html {
@@ -14,18 +15,30 @@
   }
 
   body {
-    @apply bg-terminal-bg text-terminal-fg antialiased;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    @apply bg-black text-terminal-fg antialiased relative font-sans;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1;
   }
 }
 
 @layer components {
   .glass {
-    @apply bg-white/70 dark:bg-terminal-bg/70 backdrop-blur-md border border-white/20 dark:border-white/10;
+    @apply bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
   }
 
   .terminal-border {
-    @apply border border-gray-200 dark:border-terminal-gray/30;
+    @apply border border-white/10;
   }
 }
 
@@ -69,7 +82,7 @@
 }
 
 .prose code {
-  @apply font-mono text-sm bg-primary-500/10 px-1.5 py-0.5 rounded text-primary-400 before:content-none after:content-none border border-primary-500/20;
+  @apply font-mono text-sm bg-celeste/10 px-1.5 py-0.5 rounded text-celeste before:content-none after:content-none border border-celeste/20;
 }
 
 .prose table {
@@ -98,18 +111,19 @@
 
 .prose h1, .prose h2, .prose h3, .prose h4 {
   @apply tracking-tight font-bold text-white mb-4 mt-8 flex items-center gap-2;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 }
 
 .prose h1 { @apply text-4xl mb-8; }
 .prose h2 { @apply text-2xl border-b border-white/5 pb-2; }
-.prose h3 { @apply text-xl text-primary-400; }
+.prose h3 { @apply text-xl text-celeste; }
 
 .prose p {
   @apply text-terminal-white/80 leading-relaxed mb-6;
 }
 
 .prose strong {
-  @apply text-primary-300 font-semibold;
+  @apply text-celeste/80 font-semibold;
 }
 
 .prose ul, .prose ol {
@@ -121,5 +135,5 @@
 }
 
 .prose a {
-  @apply text-primary-400 no-underline border-b border-primary-400/30 hover:border-primary-400 transition-all;
+  @apply text-celeste no-underline border-b border-celeste/30 hover:border-celeste transition-all;
 }

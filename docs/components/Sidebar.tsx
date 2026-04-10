@@ -38,8 +38,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const sidebarContent = (
     <div className="py-6 px-4 flex flex-col h-full">
       <div className="flex items-center justify-between mb-8 px-3">
-        <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-terminal-white/40 flex items-center gap-2">
-          <div className="w-1 h-1 bg-primary-500 rounded-full animate-pulse" />
+        <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-celeste/40 flex items-center gap-2">
+          <div className="w-1 h-1 bg-celeste rounded-full animate-pulse shadow-[0_0_8px_rgba(178,255,255,0.8)]" />
           System.Nav
         </div>
         {onClose && (
@@ -59,17 +59,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               className={clsx(
                 'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 relative',
                 isActive
-                  ? 'text-primary-400 bg-primary-500/5 border border-primary-500/20 shadow-[0_0_15px_rgba(14,165,233,0.1)]'
+                  ? 'text-celeste bg-celeste/5 border border-celeste/20 shadow-[0_0_15px_rgba(178,255,255,0.1)]'
                   : 'text-terminal-white/60 hover:text-terminal-white hover:bg-white/5 border border-transparent'
               )}
             >
               <item.icon className={clsx(
                 'mr-3 h-4 w-4 transition-colors duration-300',
-                isActive ? 'text-primary-400' : 'text-terminal-white/30 group-hover:text-terminal-white/60'
+                isActive ? 'text-celeste' : 'text-terminal-white/30 group-hover:text-terminal-white/60'
               )} />
               <span className="flex-1 tracking-tight">{item.name}</span>
               {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary-500 rounded-full shadow-[0_0_8px_rgba(14,165,233,0.8)]" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-celeste rounded-full shadow-[0_0_8px_rgba(178,255,255,0.8)]" />
               )}
               {isActive && (
                 <ChevronRight className="h-3 w-3 opacity-50" />
@@ -80,11 +80,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       </nav>
 
       <div className="mt-auto pt-8">
-        <div className="rounded-2xl bg-gradient-to-br from-primary-600/20 to-primary-900/40 border border-primary-500/20 p-5 shadow-2xl overflow-hidden relative group">
-          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary-500/10 rounded-full blur-2xl transition-transform group-hover:scale-150" />
+        <div className="rounded-2xl bg-gradient-to-br from-celeste/10 to-celeste/20 border border-celeste/20 p-5 shadow-2xl overflow-hidden relative group">
+          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-celeste/10 rounded-full blur-2xl transition-transform group-hover:scale-150" />
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
-            <h3 className="text-[11px] font-bold text-primary-100 uppercase tracking-widest relative z-10">Broadcast</h3>
+            <div className="w-1.5 h-1.5 rounded-full bg-celeste animate-pulse shadow-[0_0_8px_rgba(178,255,255,0.8)]" />
+            <h3 className="text-[11px] font-bold text-white uppercase tracking-widest relative z-10">Broadcast</h3>
           </div>
           <p className="text-xs text-terminal-white/60 mb-4 leading-relaxed relative z-10">
             v0.7.2 stable release is now live with enhanced AI translation logic.
@@ -92,7 +92,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <Link
             href="/changelog"
             onClick={onClose}
-            className="inline-flex items-center w-full justify-center text-[10px] font-bold uppercase tracking-tighter text-white bg-primary-500/20 hover:bg-primary-500/40 border border-primary-500/30 py-2 rounded-xl transition-all duration-300 relative z-10"
+            className="inline-flex items-center w-full justify-center text-[10px] font-bold uppercase tracking-tighter text-black bg-celeste hover:bg-white border border-celeste/30 py-2 rounded-xl transition-all duration-300 relative z-10 shadow-[0_0_15px_rgba(178,255,255,0.3)]"
           >
             Read Patch Notes
           </Link>

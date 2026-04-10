@@ -3,84 +3,51 @@ export const metadata = {
   description: 'Get started with i18nizer - installation, setup, and your first translation',
 }
 
-# Getting Started
+# Quick Start
 
-This comprehensive guide will walk you through installing i18nizer, setting up your project, and running your first translation.
+Get up and running with i18nizer in minutes.
 
-## Requirements
+## 1. Installation
 
-Before you begin, make sure you have:
-
-- **Node.js 18+** - i18nizer requires Node.js version 18 or higher
-- **Existing i18n setup** - Currently works with i18next, next-intl, or react-i18next
-- **AI API key** - Optional but recommended for automatic translations (OpenAI, Google Gemini, or Hugging Face)
-
-## Installation
-
-### Global Installation (Recommended)
-
-Install i18nizer globally using npm:
+Install i18nizer globally to use it across all your projects.
 
 ```bash
+# npm
 npm install -g i18nizer
-```
 
-Or using yarn:
-
-```bash
+# yarn
 yarn global add i18nizer
 ```
 
-### Verify Installation
+## 2. API Key Setup
 
-Confirm that i18nizer is installed correctly:
+Configure your preferred AI provider to enable automated translations.
 
 ```bash
-i18nizer --version
+# OpenAI
+i18nizer keys --setOpenAI sk-...
+
+# Google Gemini
+i18nizer keys --setGemini ...
+
+# Hugging Face
+i18nizer keys --setHF ...
 ```
 
-You should see the version number displayed.
+## 3. Initialization
 
-## API Key Configuration
-
-To enable AI-powered translations, configure at least one AI provider. API keys are stored locally in `[HOME]/.i18nizer/api-keys.json` and are **never** committed to your repository.
-
-### OpenAI
-
-Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys):
+Run the interactive setup in your project root. i18nizer will auto-detect your framework and i18n library.
 
 ```bash
-i18nizer keys --setOpenAI YOUR_OPENAI_API_KEY
+i18nizer start
 ```
 
-**Recommended models:** `gpt-4`, `gpt-3.5-turbo`
+## 4. Run First Translation
 
-### Google Gemini
-
-Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey):
+Transform your first component with a single command.
 
 ```bash
-i18nizer keys --setGemini YOUR_GEMINI_API_KEY
-```
-
-**Recommended models:** `gemini-pro`, `gemini-1.5-pro`
-
-### Hugging Face
-
-Get your API key from [Hugging Face Settings](https://huggingface.co/settings/tokens):
-
-```bash
-i18nizer keys --setHF YOUR_HUGGING_FACE_API_KEY
-```
-
-**Recommended models:** DeepSeek, Llama, Mistral
-
-### Verifying API Keys
-
-Check which API keys are configured:
-
-```bash
-i18nizer keys
+i18nizer translate src/components/Welcome.tsx --locales en,es
 ```
 
 ## Initialize Your Project

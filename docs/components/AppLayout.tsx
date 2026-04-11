@@ -19,7 +19,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     } else if (window.innerWidth >= 1024) {
       setIsSidebarOpen(true)
     }
-  }, [isLandingPage, pathname])
+  }, [isLandingPage])
 
   return (
     <div className="relative z-10 min-h-screen flex flex-col">
@@ -29,8 +29,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         )}
         <main className={clsx(
-          "flex-1 w-full transition-all duration-500 ease-in-out",
-          !isLandingPage && isSidebarOpen ? "lg:pl-64" : "lg:pl-0"
+          "flex-1 w-full",
+          !isLandingPage && isSidebarOpen ? "lg:pl-72" : "lg:pl-0"
         )}>
           <div className={clsx(
             "px-4 sm:px-6 lg:px-8 py-8",

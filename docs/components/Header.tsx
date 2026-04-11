@@ -21,24 +21,24 @@ export function Header({ onMenuClick, showMenuButton = true }: HeaderProps) {
   }, [])
 
   return (
-    <header className="sticky top-0 z-40 w-full glass">
+    <header className="sticky top-0 z-40 w-full bg-white dark:bg-black border-b-2 border-black dark:border-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             {showMenuButton && (
               <button
                 onClick={onMenuClick}
-                className="p-2 lg:hidden text-terminal-white/70 hover:text-white transition-colors"
+                className="p-2 lg:hidden text-black dark:text-white hover:bg-celeste hover:text-black transition-colors border-2 border-transparent hover:border-black"
                 aria-label="Open menu"
               >
                 <Menu className="w-6 h-6" />
               </button>
             )}
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="bg-celeste p-1.5 rounded-lg transition-transform group-hover:scale-110 shadow-[0_0_15px_rgba(178,255,255,0.5)]">
+              <div className="bg-celeste p-1.5 border-2 border-black transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 group-hover:shadow-brutal">
                 <Terminal className="w-5 h-5 text-black" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white hidden sm:inline-block">
+              <span className="text-xl font-black tracking-tighter text-black dark:text-white hidden sm:inline-block uppercase">
                 i18nizer
               </span>
             </Link>
@@ -53,7 +53,7 @@ export function Header({ onMenuClick, showMenuButton = true }: HeaderProps) {
               href="https://github.com/yossTheDev/i18nizer"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-terminal-white/70 hover:text-white transition-colors"
+              className="p-2 text-black dark:text-white hover:bg-celeste hover:text-black transition-colors border-2 border-transparent hover:border-black"
               aria-label="GitHub"
             >
               <FaGithub className="w-6 h-6" />
@@ -62,7 +62,7 @@ export function Header({ onMenuClick, showMenuButton = true }: HeaderProps) {
             {mounted && (
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-lg text-terminal-white/70 hover:bg-white/10 transition-colors"
+                className="p-2 text-black dark:text-white hover:bg-celeste hover:text-black transition-colors border-2 border-transparent hover:border-black"
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? (

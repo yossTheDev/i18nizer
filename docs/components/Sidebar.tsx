@@ -38,12 +38,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const sidebarContent = (
     <div className="py-6 px-4 flex flex-col h-full">
       <div className="flex items-center justify-between mb-8 px-3">
-        <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-celeste/40 flex items-center gap-2">
-          <div className="w-1 h-1 bg-celeste rounded-full animate-pulse shadow-[0_0_8px_rgba(178,255,255,0.8)]" />
+        <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-black/40 dark:text-white/40 flex items-center gap-2">
+          <div className="w-2 h-2 bg-celeste border border-black" />
           System.Nav
         </div>
         {onClose && (
-          <button onClick={onClose} className="lg:hidden p-1 text-terminal-white/40 hover:text-white transition-colors">
+          <button onClick={onClose} className="lg:hidden p-1 text-black dark:text-white hover:bg-celeste hover:text-black transition-colors border border-transparent hover:border-black">
             <X className="w-4 h-4" />
           </button>
         )}
@@ -57,22 +57,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               href={item.href}
               onClick={onClose}
               className={clsx(
-                'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 relative',
+                'group flex items-center px-3 py-2 text-sm font-bold transition-all duration-200 relative uppercase tracking-tighter',
                 isActive
-                  ? 'text-celeste bg-celeste/5 border border-celeste/20 shadow-[0_0_15px_rgba(178,255,255,0.1)]'
-                  : 'text-terminal-white/60 hover:text-terminal-white hover:bg-white/5 border border-transparent'
+                  ? 'text-black bg-celeste border-2 border-black shadow-brutal translate-x-1 -translate-y-1'
+                  : 'text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-celeste/20 border-2 border-transparent'
               )}
             >
               <item.icon className={clsx(
-                'mr-3 h-4 w-4 transition-colors duration-300',
-                isActive ? 'text-celeste' : 'text-terminal-white/30 group-hover:text-terminal-white/60'
+                'mr-3 h-4 w-4 transition-colors duration-200',
+                isActive ? 'text-black' : 'text-black/30 dark:text-white/30 group-hover:text-black dark:group-hover:text-white'
               )} />
-              <span className="flex-1 tracking-tight">{item.name}</span>
+              <span className="flex-1">{item.name}</span>
               {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-celeste rounded-full shadow-[0_0_8px_rgba(178,255,255,0.8)]" />
-              )}
-              {isActive && (
-                <ChevronRight className="h-3 w-3 opacity-50" />
+                <ChevronRight className="h-3 w-3" />
               )}
             </Link>
           )
@@ -80,19 +77,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       </nav>
 
       <div className="mt-auto pt-8">
-        <div className="rounded-2xl bg-gradient-to-br from-celeste/10 to-celeste/20 border border-celeste/20 p-5 shadow-2xl overflow-hidden relative group">
-          <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-celeste/10 rounded-full blur-2xl transition-transform group-hover:scale-150" />
+        <div className="border-2 border-black dark:border-white bg-white dark:bg-black p-5 shadow-brutal dark:shadow-brutal-light relative group">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-celeste animate-pulse shadow-[0_0_8px_rgba(178,255,255,0.8)]" />
-            <h3 className="text-[11px] font-bold text-white uppercase tracking-widest relative z-10">Broadcast</h3>
+            <div className="w-2 h-2 bg-celeste border border-black" />
+            <h3 className="text-[11px] font-black text-black dark:text-white uppercase tracking-widest relative z-10">Broadcast</h3>
           </div>
-          <p className="text-xs text-terminal-white/60 mb-4 leading-relaxed relative z-10">
+          <p className="text-xs text-black/60 dark:text-white/60 mb-4 leading-relaxed relative z-10">
             v0.7.2 stable release is now live with enhanced AI translation logic.
           </p>
           <Link
             href="/changelog"
             onClick={onClose}
-            className="inline-flex items-center w-full justify-center text-[10px] font-bold uppercase tracking-tighter text-black bg-celeste hover:bg-white border border-celeste/30 py-2 rounded-xl transition-all duration-300 relative z-10 shadow-[0_0_15px_rgba(178,255,255,0.3)]"
+            className="inline-flex items-center w-full justify-center text-[10px] font-black uppercase tracking-tighter text-black bg-celeste hover:bg-white border-2 border-black py-2 transition-all duration-200 relative z-10"
           >
             Read Patch Notes
           </Link>
@@ -105,7 +101,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {/* Desktop Sidebar */}
       <aside className={clsx(
-        "fixed left-0 top-16 z-30 hidden h-[calc(100vh-4rem)] overflow-y-auto border-r border-white/5 bg-terminal-bg/60 backdrop-blur-2xl lg:block custom-scrollbar transition-all duration-500 ease-in-out",
+        "fixed left-0 top-16 z-30 hidden h-[calc(100vh-4rem)] overflow-y-auto border-r-2 border-black dark:border-white bg-white dark:bg-black lg:block custom-scrollbar transition-all duration-300 ease-in-out",
         isOpen ? "w-64" : "w-0 border-none opacity-0 pointer-events-none"
       )}>
         {sidebarContent}
@@ -114,14 +110,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile Sidebar Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 z-50 bg-black/60 lg:hidden transition-opacity duration-300"
           onClick={onClose}
         />
       )}
 
       {/* Mobile Sidebar */}
       <aside className={clsx(
-        'fixed inset-y-0 left-0 z-50 w-72 bg-terminal-bg border-r border-white/5 shadow-2xl transform transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) lg:hidden overflow-y-auto custom-scrollbar',
+        'fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-black border-r-2 border-black dark:border-white shadow-brutal transform transition-transform duration-300 ease-in-out lg:hidden overflow-y-auto custom-scrollbar',
         isOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
         {sidebarContent}

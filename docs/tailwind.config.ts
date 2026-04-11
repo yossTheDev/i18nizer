@@ -49,8 +49,8 @@ const config: Config = {
           900: '#0c4a6e',
         },
         paper: {
-          white: '#FFFFFF',
-          black: '#000000',
+          white: '#fafafa',
+          black: '#0a0a0a',
         }
       },
       borderWidth: {

@@ -17,17 +17,17 @@ export const VisualDiff = () => {
   const steps = [
     {
       title: 'Original Source',
-      code: `<h1>Hello World</h1>\n<p>Welcome to our application!</p>`,
+      code: `export function WelcomeCard() {\n  return (\n    <div className="p-6">\n      <h1>Welcome to the Platform</h1>\n      <p>Start your journey today.</p>\n      <button>Get Started</button>\n    </div>\n  );\n}`,
       type: 'input'
     },
     {
       title: 'AI Transformation',
-      code: `<h1>{t('helloWorld')}</h1>\n<p>{t('welcomeMessage')}</p>`,
+      code: `import { useTranslations } from 'next-intl';\n\nexport function WelcomeCard() {\n  const t = useTranslations('WelcomeCard');\n  return (\n    <div className="p-6">\n      <h1>{t('title')}</h1>\n      <p>{t('description')}</p>\n      <button>{t('cta')}</button>\n    </div>\n  );\n}`,
       type: 'process'
     },
     {
       title: 'Generated Locales',
-      code: `{\n  "helloWorld": "Hola Mundo",\n  "welcomeMessage": "¡Bienvenido a nuestra aplicación!"\n}`,
+      code: `// en.json\n{\n  "WelcomeCard": {\n    "title": "Welcome to the Platform",\n    "description": "Start your journey today.",\n    "cta": "Get Started"\n  }\n}`,
       type: 'output'
     }
   ]
@@ -54,14 +54,14 @@ export const VisualDiff = () => {
           ))}
         </div>
       </div>
-      <div className="p-8 h-48 flex items-center justify-center bg-black">
+      <div className="p-8 h-64 flex items-center justify-start bg-paper-black overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.pre
             key={step}
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -10 }}
-            className="text-sm font-mono text-celeste leading-relaxed whitespace-pre font-bold"
+            className="text-[11px] font-mono text-celeste leading-relaxed whitespace-pre font-bold"
           >
             <code>{steps[step].code}</code>
           </motion.pre>

@@ -4,18 +4,18 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --terminal-bg: 0 0% 100%;
+    --background: 0 0% 98%; /* #fafafa */
+    --foreground: 0 0% 4%; /* #0a0a0a */
+    --terminal-bg: 0 0% 98%;
     --celeste: 180 100% 85%;
-    --border: 0 0% 0%;
+    --border: 0 0% 4%;
   }
 
   .dark {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    --terminal-bg: 0 0% 0%;
-    --border: 0 0% 100%;
+    --background: 0 0% 4%; /* #0a0a0a */
+    --foreground: 0 0% 98%; /* #fafafa */
+    --terminal-bg: 0 0% 4%;
+    --border: 0 0% 98%;
   }
 
   html {
@@ -23,17 +23,17 @@
   }
 
   body {
-    @apply bg-white dark:bg-black text-black dark:text-white antialiased relative font-sans transition-colors duration-300;
+    @apply bg-paper-white dark:bg-paper-black text-paper-black dark:text-paper-white antialiased relative font-sans transition-colors duration-300;
   }
 }
 
 @layer components {
   .brutal-border {
-    @apply border-2 border-black dark:border-white;
+    @apply border-2 border-paper-black dark:border-paper-white;
   }
 
   .brutal-card {
-    @apply brutal-border shadow-brutal dark:shadow-brutal-light bg-white dark:bg-black p-4;
+    @apply brutal-border shadow-brutal dark:shadow-brutal-light bg-paper-white dark:bg-paper-black p-4;
   }
 
   .celeste-accent {

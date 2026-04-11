@@ -18,7 +18,7 @@ const config: Config = {
           blue: '#7aa2f7',
           magenta: '#bb9af7',
           cyan: '#7dcfff',
-          white: '#a9b1d6',
+          white: '#FFFFFF',
           gray: '#414868',
           bg: '#000000',
           fg: '#c0caf5',
@@ -48,10 +48,19 @@ const config: Config = {
           800: '#075985',
           900: '#0c4a6e',
         },
+        paper: {
+          white: '#fafafa',
+          black: '#0a0a0a',
+        }
       },
-      backdropBlur: {
-        xs: '2px',
+      borderWidth: {
+        '3': '3px',
       },
+      boxShadow: {
+        'brutal': '4px 4px 0px 0px rgba(0,0,0,1)',
+        'brutal-light': '4px 4px 0px 0px rgba(255,255,255,1)',
+        'brutal-celeste': '4px 4px 0px 0px #B2FFFF',
+      }
     },
   },
   plugins: [

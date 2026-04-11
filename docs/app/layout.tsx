@@ -68,14 +68,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans antialiased bg-terminal-bg text-terminal-fg min-h-screen relative overflow-x-hidden">
-        {/* Decorative background elements */}
-        <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-500/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary-900/10 rounded-full blur-[120px]" />
-          <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-primary-400/5 rounded-full blur-[100px]" />
-        </div>
-
+      <body className="font-sans antialiased bg-white dark:bg-black text-black dark:text-white min-h-screen relative overflow-x-hidden">
         <Providers>
           <AppLayout>{children}</AppLayout>
         </Providers>

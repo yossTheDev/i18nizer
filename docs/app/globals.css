@@ -4,10 +4,18 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 210 40% 98%;
-    --terminal-bg: 0 0% 0%;
+    --background: 0 0% 98%; /* #fafafa */
+    --foreground: 0 0% 4%; /* #0a0a0a */
+    --terminal-bg: 0 0% 98%;
     --celeste: 180 100% 85%;
+    --border: 0 0% 4%;
+  }
+
+  .dark {
+    --background: 0 0% 4%; /* #0a0a0a */
+    --foreground: 0 0% 98%; /* #fafafa */
+    --terminal-bg: 0 0% 4%;
+    --border: 0 0% 98%;
   }
 
   html {
@@ -15,36 +23,27 @@
   }
 
   body {
-    @apply bg-black text-terminal-fg antialiased relative font-sans;
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.03;
-    pointer-events: none;
-    z-index: 1;
+    @apply bg-paper-white dark:bg-paper-black text-paper-black dark:text-paper-white antialiased relative font-sans transition-colors duration-300;
   }
 }
 
 @layer components {
-  .glass {
-    @apply bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+  .brutal-border {
+    @apply border-2 border-paper-black dark:border-paper-white;
   }
 
-  .terminal-border {
-    @apply border border-white/10;
+  .brutal-card {
+    @apply brutal-border shadow-brutal dark:shadow-brutal-light bg-paper-white dark:bg-paper-black p-4;
+  }
+
+  .celeste-accent {
+    @apply bg-celeste text-black;
   }
 }
 
-/* Syntax highlighting theme (Tokyo Night inspired) */
+/* Syntax highlighting theme */
 .hljs {
-  @apply rounded-lg p-4 overflow-x-auto bg-terminal-black text-terminal-fg border border-terminal-gray/20;
+  @apply rounded-none p-4 overflow-x-auto bg-black text-white border-2 border-white;
 }
 
 .hljs-keyword, .hljs-selector-tag { @apply text-terminal-magenta; }
@@ -56,20 +55,16 @@
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  @apply bg-white dark:bg-black border-l border-black dark:border-white;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-terminal-gray/50 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-terminal-gray;
+  @apply bg-black dark:bg-white;
 }
 
 /* Typography Overrides */
@@ -82,23 +77,23 @@
 }
 
 .prose code {
-  @apply font-mono text-sm bg-celeste/10 px-1.5 py-0.5 rounded text-celeste before:content-none after:content-none border border-celeste/20;
+  @apply font-mono text-sm bg-celeste text-black px-1.5 py-0.5 rounded-none before:content-none after:content-none border border-black;
 }
 
 .prose table {
-  @apply border-collapse w-full my-8 text-sm overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-sm;
+  @apply border-collapse w-full my-8 text-sm overflow-hidden border-2 border-black dark:border-white bg-white dark:bg-black;
 }
 
 .prose thead {
-  @apply bg-primary-500/10 border-b border-white/10;
+  @apply bg-black text-white dark:bg-white dark:text-black border-b-2 border-black dark:border-white;
 }
 
 .prose th {
-  @apply px-4 py-3 text-left font-bold text-primary-400 uppercase tracking-widest text-[10px];
+  @apply px-4 py-3 text-left font-bold uppercase tracking-widest text-[10px];
 }
 
 .prose td {
-  @apply px-4 py-3 border-b border-white/5 text-terminal-white/70;
+  @apply px-4 py-3 border-b border-black dark:border-white text-black dark:text-white;
 }
 
 .prose tr:last-child td {
@@ -106,34 +101,40 @@
 }
 
 .prose tr:hover td {
-  @apply bg-white/[0.02] text-terminal-white transition-colors;
+  @apply bg-celeste text-black transition-colors;
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4 {
-  @apply tracking-tight font-bold text-white mb-4 mt-8 flex items-center gap-2;
+  @apply tracking-tight font-bold text-black dark:text-white mb-4 mt-8 flex items-center gap-2;
   font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 }
 
-.prose h1 { @apply text-4xl mb-8; }
-.prose h2 { @apply text-2xl border-b border-white/5 pb-2; }
-.prose h3 { @apply text-xl text-celeste; }
+.prose h1 { @apply text-4xl mb-8 uppercase; }
+.prose h2 { @apply text-2xl border-b-2 border-black dark:border-white pb-2 uppercase; }
+.prose h3 { @apply text-xl bg-celeste text-black px-2 inline-block uppercase; }
 
 .prose p {
-  @apply text-terminal-white/80 leading-relaxed mb-6;
+  @apply text-black dark:text-white/90 leading-relaxed mb-6;
 }
 
 .prose strong {
-  @apply text-celeste/80 font-semibold;
+  @apply text-black dark:text-white font-black underline decoration-celeste decoration-4 underline-offset-2;
 }
 
 .prose ul, .prose ol {
-  @apply mb-6 ml-4;
+  @apply mb-6 ml-4 list-square;
 }
 
 .prose li {
-  @apply text-terminal-white/80 mb-2;
+  @apply text-black dark:text-white/90 mb-2;
 }
 
 .prose a {
-  @apply text-celeste no-underline border-b border-celeste/30 hover:border-celeste transition-all;
+  @apply text-black dark:text-white no-underline border-b-2 border-celeste hover:bg-celeste hover:text-black transition-all font-bold;
+}
+
+@layer utilities {
+  .list-square {
+    list-style-type: square;
+  }
 }

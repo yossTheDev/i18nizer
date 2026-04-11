@@ -38,7 +38,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     pre: TerminalPre,
     wrapper: ({ children }: { children: ReactNode }) => (
       <DocLayout>
-        <div className="prose prose-lg dark:prose-invert max-w-none">
+        <div className="prose prose-lg dark:prose-invert max-w-none pb-20">
           {children}
         </div>
       </DocLayout>
@@ -47,34 +47,34 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h3: createHeading(3, usedIds),
     h4: createHeading(4, usedIds),
     table: ({ children }: { children: ReactNode }) => (
-      <div className="overflow-x-auto my-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-sm shadow-xl">
-        <table className="min-w-full divide-y divide-white/10">
+      <div className="overflow-x-auto my-8 border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal-light bg-white dark:bg-black">
+        <table className="min-w-full divide-y-2 divide-black dark:divide-white">
           {children}
         </table>
       </div>
     ),
     thead: ({ children }: { children: ReactNode }) => (
-      <thead className="bg-celeste/5">
+      <thead className="bg-celeste">
         {children}
       </thead>
     ),
     tbody: ({ children }: { children: ReactNode }) => (
-      <tbody className="divide-y divide-white/5">
+      <tbody className="divide-y-2 divide-black dark:divide-white">
         {children}
       </tbody>
     ),
     tr: ({ children }: { children: ReactNode }) => (
-      <tr className="hover:bg-white/[0.02] transition-colors">
+      <tr className="hover:bg-celeste/20 transition-colors">
         {children}
       </tr>
     ),
     th: ({ children }: { children: ReactNode }) => (
-      <th className="px-6 py-4 text-left text-[10px] font-bold text-celeste uppercase tracking-widest">
+      <th className="px-6 py-4 text-left text-[10px] font-black text-black uppercase tracking-widest border-r-2 border-black dark:border-white last:border-r-0">
         {children}
       </th>
     ),
     td: ({ children }: { children: ReactNode }) => (
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-terminal-white/70">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-black dark:text-white border-r-2 border-black dark:border-white last:border-r-0 font-medium">
         {children}
       </td>
     ),

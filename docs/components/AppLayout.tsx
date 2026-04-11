@@ -10,16 +10,16 @@ import { usePathname } from 'next/navigation'
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isLandingPage = pathname === '/'
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  // On mobile, we might want it closed by default, but on desktop it should be open for docs
+  // Manage sidebar state based on route and device
   useEffect(() => {
     if (isLandingPage) {
       setIsSidebarOpen(false)
-    } else {
+    } else if (window.innerWidth >= 1024) {
       setIsSidebarOpen(true)
     }
-  }, [isLandingPage])
+  }, [isLandingPage, pathname])
 
   return (
     <div className="relative z-10 min-h-screen flex flex-col">

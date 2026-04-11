@@ -41,7 +41,7 @@ function ThemeSelector() {
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 text-xs font-black uppercase tracking-widest border-2 border-black dark:border-white hover:bg-celeste hover:text-black transition-all"
+        className="flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-widest border-2 border-black dark:border-white hover:bg-celeste hover:text-black transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal dark:hover:shadow-brutal-light"
       >
         <currentTheme.icon className="w-4 h-4" />
         <span className="hidden md:inline">{currentTheme.name}</span>
@@ -51,10 +51,10 @@ function ThemeSelector() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 5 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 5 }}
-            className="absolute right-0 mt-2 w-32 border-2 border-black dark:border-white bg-white dark:bg-black shadow-brutal dark:shadow-brutal-light z-50 overflow-hidden"
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute right-0 mt-3 w-40 border-[3px] border-black dark:border-white bg-white dark:bg-black shadow-brutal dark:shadow-brutal-light z-50 overflow-hidden"
           >
             {themes.map((t) => (
               <button
@@ -89,24 +89,24 @@ export function Header({ onMenuClick, showMenuButton = true }: HeaderProps) {
   }, [])
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white dark:bg-black border-b-2 border-black dark:border-white">
+    <header className="sticky top-0 z-40 w-full bg-white dark:bg-black border-b-[3px] border-black dark:border-white shadow-sm">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+        <div className="flex h-20 items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
             {showMenuButton && (
               <button
                 onClick={onMenuClick}
-                className="p-2 lg:hidden text-black dark:text-white hover:bg-celeste hover:text-black transition-colors border-2 border-transparent hover:border-black"
+                className="p-2 lg:hidden text-black dark:text-white hover:bg-celeste hover:text-black transition-all border-2 border-black shadow-brutal active:shadow-none active:translate-x-1 active:translate-y-1"
                 aria-label="Open menu"
               >
                 <Menu className="w-6 h-6" />
               </button>
             )}
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="bg-celeste p-1.5 border-2 border-black transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1 group-hover:shadow-brutal">
-                <Terminal className="w-5 h-5 text-black" />
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="bg-celeste p-2 border-2 border-black transition-all group-hover:-translate-y-1 group-hover:-translate-x-1 group-hover:shadow-brutal">
+                <Terminal className="w-6 h-6 text-black" />
               </div>
-              <span className="text-xl font-black tracking-tighter text-black dark:text-white hidden sm:inline-block uppercase">
+              <span className="text-2xl font-black tracking-tighter text-black dark:text-white hidden sm:inline-block uppercase leading-none">
                 i18nizer
               </span>
             </Link>
@@ -116,12 +116,12 @@ export function Header({ onMenuClick, showMenuButton = true }: HeaderProps) {
             <CommandPalette />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <a
               href="https://github.com/yossTheDev/i18nizer"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-black dark:text-white hover:bg-celeste hover:text-black transition-colors border-2 border-transparent hover:border-black"
+              className="p-2.5 text-black dark:text-white hover:bg-celeste hover:text-black transition-all border-2 border-black shadow-brutal dark:shadow-brutal-light hover:shadow-none hover:translate-x-1 hover:translate-y-1"
               aria-label="GitHub"
             >
               <FaGithub className="w-6 h-6" />

@@ -29,15 +29,15 @@
 
 @layer components {
   .brutal-border {
-    @apply border-2 border-paper-black dark:border-paper-white;
+    @apply border-[3px] border-black dark:border-white;
   }
 
   .brutal-card {
-    @apply brutal-border shadow-brutal dark:shadow-brutal-light bg-paper-white dark:bg-paper-black p-4;
+    @apply brutal-border shadow-brutal dark:shadow-brutal-light bg-white dark:bg-black p-6;
   }
 
   .celeste-accent {
-    @apply bg-celeste text-black;
+    @apply bg-celeste text-black border-2 border-black;
   }
 }
 
@@ -105,13 +105,13 @@
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4 {
-  @apply tracking-tight font-bold text-black dark:text-white mb-4 mt-8 flex items-center gap-2;
+  @apply tracking-tighter font-black text-black dark:text-white mb-6 mt-12 flex items-center gap-2;
   font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 }
 
-.prose h1 { @apply text-4xl mb-8 uppercase; }
-.prose h2 { @apply text-2xl border-b-2 border-black dark:border-white pb-2 uppercase; }
-.prose h3 { @apply text-xl bg-celeste text-black px-2 inline-block uppercase; }
+.prose h1 { @apply text-5xl md:text-6xl mb-10 uppercase leading-none; }
+.prose h2 { @apply text-3xl border-b-[3px] border-black dark:border-white pb-3 uppercase leading-tight; }
+.prose h3 { @apply text-xl bg-celeste text-black px-3 py-1 inline-block uppercase border-2 border-black; }
 
 .prose p {
   @apply text-black dark:text-white/90 leading-relaxed mb-6;

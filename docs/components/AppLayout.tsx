@@ -29,7 +29,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         )}
         <main className={clsx(
-          "flex-1 w-full transition-all duration-500 ease-in-out",
+          "flex-1 w-full",
           !isLandingPage && isSidebarOpen ? "lg:pl-72" : "lg:pl-0"
         )}>
           <div className={clsx(

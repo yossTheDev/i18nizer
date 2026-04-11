@@ -77,7 +77,7 @@
 }
 
 .prose code {
-  @apply font-mono text-sm bg-celeste text-black px-1.5 py-0.5 rounded-none before:content-none after:content-none border border-black;
+  @apply font-mono text-sm bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white px-1.5 py-0.5 rounded-none before:content-none after:content-none border border-black dark:border-white;
 }
 
 .prose table {

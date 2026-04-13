@@ -17,6 +17,7 @@ import {
   loadConfig,
 } from "../core/config/config-manager.js";
 import { Deduplicator } from "../core/deduplication/deduplicator.js";
+import { resolveFlatMessageKeyCollisions } from "../core/i18n/flat-message-keys.js";
 import { formatMessageKey } from "../core/i18n/output-format.js";
 import { writeLocaleFiles } from "../core/i18n/write-files.js";
 import { I18nizerConfig } from "../types/config.js";
@@ -45,6 +46,11 @@ export default class Extract extends Command {
       allowNo: true,
       default: false,
       description: "Use AI to generate human-readable keys (default: false)",
+    }),
+    "dry-run": Flags.boolean({
+      char: "d",
+      default: false,
+      description: "Preview extracted messages without writing files",
     }),
   };
 
@@ -83,7 +89,14 @@ export default class Extract extends Command {
       provider = p as Provider;
     }
 
-    this.log(chalk.cyan("🤖 Provider:"), provider);
+    this.log(
+      chalk.cyan("🤖 Provider:"),
+      flags["use-ai-keys"] ? provider : "deterministic"
+    );
+
+    if (flags["dry-run"]) {
+      this.log(chalk.yellow("\n🔍 DRY RUN MODE - No files will be modified\n"));
+    }
 
     // Parse file
     const sourceFile = parseFile(args.file);
@@ -150,14 +163,25 @@ export default class Extract extends Command {
           placeholders: t.placeholders,
           pluralForms: t.pluralForms,
           pluralVariable: t.pluralVariable,
+          sequenceNodes: t.sequenceNodes,
           tempKey: t.tempKey,
           text: t.text,
         };
       });
+      const messagesDir = flags["dry-run"] ? null : getMessagesDir(cwd, config);
+      const collisionSafeTexts =
+        config.messages.format === "inlang-message-format" && messagesDir
+          ? resolveFlatMessageKeyCollisions(
+              mappedTexts,
+              componentName,
+              messagesDir,
+              config.messages.defaultLocale
+            )
+          : mappedTexts;
 
       const i18nJson: Record<string, Record<string, string>> = {};
 
-      for (const mapped of mappedTexts) {
+      for (const mapped of collisionSafeTexts) {
         i18nJson[mapped.key] = {};
 
         if (mapped.isPlural && mapped.pluralForms) {
@@ -172,15 +196,18 @@ export default class Extract extends Command {
         }
       }
 
-      const messagesDir = getMessagesDir(cwd, config);
-      writeLocaleFiles(
-        componentName,
-        { [componentName]: i18nJson },
-        outputLocales,
-        messagesDir,
-        { format: config.messages.format }
-      );
-      this.log(chalk.green("🌍 JSON files generated without AI translations"));
+      if (!flags["dry-run"]) {
+        writeLocaleFiles(
+          componentName,
+          { [componentName]: i18nJson },
+          outputLocales,
+          messagesDir!,
+          { format: config.messages.format }
+        );
+        this.log(chalk.green("🌍 JSON files generated without AI translations"));
+      } else {
+        this.log(chalk.green("🌍 Extraction preview generated without writing locale files"));
+      }
     } catch (error: unknown) {
       if (keySpinner) {
         keySpinner.fail("❌ Failed to generate extraction output");

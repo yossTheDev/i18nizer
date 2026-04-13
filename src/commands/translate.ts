@@ -22,6 +22,7 @@ import {
 } from "../core/config/config-manager.js";
 import { Deduplicator } from "../core/deduplication/deduplicator.js";
 import { generateAggregator } from "../core/i18n/generate-aggregator.js";
+import { resolveFlatMessageKeyCollisions } from "../core/i18n/flat-message-keys.js";
 import { formatMessageKey } from "../core/i18n/output-format.js";
 import { parseAiJson } from "../core/i18n/parse-ai-json.js";
 import { saveSourceFile } from "../core/i18n/sace-source-file.js";
@@ -138,7 +139,10 @@ export default class Translate extends Command {
       chalk.bold(filesToProcess.length)
     );
     this.log(chalk.cyan("🌐 Locales:"), locales.join(", "));
-    this.log(chalk.cyan("🤖 Provider:"), provider);
+    this.log(
+      chalk.cyan("🤖 Provider:"),
+      flags["dry-run"] ? "deterministic" : provider
+    );
 
     if (flags["dry-run"]) {
       this.log(chalk.yellow("\n🔍 DRY RUN MODE - No files will be modified\n"));
@@ -210,15 +214,29 @@ export default class Translate extends Command {
               pluralForms: t.pluralForms,
               pluralVariable: t.pluralVariable,
               richTextElements: t.richTextElements,
+              sequenceNodes: t.sequenceNodes,
               tempKey: t.tempKey,
               text: t.text,
             };
           });
+          const messagesDir = flags["dry-run"] ? null : getMessagesDir(cwd, config);
+          const collisionLocale = locales.includes(config.messages.defaultLocale)
+            ? config.messages.defaultLocale
+            : locales[0];
+          const collisionSafeTexts =
+            config.messages.format === "inlang-message-format" && messagesDir
+              ? resolveFlatMessageKeyCollisions(
+                  mappedTexts,
+                  componentName,
+                  messagesDir,
+                  collisionLocale
+                )
+              : mappedTexts;
 
           // Build translations JSON
           const i18nJson: Record<string, Record<string, string>> = {};
 
-          for (const mapped of mappedTexts) {
+          for (const mapped of collisionSafeTexts) {
             i18nJson[mapped.key] = {};
 
             if (mapped.isCached) {
@@ -244,7 +262,7 @@ export default class Translate extends Command {
 
           const textsNeedingTranslation = flags["dry-run"]
             ? []
-            : mappedTexts.filter((t) => !t.isCached && !t.isPlural);
+            : collisionSafeTexts.filter((t) => !t.isCached && !t.isPlural);
 
           if (textsNeedingTranslation.length > 0) {
             spinner.text = `${componentName}: Generating translations with ${provider}...`;
@@ -294,12 +312,11 @@ export default class Translate extends Command {
           }
 
           if (!flags["dry-run"]) {
-            const messagesDir = getMessagesDir(cwd, config);
             writeLocaleFiles(
               componentName,
               { [componentName]: i18nJson },
               locales,
-              messagesDir,
+              messagesDir!,
               { format: config.messages.format }
             );
 
@@ -311,7 +328,8 @@ export default class Translate extends Command {
             }
             
             replaceTempKeysWithT(
-              mappedTexts.map((m) => ({
+              collisionSafeTexts.map((m) => ({
+                sequenceNodes: m.sequenceNodes,
                 isPlural: m.isPlural,
                 isRichText: m.isRichText,
                 key: m.key,

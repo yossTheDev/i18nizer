@@ -5,6 +5,7 @@ interface MappedText {
     key: string;
     node: Node;
     placeholders?: string[];
+    sequenceNodes?: Node[];
     tempKey: string;
     isPlural?: boolean;
     isRichText?: boolean;
@@ -70,7 +71,7 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
     const allowedMemberFunctions = new Set(options.allowedMemberFunctions ?? [...defaultAllowedMemberFunctions]);
     const isParaglide = options.i18nLibrary === "paraglide-js";
     
-    for (const { key, node, placeholders = [], isPlural = false, isRichText = false, richTextElements = [] } of mapped) {
+    for (const { key, node, placeholders = [], sequenceNodes = [], isPlural = false, isRichText = false, richTextElements = [] } of mapped) {
         // For rich text patterns, generate t.rich() call
         if (isRichText && Node.isJsxElement(node)) {
             // Build formatter functions for each element
@@ -95,6 +96,15 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
         const tCall = isParaglide
             ? `${buildParaglideAccessor(key)}(${placeholdersText})`
             : `t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`;
+
+        if (sequenceNodes.length > 0) {
+            const [firstNode, ...restNodes] = sequenceNodes;
+            firstNode.replaceWithText(`{${tCall}}`);
+            for (const sequenceNode of restNodes) {
+                sequenceNode.replaceWithText("");
+            }
+            continue;
+        }
 
         // For plural patterns (ternary expressions), replace the entire ternary
         if (isPlural && Node.isConditionalExpression(node)) {
@@ -146,6 +156,9 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
                     node.replaceWithText(tCall);
                 }
             }
+            else if (Node.isVariableDeclaration(parent) || Node.isArrayLiteralExpression(parent)) {
+                node.replaceWithText(tCall);
+            }
         }
         // Replace template literals
         else if (Node.isNoSubstitutionTemplateLiteral(node) || Node.isTemplateExpression(node)) {
@@ -169,6 +182,9 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
                 if (fnName && (allowedFunctions.has(fnName) || allowedMemberFunctions.has(fnName))) {
                     node.replaceWithText(tCall);
                 }
+            }
+            else if (Node.isVariableDeclaration(parent) || Node.isArrayLiteralExpression(parent)) {
+                node.replaceWithText(tCall);
             }
         }
     }

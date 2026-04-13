@@ -18,6 +18,7 @@ export interface ReplaceOptions {
     allowedFunctions?: string[];
     allowedMemberFunctions?: string[];
     allowedProps?: string[];
+    i18nLibrary?: string;
 }
 
 // Default allowed JSX props to replace text
@@ -55,10 +56,19 @@ function getFullCallName(node: Node): null | string {
     return null;
 }
 
+function buildParaglideAccessor(key: string): string {
+    if (/^[$A-Z_a-z][$\w]*$/.test(key)) {
+        return `m.${key}`;
+    }
+
+    return `m[${JSON.stringify(key)}]`;
+}
+
 export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptions = {}) {
     const allowedProps = new Set(options.allowedProps ?? [...defaultAllowedProps]);
     const allowedFunctions = new Set(options.allowedFunctions ?? [...defaultAllowedFunctions]);
     const allowedMemberFunctions = new Set(options.allowedMemberFunctions ?? [...defaultAllowedMemberFunctions]);
+    const isParaglide = options.i18nLibrary === "paraglide-js";
     
     for (const { key, node, placeholders = [], isPlural = false, isRichText = false, richTextElements = [] } of mapped) {
         // For rich text patterns, generate t.rich() call
@@ -68,7 +78,9 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
                 return `${elem.placeholder}: (chunks) => <${elem.tag}>{chunks}</${elem.tag}>`;
             }).join(', ');
             
-            const richCall = `t.rich("${key}", { ${formatters} })`;
+            const richCall = isParaglide
+                ? `${buildParaglideAccessor(key)}()`
+                : `t.rich("${key}", { ${formatters} })`;
             
             // Replace the entire JSX element with {t.rich(...)}
             node.replaceWithText(`{${richCall}}`);
@@ -80,7 +92,9 @@ export function replaceTempKeysWithT(mapped: MappedText[], options: ReplaceOptio
             ? `{ ${placeholders.map(p => `${p}: ${p}`).join(", ")} }`
             : "";
 
-        const tCall = `t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`;
+        const tCall = isParaglide
+            ? `${buildParaglideAccessor(key)}(${placeholdersText})`
+            : `t("${key}"${placeholdersText ? `, ${placeholdersText}` : ""})`;
 
         // For plural patterns (ternary expressions), replace the entire ternary
         if (isPlural && Node.isConditionalExpression(node)) {
